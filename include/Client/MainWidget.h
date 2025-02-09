@@ -2,8 +2,9 @@
 #ifndef MAINWIDGET_H
 #define MAINWIDGET_H
 
-#include <Client/RpcClient.h>
+#include "MessageWidget.h"
 #include <Client/Login.h>
+#include <Client/RpcClient.h>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -12,12 +13,12 @@
 #include <QPropertyAnimation>
 #include <QPushButton>
 #include <QScrollBar>
+#include <QTextBrowser>
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <qtmetamacros.h>
-#include <QTextBrowser>
-#include "MessageWidget.h"
+#include<QScrollArea>
 class MainWidget;
 
 class MainWidget : public QWidget {
@@ -27,6 +28,7 @@ public:
     ~MainWidget();
 public slots:
     void onLoginSuccess();
+
 
 private:
     void setupUI();
@@ -39,13 +41,15 @@ private:
     void addTimeDivider(const QString &timeText);
     void onSessionItemClicked(QListWidgetItem *item);
     void updateChatArea(const QString &sessionName);
+    void resizeEvent(QResizeEvent *event);
     // 组件
     QListWidget *sessionList;
-    QTextBrowser  *chatArea;
+    QScrollArea *chatArea;
     QLineEdit *messageInput;
     QPushButton *sendButton;
     QWidget *inputPanel;// 声明 inputPanel 为成员变量
     Client *m_client;   // 添加客户端成员变量
+    QVBoxLayout *chatAreaLayout; // 声明 chatAreaLayout 为成员变量
 };
 
 

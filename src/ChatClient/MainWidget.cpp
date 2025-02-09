@@ -20,6 +20,7 @@ MainWidget::MainWidget(QWidget *parent)
     setMinimumSize(900, 600);
     setupUI();// 确保在 setupStyle 之前调用 setupUI
     setupStyle();
+    //设置为最大化
 
     // 添加测试数据
     addSessionItem("战犯101小组", "曹宇轩：打联赛", "22:30");
@@ -85,8 +86,17 @@ void MainWidget::setupUI() {
     rightLayout->setSpacing(0);
 
     // 聊天区域
-    chatArea = new QTextBrowser(rightPanel);
-    chatArea->setReadOnly(true);
+    chatArea = new QScrollArea(rightPanel);
+    chatArea->setWidgetResizable(true);// 自动调整内容大小
+    chatArea->setFrameShape(QFrame::NoFrame);
+
+    QWidget *chatContent = new QWidget;// 创建一个容器用于存放聊天内容
+    QVBoxLayout *chatLayout = new QVBoxLayout(chatContent);
+    chatLayout->setContentsMargins(0, 0, 0, 0);
+    chatLayout->setSpacing(10);
+    chatLayout->addStretch();// 添加一个拉伸项，确保内容从顶部开始排列
+
+    chatArea->setWidget(chatContent);   // 将容器设置为 QScrollArea 的内容
 
     // 输入区域
     inputPanel = new QWidget(rightPanel);
@@ -173,14 +183,30 @@ void MainWidget::onSessionItemClicked(QListWidgetItem *item) {
 }
 
 void MainWidget::updateChatArea(const QString &sessionName) {
-    chatArea->clear();// 清空当前聊天区域
+    // 获取聊天区域的布局
+    QVBoxLayout *chatLayout = qobject_cast<QVBoxLayout *>(chatArea->layout());
+    if (chatLayout) {
+        // 遍历布局中的所有小部件并删除它们
+        QLayoutItem *item;
+        while ((item = chatLayout->takeAt(0)) != nullptr) {
+            QWidget *widget = item->widget();
+            if (widget) {
+                delete widget;
+            }
+            delete item;
+        }
+        // 删除布局
+        delete chatLayout;
+        chatArea->setLayout(nullptr);
+    }
 
     // 这里添加根据会话名称加载聊天记录的逻辑
     // 例如，可以使用一个预设的聊天数据来模拟更新聊天记录
     addChatMessage(sessionName, "2025-1-20 10:05", "宝宝，今天怎么样？", MessageType::Other);
-    addChatMessage("我", "2025-1-20 10:10", "还不错，就是这个傻逼项目老段错误吐核！", MessageType::Self);
+    addChatMessage("我", "2025-1-20 10:10", "还不错，宝宝，我还有点事，先不聊天了，待会陪你哦", MessageType::Self);
     addChatMessage("系统提示", "2025-1-20 10:15", "你的对象启动了英雄联盟", MessageType::System);
     // 根据需要更新聊天内容...
+    addChatMessage(sessionName, "2025-1-20 10:05", "你居然敢玩游戏！给我爬！啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊", MessageType::Other);
 }
 void MainWidget::setupStyle() {
     // 设置全局滚动条样式
@@ -241,10 +267,10 @@ void MainWidget::setupStyle() {
     )");
 
         // 启用自动换行
-        chatArea->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+        //chatArea->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
         // 设置边距
-        chatArea->document()->setDocumentMargin(12);
+        //chatArea->document()->setDocumentMargin(12);
     }
 
     // 设置输入区域样式
@@ -328,25 +354,33 @@ void MainWidget::onLoginSuccess() {
 }
 
 void MainWidget::addChatMessage(const QString &sender,
-                                const QString &time,
-                                const QString &content,
-                                MessageType type) {
-    // 创建消息控件
-    MessageWidget *messageWidget = new MessageWidget(sender, time, content, type);
+    const QString &time,
+    const QString &content,
+    MessageType type) {
+// 创建消息控件
+MessageWidget *messageWidget = new MessageWidget(sender, time, content, type);
 
-    // 将消息控件添加到聊天区域
-    QVBoxLayout *chatLayout = qobject_cast<QVBoxLayout *>(chatArea->layout());
-    if (!chatLayout) {
-        chatLayout = new QVBoxLayout(chatArea);
-        chatArea->setLayout(chatLayout);
+// 获取聊天内容的布局
+QWidget *chatContent = chatArea->widget();
+QVBoxLayout *chatLayout = qobject_cast<QVBoxLayout *>(chatContent->layout());
+
+// 移除拉伸项
+QLayoutItem *item = chatLayout->takeAt(chatLayout->count() - 1);
+if (item) {
+    if (item->spacerItem()) {
+        delete item->spacerItem();
     }
-    chatLayout->addWidget(messageWidget);
-
-    // 滚动到底部
-    QScrollBar *vScroll = chatArea->verticalScrollBar();
-    vScroll->setValue(vScroll->maximum());
 }
+// 添加消息控件
+chatLayout->addWidget(messageWidget);
 
+// 重新添加拉伸项
+chatLayout->addStretch();
+
+// 滚动到底部
+QScrollBar *vScroll = chatArea->verticalScrollBar();
+vScroll->setValue(vScroll->maximum());
+}
 // 添加时间分割线
 void MainWidget::addTimeDivider(const QString &timeText) {
     QString divider = QStringLiteral(
@@ -358,5 +392,25 @@ void MainWidget::addTimeDivider(const QString &timeText) {
                               "</div>")
                               .arg(timeText);
 
-    chatArea->append(divider);
+    //chatArea->append(divider);
+}
+
+void MainWidget::resizeEvent(QResizeEvent *event) {
+    QWidget::resizeEvent(event);
+
+    // 遍历所有消息控件并发送更新信号
+    QVBoxLayout *chatLayout = qobject_cast<QVBoxLayout *>(chatArea->layout());
+    if (!chatLayout) return;
+
+    for (int i = 0; i < chatLayout->count(); ++i) {
+        QWidget *widget = chatLayout->itemAt(i)->widget();
+        if (widget) {
+            MessageWidget *messageWidget = qobject_cast<MessageWidget *>(widget);
+            if (messageWidget) {
+                // 发送信号更新气泡的高度
+                messageWidget->updateBubbleConstraints();
+                spdlog::info("更新 气泡高度 {}", i);
+            }
+        }
+    }
 }

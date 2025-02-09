@@ -1,33 +1,38 @@
-// MessageWidget.h
-#ifndef MESSAGEWIDGET_H
-#define MESSAGEWIDGET_H
+#pragma once
 
-#include <QDateTime>
-#include <QHBoxLayout>
+#include <QWidget>
 #include <QLabel>
 #include <QVBoxLayout>
-#include <QWidget>
+#include <QPropertyAnimation>
 
-enum class MessageType {
-    Self,  // 用户自己发送的消息
-    Other, // 其他人发送的消息
-    Image, // 图片消息
-    File,  // 文件消息
-    System,// 系统消息
-};
-
+enum class MessageType { Self, Other, System, File };
 
 class MessageWidget : public QWidget {
     Q_OBJECT
 public:
-    explicit MessageWidget(const QString &sender,
-                           const QString &time,
-                           const QString &content,
-                           MessageType type,
+    explicit MessageWidget(const QString &sender, const QString &time,
+                           const QString &content, MessageType type,
                            QWidget *parent = nullptr);
 
-private:
-    void setupUI(const QString &sender, const QString &time, const QString &content, MessageType type);
-};
+    void toggleExpand(bool expanded); // 切换展开状态
+    void updateBubbleConstraints();
 
-#endif// MESSAGEWIDGET_H
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    bool eventFilter(QObject *obj, QEvent *event) override;
+
+private:
+    void setupUI(const QString &sender, const QString &time,
+                 const QString &content, MessageType type);
+    void createExpandButton();
+    void updateExpandVisibility();
+
+    QLabel *messageBubble;
+    QLabel *expandButton;
+    QPropertyAnimation *heightAnimation;
+    int collapsedHeight = 120;       // 收起时默认高度
+    int expandedHeight = 0;          // 展开后的高度
+    bool isExpanded = false;
+    bool canExpand = false;
+};
