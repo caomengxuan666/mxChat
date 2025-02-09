@@ -1,4 +1,6 @@
+#include "Client/RpcClient.h"// 添加RpcClient头文件
 #include <Client/Login.h>
+#include <DataBase/DataBaseClient.h>
 #include <QFormLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -11,18 +13,23 @@
 #include <QPixmap>
 #include <QPropertyAnimation>
 #include <QPushButton>
+#include <QSequentialAnimationGroup>
+#include <QShortcut>
 #include <QStyleOption>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <cstring>
 #include <qnamespace.h>
-#include<QSequentialAnimationGroup>
+#include <spdlog/spdlog.h>
 
 Login::Login(QWidget *parent) : QWidget(parent, Qt::FramelessWindowHint) {
     setupUI();
     setFixedSize(300, 400);
 }
 
-Login::~Login() {}
+Login::~Login() {
+    spdlog::info("Login destructor");
+}
 
 void Login::setupUI() {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -89,6 +96,10 @@ void Login::setupUI() {
     // 连接信号槽
     connect(loginButton, &QPushButton::clicked, this, &Login::onLoginButtonClicked);
     connect(exitButton, &QPushButton::clicked, this, &QWidget::close);// 连接退出按钮
+
+    // 绑定Enter shortcut到LoginButton
+    QShortcut *enterShortcut = new QShortcut(QKeySequence(Qt::Key_Enter), this);
+    connect(enterShortcut, &QShortcut::activated, this, &Login::onLoginButtonClicked);
 }
 
 void Login::setGradientBackground() {
@@ -108,26 +119,25 @@ void Login::setGradientBackground() {
 
 void Login::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
-        dragPosition = event->globalPos() - frameGeometry().topLeft();
+        dragPosition = event->globalPosition().toPoint() - frameGeometry().topLeft();
         event->accept();
     }
 }
 
 void Login::mouseMoveEvent(QMouseEvent *event) {
     if (event->buttons() & Qt::LeftButton) {
-        move(event->globalPos() - dragPosition);
+        move(event->globalPosition().toPoint() - dragPosition);
         event->accept();
     }
 }
 
-
 void Login::onLoginButtonClicked() {
     // 创建缩小动画
     QPropertyAnimation *shrinkAnimation = new QPropertyAnimation(loginButton, "geometry");
-    shrinkAnimation->setDuration(300);  // 增加动画时间
+    shrinkAnimation->setDuration(300);// 增加动画时间
     shrinkAnimation->setStartValue(loginButton->geometry());
     shrinkAnimation->setEndValue(QRect(loginButton->x(), loginButton->y(), loginButton->width() * 0.9, loginButton->height() * 0.9));
-    shrinkAnimation->setEasingCurve(QEasingCurve::InOutQuad);  // 更平滑的曲线
+    shrinkAnimation->setEasingCurve(QEasingCurve::InOutQuad);// 更平滑的曲线
 
     // 创建恢复动画
     QPropertyAnimation *reverseAnimation = new QPropertyAnimation(loginButton, "geometry");
@@ -139,7 +149,7 @@ void Login::onLoginButtonClicked() {
     // 使用 QSequentialAnimationGroup 管理动画序列
     QSequentialAnimationGroup *animationGroup = new QSequentialAnimationGroup(this);
     animationGroup->addAnimation(shrinkAnimation);
-    animationGroup->addPause(50);  // 添加短暂停顿
+    animationGroup->addPause(50);// 添加短暂停顿
     animationGroup->addAnimation(reverseAnimation);
     animationGroup->start(QAbstractAnimation::DeleteWhenStopped);
 
@@ -147,11 +157,49 @@ void Login::onLoginButtonClicked() {
     connect(animationGroup, &QSequentialAnimationGroup::finished, this, [this]() {
         QString username = usernameLineEdit->text();
         QString password = passwordLineEdit->text();
-        if (username == "admin" && password == "123456") {
-            emit loginSuccess();  // 发射登录成功信号
+        bool isValid = verifyUser(username, password);
+        if (isValid) {
+            emit loginSuccess();// 发射登录成功信号
             this->hide();
         } else {
             QMessageBox::warning(this, "登录失败", "用户名或密码错误！");
         }
     });
+}
+
+bool Login::verifyUser(const QString &username, const QString &password) {
+    // 创建RpcClient实例
+    RpcClient rpcClient;
+    rpcClient.connectToServer("127.0.0.1", 8080);// 假设服务器地址和端口
+
+    // 构造请求参数
+    QString method = "login";
+    QString params = username + "," + password;// 简单拼接，实际应用中可能需要更复杂的参数构造
+
+    // 创建事件循环
+    QEventLoop loop;
+    bool isValid = false;
+
+    // 连接信号以获取响应
+    connect(&rpcClient, &RpcClient::messageReceived, this, [this, &loop, &isValid](const QString &response) {
+        qDebug() << "Message received!";
+
+        if (std::strcmp(response.toStdString().c_str(), "Login successful") == 0) {
+            isValid = true;
+        }
+
+        qDebug() << "\n\nResponse: " << response;
+        qDebug() << "isValid: " << isValid;
+
+        // 确保在接收到响应后退出事件循环
+        QMetaObject::invokeMethod(&loop, &QEventLoop::quit, Qt::QueuedConnection);
+    });
+
+    // 发送请求并获取响应
+    rpcClient.sendMessage(method, params);
+
+    // 等待响应
+    loop.exec();
+
+    return isValid;
 }

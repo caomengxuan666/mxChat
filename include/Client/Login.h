@@ -1,6 +1,7 @@
 #ifndef LOGIN_H
 #define LOGIN_H
 
+#include <Client/Client.h>
 #include <QFormLayout>
 #include <QHBoxLayout>
 #include <QLinearGradient>
@@ -28,6 +29,7 @@ public:
 private:
     void setupUI();
     void setGradientBackground();
+    bool verifyUser(const QString &username, const QString &password);
 
 signals:
     void loginSuccess();

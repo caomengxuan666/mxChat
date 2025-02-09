@@ -1,10 +1,14 @@
 // MainWidget.cpp
 #include <Client/MainWidget.h>
 #include <Client/SessionItem.hpp>
-#include <QSequentialAnimationGroup>
 #include <QGraphicsOpacityEffect>
+#include <QSequentialAnimationGroup>
+#include <QThread>
+#include <QTime>
 #include <QTimer>
 #include <qpropertyanimation.h>
+#include <qtextbrowser.h>
+#include <spdlog/spdlog.h>
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent),
@@ -12,16 +16,19 @@ MainWidget::MainWidget(QWidget *parent)
       chatArea(nullptr),
       messageInput(nullptr),
       sendButton(nullptr),
-      inputPanel(nullptr), windowOpacityAnimation(new QPropertyAnimation(this, "windowOpacity")) {
+      inputPanel(nullptr), m_client(new RpcClient) {
     setMinimumSize(900, 600);
     setupUI();// 确保在 setupStyle 之前调用 setupUI
     setupStyle();
-    startAnimation();
 
     // 添加测试数据
     addSessionItem("战犯101小组", "曹宇轩：打联赛", "22:30");
     addSessionItem("吴羽薇", "吴羽薇：宝宝，喜欢你...", "15:45");
     addSessionItem("程序代做接单群", "[文件] requirements.docx", "09:12");
+    //connect(m_client, &Client::messageReceived, this, &MainWidget::addChatMessage);
+}
+MainWidget::~MainWidget() {
+    delete m_client;
 }
 void MainWidget::setupUI() {
     QHBoxLayout *rootLayout = new QHBoxLayout(this);
@@ -78,7 +85,7 @@ void MainWidget::setupUI() {
     rightLayout->setSpacing(0);
 
     // 聊天区域
-    chatArea = new QTextEdit(rightPanel);
+    chatArea = new QTextBrowser(rightPanel);
     chatArea->setReadOnly(true);
 
     // 输入区域
@@ -98,6 +105,15 @@ void MainWidget::setupUI() {
     sendButton->setFixedSize(80, 32);
 
     btnLayout->addWidget(sendButton);
+    connect(sendButton, &QPushButton::clicked, [this]() {
+        QString message = messageInput->text();
+        if (!message.isEmpty()) {
+            //m_client->sendMessage(message.toStdString());// 发送消息
+            messageInput->clear();
+            addChatMessage("我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
+        }
+    });
+
 
     inputLayout->addWidget(messageInput, 1);
     inputLayout->addLayout(btnLayout);
@@ -109,46 +125,51 @@ void MainWidget::setupUI() {
     rootLayout->addWidget(rightPanel, 1);
 
     connect(sendButton, &QPushButton::clicked, [this]() {
-    // 按钮按压动画
-    QPropertyAnimation *pressAnim = new QPropertyAnimation(sendButton, "geometry");
-    pressAnim->setDuration(150);
-    QRect origRect = sendButton->geometry();
-    pressAnim->setKeyValueAt(0, origRect);
-    pressAnim->setKeyValueAt(0.5, origRect.adjusted(2, 2, -2, -2));
-    pressAnim->setKeyValueAt(1, origRect);
-    pressAnim->start(QAbstractAnimation::DeleteWhenStopped);
-});
+        // 按钮按压动画
+        QPropertyAnimation *pressAnim = new QPropertyAnimation(sendButton, "geometry");
+        pressAnim->setDuration(150);
+        QRect origRect = sendButton->geometry();
+        pressAnim->setKeyValueAt(0, origRect);
+        pressAnim->setKeyValueAt(0.5, origRect.adjusted(2, 2, -2, -2));
+        pressAnim->setKeyValueAt(1, origRect);
+        pressAnim->start(QAbstractAnimation::DeleteWhenStopped);
+    });
 }
 
 void MainWidget::onSessionItemClicked(QListWidgetItem *item) {
-    // 创建淡入淡出效果组
+    QString sessionName = item->data(Qt::UserRole).toString();
+    if (sessionName.isEmpty()) {
+        sessionName = item->text();
+    }
+
     QGraphicsOpacityEffect *chatEffect = new QGraphicsOpacityEffect(chatArea);
     chatArea->setGraphicsEffect(chatEffect);
-    
-    QSequentialAnimationGroup *seqGroup = new QSequentialAnimationGroup(this);
-    
+
     // 淡出动画
     QPropertyAnimation *fadeOut = new QPropertyAnimation(chatEffect, "opacity");
     fadeOut->setDuration(300);
     fadeOut->setStartValue(1.0);
     fadeOut->setEndValue(0.0);
-    
-    // 淡入动画
-    QPropertyAnimation *fadeIn = new QPropertyAnimation(chatEffect, "opacity");
-    fadeIn->setDuration(300);
-    fadeIn->setStartValue(0.0);
-    fadeIn->setEndValue(1.0);
-    
-    // 动画链
-    seqGroup->addAnimation(fadeOut);
-    seqGroup->addAnimation(fadeIn);
-    
-    connect(seqGroup, &QSequentialAnimationGroup::finished, this, [=]() {
-        chatArea->setGraphicsEffect(nullptr); // 移除效果
-        updateChatArea(item->text());
+
+    connect(fadeOut, &QPropertyAnimation::finished, this, [=]() {
+        // 淡出完成后更新聊天内容
+        updateChatArea(sessionName);
+        spdlog::info("切换会话到：{}", sessionName.toStdString());
+
+        // 淡入动画
+        QPropertyAnimation *fadeIn = new QPropertyAnimation(chatEffect, "opacity");
+        fadeIn->setDuration(300);
+        fadeIn->setStartValue(0.0);
+        fadeIn->setEndValue(1.0);
+
+        connect(fadeIn, &QPropertyAnimation::finished, this, [=]() {
+            chatArea->setGraphicsEffect(nullptr);
+        });
+
+        fadeIn->start(QAbstractAnimation::DeleteWhenStopped);
     });
-    
-    seqGroup->start(QAbstractAnimation::DeleteWhenStopped);
+
+    fadeOut->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void MainWidget::updateChatArea(const QString &sessionName) {
@@ -270,20 +291,23 @@ void MainWidget::addSessionItem(const QString &name, const QString &msg, const Q
     QListWidgetItem *item = new QListWidgetItem;
     item->setSizeHint(QSize(280, 70));
     sessionList->addItem(item);
-    
+
     SessionItem *sessionWidget = new SessionItem(name, msg, time);
     sessionList->setItemWidget(item, sessionWidget);
+
+    // 设置 Qt::UserRole 为会话名称
+    item->setData(Qt::UserRole, name);
 
     // 会话项渐显动画
     QGraphicsOpacityEffect *itemEffect = new QGraphicsOpacityEffect(sessionWidget);
     sessionWidget->setGraphicsEffect(itemEffect);
-    
+
     QPropertyAnimation *itemAnim = new QPropertyAnimation(itemEffect, "opacity");
     itemAnim->setDuration(600);
     itemAnim->setStartValue(0.0);
     itemAnim->setEndValue(1.0);
     itemAnim->setEasingCurve(QEasingCurve::OutQuad);
-    
+
     // 分时启动动画
     QTimer::singleShot(sessionList->count() * 100, [=]() {
         itemAnim->start(QAbstractAnimation::DeleteWhenStopped);
@@ -291,88 +315,36 @@ void MainWidget::addSessionItem(const QString &name, const QString &msg, const Q
 }
 
 void MainWidget::onLoginSuccess() {
-    this->show();// Display the main window after login
+    QTimer::singleShot(300, this, &QWidget::show);// 延迟300ms显示主窗口
+    connect(m_client, &RpcClient::connected, this, [this]() {
+        qDebug() << "Connected to server, sending message in a thread...";
+        QThread *thread = QThread::create([this]() {
+            m_client->sendMessage("send", "Hello from Client!");
+        });
+        connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+        thread->start();
+    });
+    m_client->connectToServer("127.0.0.1", 8080);// 连接到服务器
 }
 
 void MainWidget::addChatMessage(const QString &sender,
                                 const QString &time,
-                                const QString &content,// 修改为 const QString &
+                                const QString &content,
                                 MessageType type) {
-    // 生成消息HTML模板
-    QString messageHtml = QStringLiteral(
-            "<div style='margin: 8px 12px;'>"
-            "<div style='%1'>"
-            "<div style='display: flex; %2'>"
-            "%3"// 头像占位
-            "<div style='max-width: 70%%; %4'>"
-            "<div style='font-size: 12px; color: #666; margin-bottom: 4px;'>"
-            "%5 · %6"// 发送者 + 时间
-            "</div>"
-            "<div style='%7'>"
-            "%8"// 消息内容
-            "</div>"
-            "</div>"
-            "</div>"
-            "</div>"
-            "</div>");
+    // 创建消息控件
+    MessageWidget *messageWidget = new MessageWidget(sender, time, content, type);
 
-    // 根据消息类型设置样式
-    QString bubbleStyle, timeStyle, contentStyle, alignment;
-    QString avatar;
-    QString formattedContent = content;// 新增变量用于存储格式化后的内容
-
-    switch (type) {
-        case MessageType::Self:// 用户自己消息（右对齐）
-            alignment = "flex-direction: row-reverse;";
-            bubbleStyle = "background: #00B4FF; color: white; border-radius: 12px 12px 0 12px;";
-            avatar = "<div style='width:32px; height:32px; background:#4CAF50; border-radius:16px; margin-left:8px;'></div>";
-            break;
-        case MessageType::Image:// 图片消息
-            contentStyle = "padding:8px; background:#F0F2F5; border-radius:8px;";
-            formattedContent = QString("<img src=':/icons/image.png' width='120' style='border-radius:6px;'>"
-                                       "<div style='font-size:12px; color:#666; margin-top:4px;'>%1</div>")
-                                       .arg(content);
-            break;
-        case MessageType::File:// 文件消息
-            contentStyle = "padding:8px; background:#F0F2F5; border-radius:8px; display:flex; align-items:center;";
-            formattedContent = QString("<img src=':/icons/file.png' width='24' style='margin-right:8px;'>"
-                                       "<div>"
-                                       "<div style='font-weight:500;'>%1</div>"
-                                       "<div style='font-size:12px; color:#666;'>12.5 MB</div>"
-                                       "</div>")
-                                       .arg(content);
-            break;
-        case MessageType::System:// 系统消息
-            alignment = "justify-content: center;";
-            timeStyle = "display:none;";
-            bubbleStyle = "color: #666; font-size: 12px; text-align: center;";
-            break;
-        default:// 其他人消息（左对齐）
-            bubbleStyle = "background: #FFFFFF; color: #333; border-radius: 12px 12px 12px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);";
-            avatar = "<div style='width:32px; height:32px; background:#FF9800; border-radius:16px; margin-right:8px;'></div>";
+    // 将消息控件添加到聊天区域
+    QVBoxLayout *chatLayout = qobject_cast<QVBoxLayout *>(chatArea->layout());
+    if (!chatLayout) {
+        chatLayout = new QVBoxLayout(chatArea);
+        chatArea->setLayout(chatLayout);
     }
+    chatLayout->addWidget(messageWidget);
 
-    // 构建完整HTML
-    QString finalHtml = messageHtml
-                                .arg(alignment)
-                                .arg(bubbleStyle)
-                                .arg(avatar)
-                                .arg(contentStyle)
-                                .arg(sender)
-                                .arg(time)
-                                .arg(timeStyle)
-                                .arg(formattedContent);
-
-    // 添加HTML到聊天区域
-    chatArea->append(finalHtml);
-        // 消息滚动动画
+    // 滚动到底部
     QScrollBar *vScroll = chatArea->verticalScrollBar();
-    QPropertyAnimation *scrollAnim = new QPropertyAnimation(vScroll, "value");
-    scrollAnim->setDuration(400);
-    scrollAnim->setStartValue(vScroll->value());
-    scrollAnim->setEndValue(vScroll->maximum());
-    scrollAnim->setEasingCurve(QEasingCurve::OutExpo);
-    scrollAnim->start(QAbstractAnimation::DeleteWhenStopped);
+    vScroll->setValue(vScroll->maximum());
 }
 
 // 添加时间分割线
@@ -387,13 +359,4 @@ void MainWidget::addTimeDivider(const QString &timeText) {
                               .arg(timeText);
 
     chatArea->append(divider);
-}
-
-void MainWidget::startAnimation() {
-    // 窗口淡入动画
-    windowOpacityAnimation->setDuration(800);
-    windowOpacityAnimation->setStartValue(0.0);
-    windowOpacityAnimation->setEndValue(1.0);
-    windowOpacityAnimation->setEasingCurve(QEasingCurve::OutCubic);
-    windowOpacityAnimation->start();
 }

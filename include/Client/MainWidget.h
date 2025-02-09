@@ -2,32 +2,29 @@
 #ifndef MAINWIDGET_H
 #define MAINWIDGET_H
 
+#include <Client/RpcClient.h>
+#include <Client/Login.h>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
 #include <QPainter>
+#include <QPropertyAnimation>
 #include <QPushButton>
 #include <QScrollBar>
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <qtmetamacros.h>
-#include <QPropertyAnimation>
-
-enum class MessageType {
-    Self,  // 用户自己发送的消息
-    Other, // 其他人发送的消息
-    Image, // 图片消息
-    File,  // 文件消息
-    System,// 系统消息
-};
+#include <QTextBrowser>
+#include "MessageWidget.h"
+class MainWidget;
 
 class MainWidget : public QWidget {
     Q_OBJECT
 public:
     explicit MainWidget(QWidget *parent = nullptr);
-
+    ~MainWidget();
 public slots:
     void onLoginSuccess();
 
@@ -39,18 +36,16 @@ private:
                         const QString &time,
                         const QString &content,
                         MessageType type);
-    void startAnimation();
     void addTimeDivider(const QString &timeText);
     void onSessionItemClicked(QListWidgetItem *item);
     void updateChatArea(const QString &sessionName);
     // 组件
     QListWidget *sessionList;
-    QTextEdit *chatArea;
+    QTextBrowser  *chatArea;
     QLineEdit *messageInput;
     QPushButton *sendButton;
     QWidget *inputPanel;// 声明 inputPanel 为成员变量
-    
-    QPropertyAnimation *windowOpacityAnimation;
+    Client *m_client;   // 添加客户端成员变量
 };
 
 

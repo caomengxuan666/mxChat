@@ -2,5 +2,14 @@
     "clangd.arguments": [
         "--compile-commands-dir=${workspaceFolder}/build"
     ],
-    "cmake.options.statusBarVisibility": "hidden"
+    "cmake.options.statusBarVisibility": "hidden",
+    "files.associations": {
+        "*.ipp": "cpp",
+        "system_error": "cpp",
+        "coroutine": "cpp",
+        "any": "cpp",
+        "optional": "cpp",
+        "variant": "cpp",
+        "chrono": "cpp"
+    }
 }
