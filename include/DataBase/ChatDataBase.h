@@ -1,6 +1,6 @@
-// DataBaseClient.h
-#ifndef DATABASECLIENT_H
-#define DATABASECLIENT_H
+// ChatDataBase.h
+#ifndef ChatDataBase_H
+#define ChatDataBase_H
 
 #include <QObject>
 #include <QString>
@@ -8,23 +8,26 @@
 #include <SQLiteCpp/Database.h>
 #include <SQLiteCpp/Statement.h>
 
-class DataBaseClient : public QObject
+class ChatDataBase : public QObject
 {
     Q_OBJECT
+    friend class RpcServer;
 public:
-    explicit DataBaseClient(QObject *parent = nullptr);
-    ~DataBaseClient();
+    explicit ChatDataBase(QObject *parent = nullptr);
+    ~ChatDataBase();
 
     bool connectToDatabase(const QString &path);
     void disconnectFromDatabase();
     bool executeQuery(const QString &query);
     bool executeQueryWithParams(const QString &query, const QVariantList &params);
     bool next();
+    void readConfig();
     QVariant value(int index);
 
 private:
     SQLite::Database *m_database;
     SQLite::Statement *m_statement;
+    QString dbPath;
 };
 
-#endif // DATABASECLIENT_H
+#endif // ChatDataBase_H

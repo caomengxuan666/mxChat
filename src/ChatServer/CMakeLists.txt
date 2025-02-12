@@ -4,24 +4,46 @@ set(INCLUDE_HEADERS_SERVER ${CMAKE_SOURCE_DIR}/include/Server)
 set(INCLUDE_HEADERS_DATABASE ${CMAKE_SOURCE_DIR}/include/DataBase)
 message(STATUS "Include Headers Server: ${INCLUDE_HEADERS_SERVER}")
 
+find_package(YAML-CPP REQUIRED)
+
 set(PROJECT_SOURCES 
     # Place your source files here
     ${INCLUDE_HEADERS_SERVER}/Server.h
     ${INCLUDE_HEADERS_SERVER}/RpcServer.h
     ${INCLUDE_HEADERS_SERVER}/HttpServer.h
-    ${INCLUDE_HEADERS_DATABASE}/DataBaseClient.h
-    ../ChatClient/DataBaseClient.cpp
+    ${INCLUDE_HEADERS_SERVER}/CServer.h
+    ${INCLUDE_HEADERS_SERVER}/HttpConnection.h
+    ${INCLUDE_HEADERS_SERVER}/HttpServer.h
+    ${INCLUDE_HEADERS_DATABASE}/ChatDataBase.h
+    ${INCLUDE_HEADERS_SERVER}/LogicSystem.h
+    ${INCLUDE_HEADERS_SERVER}/VarifyGrpcClient.h
+    ${CMAKE_SOURCE_DIR}/include/message.grpc.pb.cc
+    ${CMAKE_SOURCE_DIR}/include/message.pb.cc
+    ${CMAKE_SOURCE_DIR}/include/message.grpc.pb.h
+    ${CMAKE_SOURCE_DIR}/include/message.pb.h
+    ChatDataBase.cpp
+    CServer.cpp
     main.cpp
     RpcServer.cpp
     HttpServer.cpp
+    HttpConnection.cpp
+    HttpServer.cpp
+    LogicSystem.cpp
+    yamlReader.hpp
 )
 
 set(LINK_LIBS 
-SQLiteCpp
-spdlog::spdlog
-Boost::system
-Boost::thread
-rpclib::rpc
+    SQLiteCpp
+    spdlog::spdlog
+    Boost::system
+    Boost::thread
+    rpclib::rpc
+    yaml-cpp::yaml-cpp
+    JsonCpp::JsonCpp
+    gRPC::gpr
+    gRPC::grpc
+    gRPC::grpc++
+    gRPC::grpc++_alts
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

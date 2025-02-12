@@ -1,10 +1,13 @@
 #include "Server/RpcServer.h"
+#include "DataBase/ChatDataBase.h"
 #include "msg.hpp"
 #include <QDebug>
-#include<DataBase/DataBaseClient.h>
+
 
 RpcServer::RpcServer(QObject *parent)
-    : Server(parent), server(nullptr) {}
+    : Server(parent), server(nullptr),db(new ChatDataBase) {
+        db.readConfig();
+    }
 
 RpcServer::~RpcServer() {
     delete server;
@@ -32,7 +35,7 @@ void RpcServer::startServer(quint16 port) {
         });
 
         // 绑定 "login" 方法
-        server->bind("login", [](const Request &request) -> Response {
+        server->bind("login", [this](const Request &request) -> Response {
             Response response;
             // 假设请求参数格式为 "username,password"
             QStringList parts = QString::fromStdString(request.params).split(",");
@@ -45,9 +48,7 @@ void RpcServer::startServer(quint16 port) {
             QString username = parts[0];
             QString password = parts[1];
 
-            // 连接到数据库验证用户
-            DataBaseClient db;
-            if (!db.connectToDatabase("/home/cmx/QtProjects/mxChat/data/users.db")) {
+            if (!db.connectToDatabase(db.dbPath)) {
                 response.status = 500;
                 response.result = "Internal server error";
                 return response;

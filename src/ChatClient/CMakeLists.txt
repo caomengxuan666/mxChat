@@ -11,16 +11,20 @@ set(PROJECT_SOURCES
     ${INCLUDE_HEADERS_CLIENT}/Login.h
     ${INCLUDE_HEADERS_CLIENT}/MainWidget.h
     ${INCLUDE_HEADERS_CLIENT}/SessionItem.hpp
-    ${INCLUDE_HEADERS_DATABASE}/DataBaseClient.h
     ${INCLUDE_HEADERS_CLIENT}/Client.h
     ${INCLUDE_HEADERS_CLIENT}/RpcClient.h
     ${INCLUDE_HEADERS_CLIENT}/MessageWidget.h
+    ${INCLUDE_HEADERS_CLIENT}/Regist.ui
+    ${INCLUDE_HEADERS_CLIENT}/Regist.h
+    ${INCLUDE_HEADERS_CLIENT}/../Singleton.h
+    ${INCLUDE_HEADERS_CLIENT}/HttpMgr.h
+    Regist.cpp
     RpcClient.cpp
-    DataBaseClient.cpp
     main.cpp
     Login.cpp
     MainWidget.cpp
     MessageWidget.cpp
+    HttpMgr.cpp
     ${CMAKE_SOURCE_DIR}/resources/Login.qrc
 )
 
@@ -38,18 +42,18 @@ endif()
 
 #spdlog
 set(LINK_LIBS
-SQLiteCpp
-spdlog::spdlog
-Boost::system
-Boost::thread
-rpclib::rpc
+    SQLiteCpp
+    spdlog::spdlog
+    Boost::system
+    Boost::thread
+    rpclib::rpc
 )
 
 # 链接Qt6的Widgets和Network库
 target_link_libraries(ChatClient PRIVATE
-Qt${QT_VERSION_MAJOR}::Widgets
-Qt${QT_VERSION_MAJOR}::Network 
-Qt${QT_VERSION_MAJOR}::Gui
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Network 
+    Qt${QT_VERSION_MAJOR}::Gui
 )
 
 target_link_libraries(ChatClient PRIVATE ${LINK_LIBS})

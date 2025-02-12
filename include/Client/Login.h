@@ -15,6 +15,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <qcolor.h>
 #include <qnamespace.h>
 #include <qpoint.h>
 #include <qpushbutton.h>
@@ -51,6 +52,10 @@ private:
     QPushButton *exitButton;
     QLabel *avatarLabel;
     QPoint dragPosition;
+    QColor m_gradientStart;
+    QColor m_gradientEnd;
+    double m_gradientAngle;
+    QTimer m_gradientTimer;
 };
 
 #endif// LOGIN_H

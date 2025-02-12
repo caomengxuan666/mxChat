@@ -1,20 +1,20 @@
-// DataBaseClient.cpp
-#include <DataBase/DataBaseClient.h>
+// ChatDataBase.cpp
+#include "yamlReader.hpp"
+#include <DataBase/ChatDataBase.h>
 #include <QDebug>
 #include <SQLiteCpp/Statement.h>
+#include <spdlog/spdlog.h>
 
-DataBaseClient::DataBaseClient(QObject *parent)
-    : QObject(parent), m_database(nullptr), m_statement(nullptr)
-{
+
+ChatDataBase::ChatDataBase(QObject *parent)
+    : QObject(parent), m_database(nullptr), m_statement(nullptr) {
 }
 
-DataBaseClient::~DataBaseClient()
-{
+ChatDataBase::~ChatDataBase() {
     disconnectFromDatabase();
 }
 
-bool DataBaseClient::connectToDatabase(const QString &path)
-{
+bool ChatDataBase::connectToDatabase(const QString &path) {
     try {
         m_database = new SQLite::Database(path.toStdString(), SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
         return true;
@@ -24,8 +24,7 @@ bool DataBaseClient::connectToDatabase(const QString &path)
     }
 }
 
-void DataBaseClient::disconnectFromDatabase()
-{
+void ChatDataBase::disconnectFromDatabase() {
     if (m_statement) {
         delete m_statement;
         m_statement = nullptr;
@@ -36,8 +35,7 @@ void DataBaseClient::disconnectFromDatabase()
     }
 }
 
-bool DataBaseClient::executeQuery(const QString &query)
-{
+bool ChatDataBase::executeQuery(const QString &query) {
     try {
         m_database->exec(query.toStdString());
         return true;
@@ -47,8 +45,7 @@ bool DataBaseClient::executeQuery(const QString &query)
     }
 }
 
-bool DataBaseClient::executeQueryWithParams(const QString &query, const QVariantList &params)
-{
+bool ChatDataBase::executeQueryWithParams(const QString &query, const QVariantList &params) {
     try {
         if (m_statement) {
             delete m_statement;
@@ -57,7 +54,7 @@ bool DataBaseClient::executeQueryWithParams(const QString &query, const QVariant
 
         // 打印原始查询语句和参数
         qDebug() << "Original query:" << query;
-        for (const auto &param : params) {
+        for (const auto &param: params) {
             qDebug() << "Binding parameter:" << param;
         }
 
@@ -91,8 +88,7 @@ bool DataBaseClient::executeQueryWithParams(const QString &query, const QVariant
 }
 
 
-bool DataBaseClient::next()
-{
+bool ChatDataBase::next() {
     try {
         if (m_statement) {
             return m_statement->executeStep();
@@ -103,9 +99,39 @@ bool DataBaseClient::next()
         return false;
     }
 }
+void ChatDataBase::readConfig() {
+    // 调用 YamlReader 读取 YAML 文件
+    auto yamlOpt = YamlReader::readYaml("database.yaml");
+    if (yamlOpt) {
+        spdlog::info("Successfully read YAML file.");
 
-QVariant DataBaseClient::value(int index)
-{
+        try {
+            // 获取解析后的 YAML 节点
+            YAML::Node config = yamlOpt.value();
+
+            // 检查是否存在 "database" 节点
+            if (config["database"]) {
+                // 提取数据库路径
+                if (config["database"]["path"]) {
+                    this->dbPath = QString::fromStdString(config["database"]["path"].as<std::string>());
+                    spdlog::info("Database path set to: {}", this->dbPath.toStdString());
+                } else {
+                    spdlog::error("Failed to read 'path' from YAML file.");
+                }
+            } else {
+                spdlog::error("Error reading YAML file: 'database' key not found.");
+            }
+        } catch (const YAML::Exception &e) {
+            spdlog::error("YAML parsing error: {}", e.what());
+        } catch (const std::exception &e) {
+            spdlog::error("Error processing YAML content: {}", e.what());
+        }
+    } else {
+        spdlog::error("Failed to read YAML file.");
+    }
+}
+
+QVariant ChatDataBase::value(int index) {
     try {
         if (m_statement) {
             return QVariant::fromValue(m_statement->getColumn(index).getText());

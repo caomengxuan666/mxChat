@@ -1,0 +1,4 @@
+database:
+  name: usersDataBase
+  type: sqlite
+  path: /home/cmx/QtProjects/mxChat/data/users.db

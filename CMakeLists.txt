@@ -21,4 +21,10 @@ find_package(Boost REQUIRED system regex thread)
 # rpclib
 find_package(rpclib REQUIRED)
 
+# jsoncpp
+find_package(jsoncpp CONFIG REQUIRED)
+
+# grpc
+find_package(gRPC CONFIG REQUIRED)
+
 add_subdirectory(src)
