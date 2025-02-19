@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start VarifyServer",
+      "type": "shell",
+      "command": "cd /home/cmx/QtProjects/mxChat/varifyServer && npm run serve"
+    },
+    {
+      "label": "Start ChatClient",
+      "type": "shell",
+      "command": "cd /home/cmx/QtProjects/mxChat/build/src/ChatClient && ./ChatClient"
+    },
+    {
+      "label": "Start ChatServer",
+      "type": "shell",
+      "command": "cd /home/cmx/QtProjects/mxChat/build/src/ChatServer && ./ChatServer"
+    },
+    {
+      "label": "Start redis_server",
+      "type": "shell",
+      "command": "redis-server"
+    },
+    {
+      "label": "Start redis-cli",
+      "type": "shell",
+      "command": "redis-cli"
+    },
+    {
+      "label": "Start All",
+      "dependsOrder": "parallel",
+      "dependsOn": [
+        "Start redis_server",
+        "Start VarifyServer",
+        "Start ChatClient",
+        "Start ChatServer",
+        "Start redis-cli"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}

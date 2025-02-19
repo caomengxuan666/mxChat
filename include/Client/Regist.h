@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QMap>
 #include <QWidget>
+#include <qtimer.h>
 
 class Regist : public QWidget {
     Q_OBJECT
@@ -30,11 +31,15 @@ private:
     void setErrorSheet(QLineEdit *lineEdit);
     void updateErrorMessage();
     void initHttpHandlers();
+    void onRegisterButtonClicked();
 
 
     Ui::RegisWidget *ui;
     QMap<ErrorType, QString> m_errorMessages;
     QMap<ReqId, std::function<void(const QJsonObject &)>> _handlers;
+    bool isError;
+    QTimer *_verifyCodeTimer;
+    int _timeLeft;  // 添加这个成员变量
 };
 
 #endif// REGIST_H

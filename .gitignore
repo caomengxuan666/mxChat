@@ -4,3 +4,5 @@ CMakeLists.txt.user*
 out/
 开发文档/
 /varifyServer/node_modules
+*.out
+*/rdb

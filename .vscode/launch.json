@@ -1,27 +1,53 @@
 {
-    // 使用 IntelliSense 了解相关属性。 
-    // 悬停以查看现有属性的描述。
-    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
             "name": "C/C++ Debug (gdb Launch)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "enter program name, for example: ${workspaceFolder}/a.out",
+            "program": "/home/cmx/QtProjects/mxChat/build/src/ChatClient/ChatClient",
             "args": [],
             "stopAtEntry": true,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
+            "cwd": "${workspaceRoot}",
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "/home/cmx/Qt/6.8.1/gcc_64/bin:${env:PATH}"
+                }
+            ],
             "MIMode": "gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
                 }
             ],
+            "sourceFileMap": {
+                "/home/qt/work/qt": "/home/cmx/Qt/6.8.1/Src"
+            },
             "visualizerFile": "/home/cmx/.vscode-server/data/User/workspaceStorage/cd53ded456ab5bb56d226037670fae94/tonka3000.qtvsctools/qt.natvis.xml"
+        },
+        {
+            "name": "Debug",
+            "type": "gdb",
+            "request": "launch",
+            "target": "/home/cmx/QtProjects/mxChat/build/src/ChatClient/ChatClient",
+            "cwd": "/home/cmx/QtProjects/mxChat/build/src/ChatClient",
+            "valuesFormatting": "parseText",
+            "stopAtEntry": true,
+            "env": {
+                "PATH": "/home/cmx/Qt/6.8.1/gcc_64/bin:${env:PATH}"
+            },
+            "pathSubstitutions": {
+                "/home/qt/work/qt": "/home/cmx/Qt/6.8.1/Src"
+            },
+            "arguments": ""
         }
     ]
 }

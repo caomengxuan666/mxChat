@@ -5,9 +5,8 @@ set(INCLUDE_HEADERS_DATABASE ${CMAKE_SOURCE_DIR}/include/DataBase)
 message(STATUS "Include Headers Server: ${INCLUDE_HEADERS_SERVER}")
 
 find_package(YAML-CPP REQUIRED)
-
-set(PROJECT_SOURCES 
-    # Place your source files here
+find_package(lz4 REQUIRED) 
+set(HEADERS 
     ${INCLUDE_HEADERS_SERVER}/Server.h
     ${INCLUDE_HEADERS_SERVER}/RpcServer.h
     ${INCLUDE_HEADERS_SERVER}/HttpServer.h
@@ -21,6 +20,11 @@ set(PROJECT_SOURCES
     ${CMAKE_SOURCE_DIR}/include/message.pb.cc
     ${CMAKE_SOURCE_DIR}/include/message.grpc.pb.h
     ${CMAKE_SOURCE_DIR}/include/message.pb.h
+)
+
+set(PROJECT_SOURCES 
+    ${HEADERS}
+    RedisMgr.cpp
     ChatDataBase.cpp
     CServer.cpp
     main.cpp
@@ -30,6 +34,8 @@ set(PROJECT_SOURCES
     HttpServer.cpp
     LogicSystem.cpp
     yamlReader.hpp
+    AsioIOServicePool.cpp
+    MysqlMgr.cpp
 )
 
 set(LINK_LIBS 
@@ -44,6 +50,14 @@ set(LINK_LIBS
     gRPC::grpc
     gRPC::grpc++
     gRPC::grpc++_alts
+    redis++::redis++_static
+    unofficial::mysql-connector-cpp::connector
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Gui
+    /lib/x86_64-linux-gnu/libzstd.so
+    resolv
+    lz4::lz4
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -56,9 +70,6 @@ else()
         ${PROJECT_SOURCES}
     )
 endif()
-
-# 链接Qt6的Widgets和Network库
-target_link_libraries(ChatServer PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Gui)
 
 target_link_libraries(ChatServer PRIVATE ${LINK_LIBS})
 

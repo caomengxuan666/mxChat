@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.14)
 project(mxChat VERSION 0.1 LANGUAGES CXX)
-
+set(CMAKE_TOOLCHAIN_FILE "/home/cmx/vcpkg/scripts/buildsystems/vcpkg.cmake")
+set(CMAKE_PREFIX_PATH
+    "/home/cmx/vcpkg/installed/x64-linux"
+    "/home/cmx/Qt/6.8.1/gcc_64"
+    CACHE PATH "Additional directories to be searched for packages"
+)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -8,6 +13,11 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pg")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg")
 
 # 添加网络模块
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Core Gui Network)
@@ -26,5 +36,20 @@ find_package(jsoncpp CONFIG REQUIRED)
 
 # grpc
 find_package(gRPC CONFIG REQUIRED)
+
+# redis
+find_package(redis++ CONFIG REQUIRED)
+
+# mysql connector
+find_package(unofficial-mysql-connector-cpp CONFIG REQUIRED)
+
+function(copy_config_files)
+    file(COPY "config/" DESTINATION ${CMAKE_BINARY_DIR}/config)
+    message(STATUS "from ${CMAKE_SOURCE_DIR}/config Copy config/ to ${CMAKE_BINARY_DIR}/config")
+endfunction()
+
+# 调用函数
+copy_config_files()
+
 
 add_subdirectory(src)

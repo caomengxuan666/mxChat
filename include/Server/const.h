@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-11 18:23:13
+ * @LastEditTime : 2025-02-17 21:04:04
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
@@ -25,4 +25,8 @@ enum ErrorCodes {
 	Success = 0,
 	Error_Json = 1001,  //Json解析错误
 	RPCFailed = 1002,  //RPC请求错误
+	VarifyExpired=1003,
+	VarifyCodeErr=1004,
+	UserExist=1005,
+	PasswdErr=1006
 };

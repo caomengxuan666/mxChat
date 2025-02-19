@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-11 18:26:55
+ * @LastEditTime : 2025-02-18 23:04:01
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 
@@ -76,7 +76,7 @@ HttpConnection::HttpConnection(tcp::socket socket)
 void HttpConnection::Start() {
     auto self = shared_from_this();
     http::async_read(_socket, _buffer, _request, [self](beast::error_code ec, std::size_t bytes_transferred) {
-        try {
+
             if (ec) {
                 spdlog::info("read error: {}", ec.message());
                 return;
@@ -86,9 +86,7 @@ void HttpConnection::Start() {
             boost::ignore_unused(bytes_transferred);
             self->HandleReq();
             self->CheckDeadline();
-        } catch (std::exception &exp) {
-            spdlog::info("exception: {}", exp.what());
-        }
+        
     });
 }
 
@@ -164,4 +162,8 @@ void HttpConnection::PreParseGetParam() {
             _get_params[key] = value;
         }
     }
+}
+
+tcp::socket &HttpConnection::GetSocket() {
+    return _socket;
 }

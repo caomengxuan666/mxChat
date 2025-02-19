@@ -4,16 +4,16 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-10 20:04:17
+ * @LastEditTime : 2025-02-16 20:04:00
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #ifndef RPCSERVER_H
 #define RPCSERVER_H
 
 #include "Server.h"
-#include <rpc/server.h>
+#include <DataBase/ChatDataBase.h>
 #include <QString>
-#include<DataBase/ChatDataBase.h>
+#include <rpc/server.h>
 
 
 class RpcServer : public Server {
@@ -34,4 +34,4 @@ private:
     ChatDataBase db;
 };
 
-#endif // RPCSERVER_H
+#endif// RPCSERVER_H

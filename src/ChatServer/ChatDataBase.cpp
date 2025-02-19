@@ -60,7 +60,7 @@ bool ChatDataBase::executeQueryWithParams(const QString &query, const QVariantLi
 
         // 绑定参数
         for (int i = 0; i < params.size(); ++i) {
-            switch (params[i].type()) {
+            switch (params[i].typeId()) {
                 case QVariant::Int:
                     m_statement->bind(i + 1, params[i].toInt());
                     break;
@@ -109,11 +109,11 @@ void ChatDataBase::readConfig() {
             // 获取解析后的 YAML 节点
             YAML::Node config = yamlOpt.value();
 
-            // 检查是否存在 "database" 节点
-            if (config["database"]) {
+            // 检查是否存在 "sqlite" 节点
+            if (config["sqlite"]) {
                 // 提取数据库路径
-                if (config["database"]["path"]) {
-                    this->dbPath = QString::fromStdString(config["database"]["path"].as<std::string>());
+                if (config["sqlite"]["path"]) {
+                    this->dbPath = QString::fromStdString(config["sqlite"]["path"].as<std::string>());
                     spdlog::info("Database path set to: {}", this->dbPath.toStdString());
                 } else {
                     spdlog::error("Failed to read 'path' from YAML file.");

@@ -83,9 +83,26 @@
         "cinttypes": "cpp",
         "typeindex": "cpp",
         "typeinfo": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "*.moc": "cpp",
+        "cfenv": "cpp"
     },
     "cSpell.words": [
         "Varify"
+    ],
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "cmx",
+            "database": "mxchat",
+            "username": "cmx"
+        }
     ]
 }
