@@ -4,11 +4,12 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-18 10:58:09
+ * @LastEditTime : 2025-02-21 14:31:36
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include <DataBase/RedisMgr.h>
 #include <spdlog/spdlog.h>
+
 
 bool RedisMgr::Connect(const std::string &host, int port) {
     this->_connect = redisConnect(host.c_str(), port);
@@ -25,9 +26,9 @@ bool RedisMgr::Connect(const std::string &host, int port) {
     return true;
 }
 
-bool RedisMgr::Get(const std::string &key, std::string &value) {
+bool RedisMgr::Get(const std::string &key, std::string &value,const std::string &code_prefix) {
     //给key加上code_前缀
-    const std::string queryKey="code_"+key;
+    const std::string queryKey=code_prefix+key;
     if (!Connect("127.0.0.1", 6379)) {// 默认连接本地 Redis
         std::cerr << "Failed to connect to Redis!" << std::endl;
     }

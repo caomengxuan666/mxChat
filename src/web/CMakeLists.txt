@@ -7,6 +7,7 @@ find_package(yaml-cpp CONFIG REQUIRED)
 
 set(EXECUTABLE_NAME webserver)
 
+set(SRC_COMPLEMENTS ${SRC_COMPLEMENTS} ${CMAKE_SOURCE_DIR}/src/ChatServer/RedisMgr.cpp)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 

@@ -128,6 +128,7 @@ private:
             auto &config_manager = Config_Manager::getInstance();
 
             // 设置并加载配置文件
+            config_manager.setRootPath("/home/cmx/QtProjects/mxChat/config/");
             config_manager.setYamlPath("ServicePool.yaml");
             YAML::Node config = config_manager.loadYamlDoc();
 

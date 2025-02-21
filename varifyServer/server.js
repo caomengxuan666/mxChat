@@ -24,7 +24,7 @@ async function GetVarifyCode(call, callback) {
         if (query_res == null) {
             // 生成6位数字验证码
             verifyCode = generateShortCode(6);
-            let bres = await redis_module.SetRedisExpire(const_module.code_prefix + call.request.email, verifyCode, 18000);
+            let bres = await redis_module.SetRedisExpire(const_module.code_prefix + call.request.email, verifyCode, 180);
             if (!bres) {
                 callback(null, {
                     email: call.request.email,
@@ -87,7 +87,7 @@ async function SendResetPasswordCode(call, callback) {
     try {
         // 生成6位数字验证码
         let verifyCode = generateShortCode(6);
-        let bres = await redis_module.SetRedisExpire(const_module.reset_code_prefix + call.request.email, verifyCode, 18000);
+        let bres = await redis_module.SetRedisExpire(const_module.reset_prefix + call.request.email, verifyCode, 180);
         if (!bres) {
             callback(null, {
                 email: call.request.email,
@@ -134,7 +134,7 @@ async function SendResetPasswordCode(call, callback) {
         });
 
     } catch (error) {
-        console.log("catch error is ", error);
+        console.log("catch error is ", error);  
         callback(null, {
             email: call.request.email,
             error: const_module.Errors.Exception

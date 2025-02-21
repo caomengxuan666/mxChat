@@ -62,31 +62,72 @@ void Server::setupRoutes() {
         return utilFunc::downloadFile("Bin.zip");
     });
 
+    // 发送验证码路由
+    CROW_ROUTE(app, "/send-verification-code").methods(crow::HTTPMethod::POST)([](const crow::request &req) {
+        try {
+            auto json_data = crow::json::load(req.body);
+            if (!json_data) {
+                return crow::response(400, "Invalid JSON format");
+            }
+            std::string email = json_data["email"].s();
+
+            // 调用 gRPC 服务发送验证码
+            GetVarifyRsp rsp = VerifyGrpcClient::GetInstance()->SendResetPasswordCode(email);
+            if (rsp.error() != 0) {
+                return crow::response(500, "Failed to send verification code to " + email);
+            }
+
+            return crow::response(200, "Verification code sent to " + email);
+        } catch (const std::exception &e) {
+            return crow::response(500, "Error: " + std::string(e.what()));
+        }
+    });
+
+    // 验证验证码路由
+    CROW_ROUTE(app, "/verify-verification-code").methods(crow::HTTPMethod::POST)([](const crow::request &req) {
+        try {
+            auto json_data = crow::json::load(req.body);
+            if (!json_data) {
+                return crow::response(400, "Invalid JSON format");
+            }
+            std::string email = json_data["email"].s();
+            std::string verificationCode = json_data["verificationCode"].s();
+
+            // 从 Redis 中读取验证码
+            std::string storedCode;
+            bool b_get_varify = RedisMgr::GetInstance()->Get(email, storedCode,"code_reset_");
+            if (!b_get_varify) {
+                return crow::response(400, "Verification code expired or not found");
+            }
+
+            if (storedCode == verificationCode) {
+                return crow::response(200, "Verification code is correct");
+            } else {
+                return crow::response(400, "Verification code is incorrect");
+            }
+        } catch (const std::exception &e) {
+            return crow::response(500, "Error: " + std::string(e.what()));
+        }
+    });
 
     // 重置密码路由
     CROW_ROUTE(app, "/reset-password").methods(crow::HTTPMethod::POST)([](const crow::request &req) {
         try {
-            // 打印请求头
-            CROW_LOG_INFO << "Headers:";
-            for (const auto &header: req.headers) {
-                CROW_LOG_INFO << header.first << ": " << header.second;
-            }
-
-            // 打印请求体
-            CROW_LOG_INFO << "Body: " << req.body;
-
             auto json_data = crow::json::load(req.body);
-
             if (!json_data) {
-                CROW_LOG_ERROR << "Invalid JSON received";
                 return crow::response(400, "Invalid JSON format");
             }
-            // 打印解析后的 JSON
-            CROW_LOG_INFO << "Parsed JSON: " << json_data;
-
             std::string email = json_data["email"].s();
             std::string username = json_data["username"].s();
             std::string newPassword = json_data["newPassword"].s();
+            std::string verificationCode = json_data["verificationCode"].s();
+
+            // 验证验证码
+            std::string storedCode;
+            bool b_get_varify = RedisMgr::GetInstance()->Get(email, storedCode,"code_reset_");
+            if (!b_get_varify || storedCode != verificationCode) {
+                return crow::response(400, "Verification code is incorrect or expired");
+            }
 
             // 验证新密码的条件
             std::regex password_regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$");
@@ -94,9 +135,7 @@ void Server::setupRoutes() {
                 return crow::response(400, "Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters.");
             }
 
-            //根据邮箱，找回密码
-
-
+            // 重置密码
             auto mysql_handler = MysqlHandler::GetInstance();
             auto res = mysql_handler->ResetPwdByEmail(email, newPassword);
             if (res == HandleResult::NO_SUCH_USER_OR_EMAIL)
@@ -126,55 +165,6 @@ void Server::setupRoutes() {
         res.add_header("Content-Type", "text/html");
         spdlog::info("Returning reset-password.html with Content-Type: text/html");
         return res;
-    });
-
-    // 发送验证码路由
-    CROW_ROUTE(app, "/send-verification-code").methods(crow::HTTPMethod::POST)([](const crow::request &req) {
-        try {
-            auto json_data = crow::json::load(req.body);
-            if (!json_data) {
-                return crow::response(400, "Invalid JSON format");
-            }
-            std::string email = json_data["email"].s();
-
-            // 调用 JavaScript 服务发送验证码
-            // 这里假设你有一个函数可以调用 JavaScript 服务
-            // 例如：sendVerificationCodeToEmail(email);
-            // 你需要实现这个函数来调用 JavaScript 服务
-            GetVarifyRsp rsp=VerifyGrpcClient::GetInstance()->GetVarifyCode(email);
-    
-            return crow::response(200, "Verification code sent to " + email);
-        } catch (const std::exception &e) {
-            return crow::response(500, "Error: " + std::string(e.what()));
-        }
-    });
-
-    // 验证验证码路由
-    CROW_ROUTE(app, "/verify-verification-code").methods(crow::HTTPMethod::POST)([](const crow::request &req) {
-        try {
-            auto json_data = crow::json::load(req.body);
-            if (!json_data) {
-                return crow::response(400, "Invalid JSON format");
-            }
-            std::string email = json_data["email"].s();
-            std::string verificationCode = json_data["verificationCode"].s();
-
-            // 从 Redis 中读取验证码
-            // 这里假设你有一个函数可以从 Redis 中读取验证码
-            // 例如：std::string storedCode = getVerificationCodeFromRedis(email);
-            // 你需要实现这个函数来从 Redis 中读取验证码
-
-            // 假设 storedCode 是从 Redis 中读取到的验证码
-            std::string storedCode = "123456";// 示例验证码
-
-            if (storedCode == verificationCode) {
-                return crow::response(200, "Verification code is correct");
-            } else {
-                return crow::response(400, "Verification code is incorrect");
-            }
-        } catch (const std::exception &e) {
-            return crow::response(500, "Error: " + std::string(e.what()));
-        }
     });
 
     // 捕获所有未定义路由
