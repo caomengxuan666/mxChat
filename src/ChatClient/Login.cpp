@@ -276,7 +276,7 @@ void Login::onLoginButtonClicked() {
 bool Login::verifyUser(const QString &username, const QString &password) {
     // 创建RpcClient实例
     RpcClient rpcClient;
-    rpcClient.connectToServer("127.0.0.1", 8080);// 假设服务器地址和端口
+    rpcClient.connectToServer("127.0.0.1", 8081);// 假设服务器地址和端口
 
     // 构造请求参数
     QString method = "login";

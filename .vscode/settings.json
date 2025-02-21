@@ -4,6 +4,9 @@
     ],
     "cmake.options.statusBarVisibility": "hidden",
     "files.associations": {
+        "*.sqlbook": "sql",
+        "*.ndjson": "jsonl",
+        "*.dbclient-js": "javascript",
         "*.ipp": "cpp",
         "system_error": "cpp",
         "coroutine": "cpp",
@@ -85,7 +88,8 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "*.moc": "cpp",
-        "cfenv": "cpp"
+        "cfenv": "cpp",
+        "regex": "cpp"
     },
     "cSpell.words": [
         "Varify"

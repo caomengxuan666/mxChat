@@ -6,3 +6,5 @@ out/
 /varifyServer/node_modules
 *.out
 */rdb
+/*.zip
+/install

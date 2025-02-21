@@ -3,6 +3,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 set(INCLUDE_HEADERS_SERVER ${CMAKE_SOURCE_DIR}/include/Server)
 set(INCLUDE_HEADERS_DATABASE ${CMAKE_SOURCE_DIR}/include/DataBase)
 message(STATUS "Include Headers Server: ${INCLUDE_HEADERS_SERVER}")
+message(STATUS "Include Headers Database: ${INCLUDE_HEADERS_DATABASE}")
 
 find_package(YAML-CPP REQUIRED)
 find_package(lz4 REQUIRED) 
@@ -41,8 +42,6 @@ set(PROJECT_SOURCES
 set(LINK_LIBS 
     SQLiteCpp
     spdlog::spdlog
-    Boost::system
-    Boost::thread
     rpclib::rpc
     yaml-cpp::yaml-cpp
     JsonCpp::JsonCpp
@@ -87,3 +86,6 @@ set_target_properties(ChatServer PROPERTIES
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(ChatServer)
 endif()
+
+# 安装规则
+install(TARGETS ChatServer DESTINATION Bin)

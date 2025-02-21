@@ -127,15 +127,17 @@ const char descriptor_table_protodef_include_2fmessage_2eproto[] ABSL_ATTRIBUTE_
     "\n\025include/message.proto\022\007message\"\035\n\014GetV"
     "arifyReq\022\r\n\005email\030\001 \001(\t\":\n\014GetVarifyRsp\022"
     "\r\n\005error\030\001 \001(\005\022\r\n\005email\030\002 \001(\t\022\014\n\004code\030\003 "
-    "\001(\t2P\n\rVarifyService\022\?\n\rGetVarifyCode\022\025."
-    "message.GetVarifyReq\032\025.message.GetVarify"
-    "Rsp\"\000b\006proto3"
+    "\001(\t2\225\001\n\rVarifyService\022=\n\rGetVarifyCode\022\025"
+    ".message.GetVarifyReq\032\025.message.GetVarif"
+    "yRsp\022E\n\025SendResetPasswordCode\022\025.message."
+    "GetVarifyReq\032\025.message.GetVarifyRspb\006pro"
+    "to3"
 };
 static ::absl::once_flag descriptor_table_include_2fmessage_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_include_2fmessage_2eproto = {
     false,
     false,
-    213,
+    283,
     descriptor_table_protodef_include_2fmessage_2eproto,
     "include/message.proto",
     &descriptor_table_include_2fmessage_2eproto_once,

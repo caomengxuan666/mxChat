@@ -1,4 +1,5 @@
-#pragma 
+#pragma once
+
 // 取消定义所有可能冲突的宏
 #ifdef INTERNAL
 # undef INTERNAL
@@ -21,16 +22,13 @@ using message::GetVarifyReq;
 using message::GetVarifyRsp;
 using message::VarifyService;
 
-
 class RPConPool {
 public:
     RPConPool(size_t poolSize, std::string host, std::string port)
         : poolSize_(poolSize), host_(host), port_(port), b_stop_(false) {
         for (size_t i = 0; i < poolSize_; ++i) {
-
             std::shared_ptr<Channel> channel = grpc::CreateChannel(host + ":" + port,
                                                                    grpc::InsecureChannelCredentials());
-
             connections_.push(VarifyService::NewStub(channel));
         }
     }
@@ -51,7 +49,6 @@ public:
             }
             return !connections_.empty();
         });
-        //如果停止则直接返回空指针
         if (b_stop_) {
             return nullptr;
         }
@@ -106,6 +103,24 @@ public:
         }
     }
 
+    GetVarifyRsp SendResetPasswordCode(std::string email) {
+        ClientContext context;
+        GetVarifyRsp reply;
+        GetVarifyReq request;
+        request.set_email(email);
+        auto stub = pool_->getConnection();
+        Status status = stub->SendResetPasswordCode(&context, request, &reply);
+
+        if (status.ok()) {
+            pool_->returnConnection(std::move(stub));
+            return reply;
+        } else {
+            pool_->returnConnection(std::move(stub));
+            reply.set_error(ErrorCodes::RPCFailed);
+            return reply;
+        }
+    }
+
 private:
     VerifyGrpcClient() {
         try {
@@ -128,13 +143,12 @@ private:
             spdlog::info("VerifyGrpcClient initialized with poolSize: {}, host: {}, port: {}", poolSize, host, port);
         } catch (const YAML::Exception &yamlEx) {
             spdlog::critical("YAML parsing error: {}", yamlEx.what());
-            assert(false);// 终止程序
+            assert(false); // 终止程序
         } catch (const std::exception &ex) {
             spdlog::critical("Failed to initialize VerifyGrpcClient: {}", ex.what());
-            assert(false);// 终止程序
+            assert(false); // 终止程序
         }
     }
 
-    std::unique_ptr<VarifyService::Stub> stub_;
     std::unique_ptr<RPConPool> pool_;
 };

@@ -27,6 +27,11 @@
       "command": "redis-cli"
     },
     {
+      "label": "Start web-server",
+      "type": "shell",
+      "command": "cd /home/cmx/QtProjects/mxChat && /home/cmx/QtProjects/mxChat/build/src/web/webserver"
+    },
+    {
       "label": "Start All",
       "dependsOrder": "parallel",
       "dependsOn": [
@@ -34,7 +39,8 @@
         "Start VarifyServer",
         "Start ChatClient",
         "Start ChatServer",
-        "Start redis-cli"
+        "Start redis-cli",
+        "Start web-server"
       ],
       "group": {
         "kind": "build",

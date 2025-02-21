@@ -1,9 +1,9 @@
 syntax = "proto3";
 
 package message;
-
 service VarifyService {
-    rpc GetVarifyCode(GetVarifyReq) returns (GetVarifyRsp) {}
+    rpc GetVarifyCode (GetVarifyReq) returns (GetVarifyRsp);
+    rpc SendResetPasswordCode (GetVarifyReq) returns (GetVarifyRsp); // 新增服务方法
 }
 
 message GetVarifyReq {
@@ -15,3 +15,4 @@ message GetVarifyRsp {
     string email = 2;
     string code = 3;
 }
+

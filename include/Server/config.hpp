@@ -19,6 +19,11 @@ public:
         spdlog::info("Set YAML path: {}", _configName);
     }
 
+    void setRootPath(const std::string& rootPath) {
+        _configRoot = rootPath;
+        spdlog::info("Set config root path: {}", _configRoot);
+    }
+
     std::string getYamlPath() const {
         return _configName;
     }

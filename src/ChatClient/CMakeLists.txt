@@ -4,6 +4,7 @@ set(CMAKE_AUTORCC ON)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
+
 set(INCLUDE_HEADERS_CLIENT ${CMAKE_SOURCE_DIR}/include/Client)
 set(INCLUDE_HEADERS_DATABASE ${CMAKE_SOURCE_DIR}/include/DataBase)
 set(PROJECT_SOURCES 
@@ -44,8 +45,6 @@ endif()
 set(LINK_LIBS
     SQLiteCpp
     spdlog::spdlog
-    Boost::system
-    Boost::thread
     rpclib::rpc
     redis++::redis++_static
     Qt${QT_VERSION_MAJOR}::Widgets
@@ -59,3 +58,5 @@ target_link_libraries(ChatClient PRIVATE ${LINK_LIBS})
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(ChatClient)
 endif()
+
+install(TARGETS ChatClient DESTINATION Bin)

@@ -1,0 +1,108 @@
+/* Reset some default browser styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f3f2f1;
+    color: #323130;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    text-align: center;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+.welcome-card {
+    padding: 40px;
+}
+
+h1, h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #0078d4;
+}
+
+p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    color: #5d5a58;
+}
+
+form {
+    margin-top: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: #323130;
+}
+
+input[type="text"], input[type="email"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    display: block; /* 确保每个输入框独占一行 */
+}
+
+button {
+    background-color: #0078d4;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #005a9e;
+}
+
+button:active {
+    background-color: #004578;
+}
+
+#resetPasswordMessage {
+    margin-top: 20px;
+    font-size: 1rem;
+    color: #ff0000;
+}
+
+.download-button {
+    background-color: #0078d4;
+    color: #ffffff;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.download-button:hover {
+    background-color: #005a9e;
+}
+
+.download-button:active {
+    background-color: #004578;
+}
