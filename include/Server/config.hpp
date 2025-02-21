@@ -44,9 +44,11 @@ private:
         if (configRootEnv) {
             _configRoot = configRootEnv;
         } else {
-            std::filesystem::path buildDir = std::filesystem::current_path();
-            _configRoot = buildDir.parent_path().parent_path() / "config/";
+            std::filesystem::path source_dir = std::filesystem::current_path();
+            //currrent_path/ + config
+            _configRoot = source_dir / "config";
         }
+        _configRoot="/home/cmx/QtProjects/mxChat/config/";
         spdlog::info("Config root path: {}", _configRoot);
     }
 

@@ -102,7 +102,7 @@ void Regist::resetStyleSheet() {
 }
 
 void Regist::slot_reg_mod_finish(ReqId id, QString res, ErrorCodes err) {
-    if (err != ErrorCodes::SUCCESS) {
+    if (err != ErrorCodes::SUCCESSFUL) {
         QMessageBox::warning(this, tr("网络请求错误"), tr("注册失败"));
         return;
     }
@@ -135,7 +135,7 @@ void Regist::initHttpHandlers() {
     //注册获取验证码回包逻辑
     _handlers.insert(ReqId::ID_GET_VARIFY_CODE, [this](QJsonObject jsonObj) {
         int error = jsonObj["error"].toInt();
-        if (error != ErrorCodes::SUCCESS) {
+        if (error != ErrorCodes::SUCCESSFUL) {
             QMessageBox::warning(this, tr("参数错误"), tr("获取验证码失败"));
             return;
         }
@@ -147,7 +147,7 @@ void Regist::initHttpHandlers() {
     // 添加注册用户回包逻辑
     _handlers.insert(ReqId::ID_REG_USER, [this](QJsonObject jsonObj) {
         int error = jsonObj["error"].toInt();
-        if (error != ErrorCodes::SUCCESS) {
+        if (error != ErrorCodes::SUCCESSFUL) {
             QMessageBox::warning(this, tr("参数错误"), tr("注册失败"));
             return;
         }

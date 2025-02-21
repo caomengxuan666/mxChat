@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-18 23:18:29
+ * @LastEditTime : 2025-02-21 22:16:40
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #ifndef MYSQL_DAO_HPP
@@ -12,6 +12,7 @@
 
 #include "../Server/config.hpp"
 #include "MySqlPool.hpp"
+#include "global.h"
 #include <string>
 
 class MysqlDao {
@@ -19,6 +20,7 @@ public:
     MysqlDao();
     ~MysqlDao();
     int RegUser(const std::string &name, const std::string &email, const std::string &pwd);
+    bool CheckPwd(const std::string &name, const std::string &pwd, UserInfo &userInfo);
 
 private:
     std::unique_ptr<MySqlPool> pool_;
@@ -110,6 +112,59 @@ inline int MysqlDao::RegUser(const std::string &name, const std::string &email, 
         pool_->returnConnection(session);
         std::cerr << "SQLException: " << e.what() << std::endl;
         return -1;
+    }
+}
+
+inline bool MysqlDao::CheckPwd(const std::string &name, const std::string &pwd, UserInfo &userInfo) {
+    auto session = pool_->getConnection();
+    if (!session) {
+        std::cerr << "Failed to get connection from pool" << std::endl;
+        return false;
+    }
+
+    try {
+        // 调用存储过程 check_pwd
+        auto result = session->sql("CALL check_pwd(?, ?, @result)")
+                              .bind(name)
+                              .bind(pwd)
+                              .execute();
+
+        // 获取存储过程的输出参数 @result
+        auto res = session->sql("SELECT @result AS result").execute();
+        auto row = res.fetchOne();
+
+        if (row) {
+            int result = row[0]; // 获取输出参数值
+            std::cout << "Result: " << result << std::endl;
+
+            if (result == 1) {
+                // 获取用户信息
+                auto userRes = session->sql("SELECT * FROM user WHERE name = ?")
+                                        .bind(name)
+                                        .execute();
+                auto userRow = userRes.fetchOne();
+
+                if (userRow) {
+                    userInfo.name = userRow[0].get<std::string>(); 
+                    userInfo.email = userRow[1].get<std::string>();
+                    userInfo.uid = userRow[2].get<int>();
+                    userInfo.pwd = userRow[3].get<std::string>();
+                }
+            }
+
+            // 归还连接
+            pool_->returnConnection(session);
+            return result == 1;
+        }
+
+        // 如果没有结果，返回错误
+        pool_->returnConnection(session);
+        return false;
+    } catch (const mysqlx::Error &e) {
+        // 捕获异常并归还连接
+        pool_->returnConnection(session);
+        std::cerr << "SQLException: " << e.what() << std::endl;
+        return false;
     }
 }
 

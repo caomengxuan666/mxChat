@@ -19,6 +19,8 @@
 #include <qnamespace.h>
 #include <qpoint.h>
 #include <qpushbutton.h>
+#include "global.h"
+#include<Server/const.h>
 
 class Login : public QWidget {
     Q_OBJECT
@@ -31,12 +33,13 @@ private:
     void setupUI();
     void setGradientBackground();
     bool verifyUser(const QString &username, const QString &password);
-
+    void initHttpHandlers();
 signals:
     void loginSuccess();
 
 private slots:
     void onLoginButtonClicked();
+    void slot_login_mod_finish(ReqId id, QString res, ErrorCodes err);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -56,6 +59,7 @@ private:
     QColor m_gradientEnd;
     double m_gradientAngle;
     QTimer m_gradientTimer;
+    QMap<ReqId, std::function<void(const QJsonObject &)>>_handlers;
 };
 
 #endif// LOGIN_H

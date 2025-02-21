@@ -10,10 +10,8 @@ find_package(lz4 REQUIRED)
 set(HEADERS 
     ${INCLUDE_HEADERS_SERVER}/Server.h
     ${INCLUDE_HEADERS_SERVER}/RpcServer.h
-    ${INCLUDE_HEADERS_SERVER}/HttpServer.h
     ${INCLUDE_HEADERS_SERVER}/CServer.h
     ${INCLUDE_HEADERS_SERVER}/HttpConnection.h
-    ${INCLUDE_HEADERS_SERVER}/HttpServer.h
     ${INCLUDE_HEADERS_DATABASE}/ChatDataBase.h
     ${INCLUDE_HEADERS_SERVER}/LogicSystem.h
     ${INCLUDE_HEADERS_SERVER}/VarifyGrpcClient.h
@@ -30,9 +28,7 @@ set(PROJECT_SOURCES
     CServer.cpp
     main.cpp
     RpcServer.cpp
-    HttpServer.cpp
     HttpConnection.cpp
-    HttpServer.cpp
     LogicSystem.cpp
     yamlReader.hpp
     AsioIOServicePool.cpp

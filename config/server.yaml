@@ -5,3 +5,7 @@ RpcServer:
 CServer:
   host: 127.0.0.1  # 冒号后添加空格
   port: 8082       # 冒号后添加空格
+
+StatusSerever: 
+  host: 127.0.0.1
+  port: 8083

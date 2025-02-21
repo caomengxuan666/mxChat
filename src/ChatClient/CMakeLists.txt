@@ -13,14 +13,12 @@ set(PROJECT_SOURCES
     ${INCLUDE_HEADERS_CLIENT}/MainWidget.h
     ${INCLUDE_HEADERS_CLIENT}/SessionItem.hpp
     ${INCLUDE_HEADERS_CLIENT}/Client.h
-    ${INCLUDE_HEADERS_CLIENT}/RpcClient.h
     ${INCLUDE_HEADERS_CLIENT}/MessageWidget.h
     ${INCLUDE_HEADERS_CLIENT}/Regist.ui
     ${INCLUDE_HEADERS_CLIENT}/Regist.h
     ${INCLUDE_HEADERS_CLIENT}/../Singleton.h
     ${INCLUDE_HEADERS_CLIENT}/HttpMgr.h
     Regist.cpp
-    RpcClient.cpp
     main.cpp
     Login.cpp
     MainWidget.cpp

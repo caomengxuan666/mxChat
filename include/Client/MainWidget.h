@@ -4,7 +4,6 @@
 
 #include "MessageWidget.h"
 #include <Client/Login.h>
-#include <Client/RpcClient.h>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>

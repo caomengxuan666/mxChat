@@ -1,6 +1,5 @@
 #include <QCoreApplication>
 #include <QDebug>
-#include <Server/HttpServer.h>
 #include <Server/RpcServer.h>
 #include <Server/CServer.h>
 #include <boost/asio.hpp>

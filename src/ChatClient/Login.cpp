@@ -1,6 +1,7 @@
-#include "Client/RpcClient.h"// 添加RpcClient头文件
+#include "Client/HttpMgr.h"
 #include <Client/Login.h>
 #include <Client/Regist.h>
+#include <QDesktopServices>
 #include <QFormLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -18,10 +19,14 @@
 #include <QStyleOption>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <Server/config.hpp>
 #include <cstring>
+#include <qdebug.h>
+#include <qjsonobject.h>
 #include <qnamespace.h>
 #include <qpushbutton.h>
 #include <spdlog/spdlog.h>
+
 
 class RainbowBorder : public QWidget {
     Q_OBJECT                                          // Required for Qt's meta-object system
@@ -84,6 +89,10 @@ private:
 };
 Login::Login(QWidget *parent) : QWidget(parent, Qt::FramelessWindowHint) {
     setupUI();
+    initHttpHandlers();
+
+    connect(HttpMgr::GetInstance().get(), &HttpMgr::sig_login_mod_finish, this,
+            &Login::slot_login_mod_finish);
     setFixedSize(300, 400);
 }
 
@@ -98,7 +107,7 @@ void Login::setupUI() {
 
     // 添加顶部退出按钮布局
     QHBoxLayout *topLayout = new QHBoxLayout();
-    topLayout->setContentsMargins(0, 0, 0, 0);// 右侧留出5像素边距
+    topLayout->setContentsMargins(0, 0, 0, 0);
     exitButton = new QPushButton("×", this);
     exitButton->setFixedSize(20, 20);
     exitButton->setStyleSheet(
@@ -116,6 +125,13 @@ void Login::setupUI() {
     passwordLineEdit = new QLineEdit(this);
     passwordLineEdit->setEchoMode(QLineEdit::Password);
     loginButton = new QPushButton("登录", this);
+
+    QPushButton *registerButton = new QPushButton("注册", this);
+    registerButton->setStyleSheet(
+            "QPushButton { background-color: #4CAF50; color: white; border: none; border-radius: 10px; padding: 10px 20px; font-size: 16px; }"
+            "QPushButton:hover { background-color: #45a049; }");
+    loginButton->setFixedSize(100, 40);   // 设置登录按钮的固定大小为 100x40
+    registerButton->setFixedSize(100, 40);// 设置注册按钮的固定大小为 100x40
 
     // 创建圆形头像标签
     QPixmap avatarPixmap(":/images/avatar.png");
@@ -159,23 +175,27 @@ void Login::setupUI() {
     formLayout->setSpacing(10);
     formLayout->addRow(usernameLabel, usernameLineEdit);
     formLayout->addRow(passwordLabel, passwordLineEdit);
+
+    // 添加“忘记密码”标签到表单布局的最后一行
+    QLabel *forgetPasswordLabel = new QLabel("<a href=\"http://127.0.0.1:11451/index\">忘记密码</a>", this);
+    forgetPasswordLabel->setStyleSheet("QLabel { color: #4CAF50; }");
+    forgetPasswordLabel->setAlignment(Qt::AlignRight);
+    formLayout->addRow(forgetPasswordLabel);
+    connect(forgetPasswordLabel, &QLabel::linkActivated, [this](const QString &link) {
+        //在浏览器中打开
+        QDesktopServices::openUrl(QUrl(link));
+    });
+
     mainLayout->addLayout(formLayout);
 
     mainLayout->addSpacing(20);
 
-    QPushButton *registerButton = new QPushButton("注册", this);
-    registerButton->setStyleSheet(
-            "QPushButton { background-color: #4CAF50; color: white; border: none; border-radius: 10px; padding: 10px 20px; font-size: 16px; }"
-            "QPushButton:hover { background-color: #45a049; }");
-    loginButton->setFixedSize(100, 40);   // 设置登录按钮的固定大小为 100x40
-    registerButton->setFixedSize(100, 40);// 设置注册按钮的固定大小为 100x40
-
     // 创建水平布局来容纳登录和注册按钮
     QHBoxLayout *buttonLayout = new QHBoxLayout();
-    buttonLayout->addSpacerItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));// 左侧弹簧
+    buttonLayout->addStretch();// 左侧弹簧
     buttonLayout->addWidget(loginButton);
     buttonLayout->addWidget(registerButton);
-    buttonLayout->addSpacerItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));// 右侧弹簧
+    buttonLayout->addStretch();// 右侧弹簧
 
     mainLayout->addLayout(buttonLayout);
 
@@ -274,39 +294,51 @@ void Login::onLoginButtonClicked() {
 }
 
 bool Login::verifyUser(const QString &username, const QString &password) {
-    // 创建RpcClient实例
-    RpcClient rpcClient;
-    rpcClient.connectToServer("127.0.0.1", 8081);// 假设服务器地址和端口
-
-    // 构造请求参数
-    QString method = "login";
-    QString params = username + "," + password;// 简单拼接，实际应用中可能需要更复杂的参数构造
-
-    // 创建事件循环
-    QEventLoop loop;
     bool isValid = false;
 
-    // 连接信号以获取响应
-    connect(&rpcClient, &RpcClient::messageReceived, this, [this, &loop, &isValid](const QString &response) {
-        qDebug() << "Message received!";
+    QJsonObject login_json;
+    login_json["user"] = username;
+    login_json["passwd"] = password;
+    auto host = Config_Manager::getInstance();
 
-        if (std::strcmp(response.toStdString().c_str(), "Login successful") == 0) {
-            isValid = true;
-        }
-
-        qDebug() << "\n\nResponse: " << response;
-        qDebug() << "isValid: " << isValid;
-
-        // 确保在接收到响应后退出事件循环
-        QMetaObject::invokeMethod(&loop, &QEventLoop::quit, Qt::QueuedConnection);
-    });
-
-    // 发送请求并获取响应
-    rpcClient.sendMessage(method, params);
-
-    // 等待响应
-    loop.exec();
-
+    HttpMgr::GetInstance()
+            ->PostHttpReq(QUrl("/user_login"),
+                          login_json, ReqId::ID_LOGIN_USER, Modules::LOGINMOD);
+    isValid = true;
     return isValid;
+}
+
+void Login::initHttpHandlers() {
+    //注册获取登录回包逻辑
+    _handlers.insert(ReqId::ID_LOGIN_USER, [this](QJsonObject jsonObj) {
+        int error = jsonObj["error"].toInt();
+        if (error != ErrorCodes::SUCCESSFUL) {
+            return;
+        }
+        auto user = jsonObj["user"].toString();
+    });
+}
+
+void Login::slot_login_mod_finish(ReqId id, QString res, ErrorCodes err) {
+    if (err != ErrorCodes::SUCCESSFUL) {
+        return;
+    }
+
+    // 解析 JSON 字符串,res需转化为QByteArray
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(res.toUtf8());
+    //json解析错误
+    if (jsonDoc.isNull()) {
+        return;
+    }
+
+    //json解析错误
+    if (!jsonDoc.isObject()) {
+        return;
+    }
+
+    //调用对应的逻辑,根据id回调。
+    _handlers[id](jsonDoc.object());
+
+    return;
 }
 #include "Login.moc"

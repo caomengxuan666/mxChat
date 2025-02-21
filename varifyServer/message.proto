@@ -1,10 +1,9 @@
 syntax = "proto3";
 
 package message;
-
 service VarifyService {
-    rpc GetVarifyCode (GetVarifyReq) returns (GetVarifyRsp);
-    rpc SendResetPasswordCode (GetVarifyReq) returns (GetVarifyRsp); // 新增服务方法
+    rpc GetVarifyCode(GetVarifyReq) returns (GetVarifyRsp);
+    rpc SendResetPasswordCode(GetVarifyReq) returns (GetVarifyRsp);// 新增服务方法
 }
 
 message GetVarifyReq {
@@ -17,3 +16,17 @@ message GetVarifyRsp {
     string code = 3;
 }
 
+message GetChatServerReq {
+    int32 uid = 1;
+}
+
+message GetChatServerRsp {
+    int32 error = 1;
+    string host = 2;
+    string port = 3;
+    string token = 4;
+}
+
+service StatusService {
+    rpc GetChatServer(GetChatServerReq) returns (GetChatServerRsp) {}
+}

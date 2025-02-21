@@ -4,22 +4,27 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-11 16:08:45
+ * @LastEditTime : 2025-02-21 22:11:55
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
-
-enum ReqId{
-    ID_GET_VARIFY_CODE = 1001, //获取验证码
-    ID_REG_USER = 1002, //注册用户
+#include <string>
+enum ReqId {
+    ID_GET_VARIFY_CODE = 1001,//获取验证码
+    ID_REG_USER = 1002,       //注册用户
+    ID_LOGIN_USER = 1003,     //登录用户
 };
 
-enum ErrorCodes{
-    SUCCESS = 0,
-    ERR_JSON = 1, //Json解析失败
-    ERR_NETWORK = 2,
-};
 
-enum Modules{
+enum Modules {
     REGISTERMOD = 0,
+    RESETMOD = 1,
+    LOGINMOD = 2
+};
+
+struct UserInfo {
+    std::string name;
+    std::string email;
+    std::string pwd;
+    size_t uid;
 };

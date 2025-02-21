@@ -98,7 +98,7 @@ public:
             return reply;
         } else {
             pool_->returnConnection(std::move(stub));
-            reply.set_error(ErrorCodes::RPCFailed);
+            reply.set_error(ErrorCodes::RPCGetFailed);
             return reply;
         }
     }
@@ -116,7 +116,7 @@ public:
             return reply;
         } else {
             pool_->returnConnection(std::move(stub));
-            reply.set_error(ErrorCodes::RPCFailed);
+            reply.set_error(ErrorCodes::RPCGetFailed);
             return reply;
         }
     }

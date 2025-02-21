@@ -89,7 +89,8 @@
         "valarray": "cpp",
         "*.moc": "cpp",
         "cfenv": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "filesystem": "cpp"
     },
     "cSpell.words": [
         "Varify"

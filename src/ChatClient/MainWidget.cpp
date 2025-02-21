@@ -16,7 +16,7 @@ MainWidget::MainWidget(QWidget *parent)
       chatArea(nullptr),
       messageInput(nullptr),
       sendButton(nullptr),
-      inputPanel(nullptr), m_client(new RpcClient) {
+      inputPanel(nullptr){
     setMinimumSize(900, 600);
     setupUI();// 确保在 setupStyle 之前调用 setupUI
     setupStyle();
@@ -29,7 +29,7 @@ MainWidget::MainWidget(QWidget *parent)
     //connect(m_client, &Client::messageReceived, this, &MainWidget::addChatMessage);
 }
 MainWidget::~MainWidget() {
-    delete m_client;
+
 }
 void MainWidget::setupUI() {
     QHBoxLayout *rootLayout = new QHBoxLayout(this);
@@ -342,15 +342,6 @@ void MainWidget::addSessionItem(const QString &name, const QString &msg, const Q
 
 void MainWidget::onLoginSuccess() {
     QTimer::singleShot(300, this, &QWidget::show);// 延迟300ms显示主窗口
-    connect(m_client, &RpcClient::connected, this, [this]() {
-        qDebug() << "Connected to server, sending message in a thread...";
-        QThread *thread = QThread::create([this]() {
-            m_client->sendMessage("send", "Hello from Client!");
-        });
-        connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-        thread->start();
-    });
-    m_client->connectToServer("127.0.0.1", 8080);// 连接到服务器
 }
 
 void MainWidget::addChatMessage(const QString &sender,

@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-17 21:04:04
+ * @LastEditTime : 2025-02-21 22:43:15
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
@@ -22,11 +22,12 @@ namespace net = boost::asio;            // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
 enum ErrorCodes {
-	Success = 0,
+	SUCCESSFUL = 0,
 	Error_Json = 1001,  //Json解析错误
-	RPCFailed = 1002,  //RPC请求错误
+	RPCGetFailed = 1002,  //RPC请求错误
 	VarifyExpired=1003,
 	VarifyCodeErr=1004,
 	UserExist=1005,
-	PasswdErr=1006
+	PasswdErr=1006,
+	ERR_NETWORK=1007,
 };
