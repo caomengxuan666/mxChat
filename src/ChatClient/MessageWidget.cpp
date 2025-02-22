@@ -2,8 +2,8 @@
 #include <QGraphicsDropShadowEffect>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QTimer>
 #include <QTextDocument>
+#include <QTimer>
 
 MessageWidget::MessageWidget(const QString &sender, const QString &time,
                              const QString &content, MessageType type,
@@ -16,14 +16,14 @@ MessageWidget::MessageWidget(const QString &sender, const QString &time,
 int calculateContentHeight(const QString &text, int maxWidth) {
     QTextDocument doc;
     doc.setHtml(text);         // 如果需要支持富文本
-    doc.setTextWidth(maxWidth); // 设置最大宽度
-    return doc.size().height(); // 返回实际高度
+    doc.setTextWidth(maxWidth);// 设置最大宽度
+    return doc.size().height();// 返回实际高度
 }
 
 void MessageWidget::createExpandButton() {
     // 创建下拉指示器
     expandButton = new QLabel(this);
-    expandButton->setFixedSize(32, 32); // 增大点击区域
+    expandButton->setFixedSize(32, 32);// 增大点击区域
     expandButton->setAlignment(Qt::AlignCenter);
     expandButton->setStyleSheet("background: rgba(0, 0, 0, 0.1); border-radius: 4px;");
     expandButton->setAttribute(Qt::WA_TransparentForMouseEvents, false);
@@ -34,9 +34,9 @@ void MessageWidget::createExpandButton() {
     QPainter painter(&arrow);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(QPen(Qt::white, 2));
-    painter.drawLine(10, 14, 22, 14); // 水平线
-    painter.drawLine(16, 18, 22, 14); // 下斜线
-    painter.drawLine(16, 10, 22, 14); // 上斜线
+    painter.drawLine(10, 14, 22, 14);// 水平线
+    painter.drawLine(16, 18, 22, 14);// 下斜线
+    painter.drawLine(16, 10, 22, 14);// 上斜线
     expandButton->setPixmap(arrow);
 
     expandButton->raise();
@@ -59,7 +59,7 @@ void MessageWidget::setupUI(const QString &sender, const QString &time,
     messageBubble->setWordWrap(true);
     messageBubble->setTextInteractionFlags(Qt::TextSelectableByMouse);
     messageBubble->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
-    messageBubble->setMaximumWidth(600); // 绝对最大宽度
+    messageBubble->setMaximumWidth(600);// 绝对最大宽度
     messageBubble->setAlignment(Qt::AlignTop);
 
     // 时间戳
@@ -130,7 +130,7 @@ void MessageWidget::updateBubbleConstraints() {
     updateExpandVisibility();
 
     // 设置默认高度限制
-    expandedHeight = contentHeight + 20; // 加20px留白
+    expandedHeight = contentHeight + 20;// 加20px留白
     messageBubble->setMaximumHeight(isExpanded ? expandedHeight : collapsedHeight);
 
     // 更新按钮位置
@@ -176,7 +176,7 @@ void MessageWidget::toggleExpand(bool expanded) {
     heightAnimation->start();
 
     // 调整整个控件高度
-    this->setMinimumHeight(messageBubble->height() + 40); // 40=时间戳+间距
+    this->setMinimumHeight(messageBubble->height() + 40);// 40=时间戳+间距
     updateExpandVisibility();
 }
 

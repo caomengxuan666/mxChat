@@ -16,7 +16,7 @@ MainWidget::MainWidget(QWidget *parent)
       chatArea(nullptr),
       messageInput(nullptr),
       sendButton(nullptr),
-      inputPanel(nullptr){
+      inputPanel(nullptr) {
     setMinimumSize(900, 600);
     setupUI();// 确保在 setupStyle 之前调用 setupUI
     setupStyle();
@@ -29,7 +29,6 @@ MainWidget::MainWidget(QWidget *parent)
     //connect(m_client, &Client::messageReceived, this, &MainWidget::addChatMessage);
 }
 MainWidget::~MainWidget() {
-
 }
 void MainWidget::setupUI() {
     QHBoxLayout *rootLayout = new QHBoxLayout(this);
@@ -96,7 +95,7 @@ void MainWidget::setupUI() {
     chatLayout->setSpacing(10);
     chatLayout->addStretch();// 添加一个拉伸项，确保内容从顶部开始排列
 
-    chatArea->setWidget(chatContent);   // 将容器设置为 QScrollArea 的内容
+    chatArea->setWidget(chatContent);// 将容器设置为 QScrollArea 的内容
 
     // 输入区域
     inputPanel = new QWidget(rightPanel);
@@ -345,32 +344,32 @@ void MainWidget::onLoginSuccess() {
 }
 
 void MainWidget::addChatMessage(const QString &sender,
-    const QString &time,
-    const QString &content,
-    MessageType type) {
-// 创建消息控件
-MessageWidget *messageWidget = new MessageWidget(sender, time, content, type);
+                                const QString &time,
+                                const QString &content,
+                                MessageType type) {
+    // 创建消息控件
+    MessageWidget *messageWidget = new MessageWidget(sender, time, content, type);
 
-// 获取聊天内容的布局
-QWidget *chatContent = chatArea->widget();
-QVBoxLayout *chatLayout = qobject_cast<QVBoxLayout *>(chatContent->layout());
+    // 获取聊天内容的布局
+    QWidget *chatContent = chatArea->widget();
+    QVBoxLayout *chatLayout = qobject_cast<QVBoxLayout *>(chatContent->layout());
 
-// 移除拉伸项
-QLayoutItem *item = chatLayout->takeAt(chatLayout->count() - 1);
-if (item) {
-    if (item->spacerItem()) {
-        delete item->spacerItem();
+    // 移除拉伸项
+    QLayoutItem *item = chatLayout->takeAt(chatLayout->count() - 1);
+    if (item) {
+        if (item->spacerItem()) {
+            delete item->spacerItem();
+        }
     }
-}
-// 添加消息控件
-chatLayout->addWidget(messageWidget);
+    // 添加消息控件
+    chatLayout->addWidget(messageWidget);
 
-// 重新添加拉伸项
-chatLayout->addStretch();
+    // 重新添加拉伸项
+    chatLayout->addStretch();
 
-// 滚动到底部
-QScrollBar *vScroll = chatArea->verticalScrollBar();
-vScroll->setValue(vScroll->maximum());
+    // 滚动到底部
+    QScrollBar *vScroll = chatArea->verticalScrollBar();
+    vScroll->setValue(vScroll->maximum());
 }
 // 添加时间分割线
 void MainWidget::addTimeDivider(const QString &timeText) {

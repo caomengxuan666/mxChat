@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-21 23:03:28
+ * @LastEditTime : 2025-02-22 13:27:22
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
@@ -93,41 +93,36 @@ class StatusGrpcClient : public Singleton<StatusGrpcClient> {
 public:
     ~StatusGrpcClient() {
     }
-    GetChatServerRsp GetChatServer(int uid);
+    GetChatServerRsp GetChatServer(int uid){
+        ClientContext context;
+        GetChatServerRsp reply;
+        GetChatServerReq request;
+        request.set_uid(uid);
+        auto stub = pool_->getConnection();
+        Status status = stub->GetChatServer(&context, request, &reply);
+    
+        // 使用 std::unique_ptr 和 lambda 表达式来替代 Defer
+        auto defer = std::unique_ptr<void, std::function<void(void*)>>(nullptr, [&stub, this](void*) {
+            pool_->returnConnection(std::move(stub));
+        });
+    
+        if (status.ok()) {
+            return reply;
+        } else {
+            reply.set_error(ErrorCodes::RPCGetFailed);
+            return reply;
+        }
+    }
 
 private:
-    StatusGrpcClient();
+    StatusGrpcClient(){
+        auto &cfg = Config_Manager::getInstance();
+        cfg.setYamlPath("server.yaml");
+        auto config = cfg.loadYamlDoc();
+        //std::string host = gCfgMgr["StatusServer"]["Host"];
+        std::string host = config["StatusServer"]["host"].as<std::string>();
+        std::string port = config["StatusServer"]["port"].as<std::string>();
+        pool_.reset(new StatusConPool(5, host, port));
+    }
     std::unique_ptr<StatusConPool> pool_;
 };
-
-
-GetChatServerRsp StatusGrpcClient::GetChatServer(int uid) {
-    ClientContext context;
-    GetChatServerRsp reply;
-    GetChatServerReq request;
-    request.set_uid(uid);
-    auto stub = pool_->getConnection();
-    Status status = stub->GetChatServer(&context, request, &reply);
-
-    // 使用 std::unique_ptr 和 lambda 表达式来替代 Defer
-    auto defer = std::unique_ptr<void, std::function<void(void*)>>(nullptr, [&stub, this](void*) {
-        pool_->returnConnection(std::move(stub));
-    });
-
-    if (status.ok()) {
-        return reply;
-    } else {
-        reply.set_error(ErrorCodes::RPCGetFailed);
-        return reply;
-    }
-}
-
-StatusGrpcClient::StatusGrpcClient() {
-    auto &cfg = Config_Manager::getInstance();
-    cfg.setYamlPath("server.yaml");
-    auto config = cfg.loadYamlDoc();
-    //std::string host = gCfgMgr["StatusServer"]["Host"];
-    std::string host = config["StatusServer"]["Host"].as<std::string>();
-    std::string port = config["StatusServer"]["Port"].as<std::string>();
-    pool_.reset(new StatusConPool(5, host, port));
-}

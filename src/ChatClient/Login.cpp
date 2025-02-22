@@ -336,8 +336,14 @@ void Login::slot_login_mod_finish(ReqId id, QString res, ErrorCodes err) {
         return;
     }
 
-    //调用对应的逻辑,根据id回调。
-    _handlers[id](jsonDoc.object());
+    QJsonObject jsonObj = jsonDoc.object();
+
+    // 调用对应的逻辑
+    if (_handlers.contains(id)) {
+        _handlers[id](jsonObj);
+    } else {
+        qWarning() << "Handler not found for ID:" << id;
+    }
 
     return;
 }

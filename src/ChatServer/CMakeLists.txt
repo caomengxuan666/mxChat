@@ -9,7 +9,6 @@ find_package(YAML-CPP REQUIRED)
 find_package(lz4 REQUIRED) 
 set(HEADERS 
     ${INCLUDE_HEADERS_SERVER}/Server.h
-    ${INCLUDE_HEADERS_SERVER}/RpcServer.h
     ${INCLUDE_HEADERS_SERVER}/CServer.h
     ${INCLUDE_HEADERS_SERVER}/HttpConnection.h
     ${INCLUDE_HEADERS_DATABASE}/ChatDataBase.h
@@ -27,12 +26,12 @@ set(PROJECT_SOURCES
     ChatDataBase.cpp
     CServer.cpp
     main.cpp
-    RpcServer.cpp
     HttpConnection.cpp
     LogicSystem.cpp
     yamlReader.hpp
     AsioIOServicePool.cpp
     MysqlMgr.cpp
+    StatusServiceImpl.cpp
 )
 
 set(LINK_LIBS 
