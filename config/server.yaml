@@ -3,7 +3,6 @@ CServer:
   port: 8082       # 冒号后添加空格
 
 StatusServer: 
-  host: 127.0.0.1
   port: 8083
 
 ChatServer1: 

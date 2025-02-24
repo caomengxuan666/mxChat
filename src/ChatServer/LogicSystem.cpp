@@ -4,15 +4,16 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-21 22:53:57
+ * @LastEditTime : 2025-02-23 11:45:33
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include "Server/LogicSystem.h"
 #include "DataBase/MysqlMgr.h"
 #include "DataBase/RedisMgr.h"
 #include "Server/HttpConnection.h"
+#include "Server/StatusGrpcClient.hpp"
 #include "Server/VarifyGrpcClient.h"
-#include"Server/StatusGrpcClient.hpp"
+#include <spdlog/spdlog.h>
 
 LogicSystem::~LogicSystem() {}
 
@@ -196,6 +197,7 @@ LogicSystem::LogicSystem() {
             beast::ostream(connection->_response.body()) << jsonstr;
             return true;
         }
+        spdlog::info("succeed to load userinfo name :{} email :{}", userInfo.name, userInfo.email);
 
         //查询StatusServer找到合适的连接
         auto reply = StatusGrpcClient::GetInstance()->GetChatServer(userInfo.uid);

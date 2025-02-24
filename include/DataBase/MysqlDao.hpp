@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-21 22:16:40
+ * @LastEditTime : 2025-02-23 11:38:47
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #ifndef MYSQL_DAO_HPP
@@ -134,7 +134,7 @@ inline bool MysqlDao::CheckPwd(const std::string &name, const std::string &pwd, 
         auto row = res.fetchOne();
 
         if (row) {
-            int result = row[0]; // 获取输出参数值
+            int result = row[0]; // 获取输出参数值,id
             std::cout << "Result: " << result << std::endl;
 
             if (result == 1) {
@@ -145,10 +145,10 @@ inline bool MysqlDao::CheckPwd(const std::string &name, const std::string &pwd, 
                 auto userRow = userRes.fetchOne();
 
                 if (userRow) {
-                    userInfo.name = userRow[0].get<std::string>(); 
-                    userInfo.email = userRow[1].get<std::string>();
-                    userInfo.uid = userRow[2].get<int>();
-                    userInfo.pwd = userRow[3].get<std::string>();
+                    userInfo.uid = userRow[1].get<int>();
+                    userInfo.name = userRow[2].get<std::string>(); 
+                    userInfo.email = userRow[3].get<std::string>();
+                    userInfo.pwd = userRow[4].get<std::string>();
                 }
             }
 

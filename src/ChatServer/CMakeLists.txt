@@ -20,24 +20,30 @@ set(HEADERS
     ${CMAKE_SOURCE_DIR}/include/message.pb.h
 )
 
-set(PROJECT_SOURCES 
+set(CHAT_SERVER_PROJECT_SOURCES 
     ${HEADERS}
     RedisMgr.cpp
     ChatDataBase.cpp
     CServer.cpp
-    main.cpp
+    ChatServer.cpp
     HttpConnection.cpp
     LogicSystem.cpp
     yamlReader.hpp
     AsioIOServicePool.cpp
     MysqlMgr.cpp
-    StatusServiceImpl.cpp
 )
 
-set(LINK_LIBS 
+set(STATUS_SERVER_PROJECT_SOURCES
+    ${CMAKE_SOURCE_DIR}/include/message.grpc.pb.cc
+    ${CMAKE_SOURCE_DIR}/include/message.pb.cc
+    StatusServer.cpp
+    StatusServiceImpl.cpp
+    StatusMonitor.cpp
+)
+
+set(LINK_LIBS_CHAT_SERVER 
     SQLiteCpp
     spdlog::spdlog
-    rpclib::rpc
     yaml-cpp::yaml-cpp
     JsonCpp::JsonCpp
     gRPC::gpr
@@ -46,26 +52,40 @@ set(LINK_LIBS
     gRPC::grpc++_alts
     redis++::redis++_static
     unofficial::mysql-connector-cpp::connector
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Network
-    Qt${QT_VERSION_MAJOR}::Gui
     /lib/x86_64-linux-gnu/libzstd.so
     resolv
     lz4::lz4
 )
 
+set(LINK_LIBS_STATUS_SERVER
+    spdlog::spdlog
+    yaml-cpp::yaml-cpp
+    gRPC::gpr
+    gRPC::grpc
+    gRPC::grpc++
+    gRPC::grpc++_alts
+)
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(ChatServer
         MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
+        ${CHAT_SERVER_PROJECT_SOURCES}
+    )
+    qt_add_executable(StatusServer
+        MANUAL_FINALIZATION
+        ${STATUS_SERVER_PROJECT_SOURCES}
     )
 else()
     add_executable(ChatServer
-        ${PROJECT_SOURCES}
+        ${CHAT_SERVER_PROJECT_SOURCES}
+    )
+    add_executable(StatusServer
+        ${STATUS_SERVER_PROJECT_SOURCES}
     )
 endif()
 
-target_link_libraries(ChatServer PRIVATE ${LINK_LIBS})
+target_link_libraries(ChatServer PRIVATE ${LINK_LIBS_CHAT_SERVER})
+target_link_libraries(StatusServer PRIVATE ${LINK_LIBS_STATUS_SERVER})
 
 if(${QT_VERSION} VERSION_LESS 6.1.0)
   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.FileTransAssistant)

@@ -4,10 +4,16 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-22 13:27:22
+ * @LastEditTime : 2025-02-24 19:59:58
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
+
+#include <spdlog/spdlog.h>
+#ifdef INTERNAL
+#undef INTERNAL
+#endif
+
 
 #include "Singleton.h"
 #include "config.hpp"
@@ -27,13 +33,23 @@ using message::StatusService;
 
 class StatusConPool {
 public:
-    StatusConPool(size_t poolSize, std::string host, std::string port)
-        : poolSize_(poolSize), host_(host), port_(port), b_stop_(false) {
+    StatusConPool(size_t poolSize, std::string port)
+        : poolSize_(poolSize), port_(port), b_stop_(false) {
+        auto deadline = std::chrono::system_clock::now() + std::chrono::milliseconds(100);
         for (size_t i = 0; i < poolSize_; ++i) {
+            // 硬编码为 [::1]:8083
+            std::string target_address = "[::1]:8083";
 
-            std::shared_ptr<Channel> channel = grpc::CreateChannel(host + ":" + port,
-                                                                   grpc::InsecureChannelCredentials());
-
+            // 创建 gRPC Channel
+            std::shared_ptr<Channel> channel = grpc::CreateChannel(target_address, grpc::InsecureChannelCredentials());
+            if (i == 0) {
+                // 测试 Channel 是否可用
+                if (!channel->WaitForConnected(deadline)) {
+                    spdlog::error("Failed to connect to {}", target_address);
+                    throw std::runtime_error("Channel connection failed");
+                }
+            }
+            // 将 Stub 放入连接池
             connections_.push(StatusService::NewStub(channel));
         }
     }
@@ -93,36 +109,36 @@ class StatusGrpcClient : public Singleton<StatusGrpcClient> {
 public:
     ~StatusGrpcClient() {
     }
-    GetChatServerRsp GetChatServer(int uid){
+    GetChatServerRsp GetChatServer(int uid) {
         ClientContext context;
         GetChatServerRsp reply;
         GetChatServerReq request;
         request.set_uid(uid);
         auto stub = pool_->getConnection();
         Status status = stub->GetChatServer(&context, request, &reply);
-    
+
         // 使用 std::unique_ptr 和 lambda 表达式来替代 Defer
-        auto defer = std::unique_ptr<void, std::function<void(void*)>>(nullptr, [&stub, this](void*) {
+        auto defer = std::unique_ptr<void, std::function<void(void *)>>(nullptr, [&stub, this](void *) {
             pool_->returnConnection(std::move(stub));
         });
-    
         if (status.ok()) {
             return reply;
         } else {
             reply.set_error(ErrorCodes::RPCGetFailed);
+            spdlog::warn("RPC failed: {} \n detailed :{} \n", status.error_message(), status.error_details());
             return reply;
         }
     }
 
 private:
-    StatusGrpcClient(){
+    StatusGrpcClient() {
         auto &cfg = Config_Manager::getInstance();
         cfg.setYamlPath("server.yaml");
         auto config = cfg.loadYamlDoc();
         //std::string host = gCfgMgr["StatusServer"]["Host"];
-        std::string host = config["StatusServer"]["host"].as<std::string>();
         std::string port = config["StatusServer"]["port"].as<std::string>();
-        pool_.reset(new StatusConPool(5, host, port));
+        spdlog::info("connect to status server at {}", port);
+        pool_.reset(new StatusConPool(5, port));
     }
     std::unique_ptr<StatusConPool> pool_;
 };

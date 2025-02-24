@@ -299,10 +299,12 @@ bool Login::verifyUser(const QString &username, const QString &password) {
     QJsonObject login_json;
     login_json["user"] = username;
     login_json["passwd"] = password;
-    auto host = Config_Manager::getInstance();
+    auto cfg = Config_Manager::getInstance();
+    cfg.setYamlPath("server.yaml");
 
+    //todo 后面用这个host和port来构造完整的URL
     HttpMgr::GetInstance()
-            ->PostHttpReq(QUrl("/user_login"),
+            ->PostHttpReq(QUrl("http://localhost:8082/user_login"),
                           login_json, ReqId::ID_LOGIN_USER, Modules::LOGINMOD);
     isValid = true;
     return isValid;
