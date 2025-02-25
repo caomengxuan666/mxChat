@@ -65,6 +65,8 @@ copy_config_files()
 
 add_subdirectory(src)
 
+add_subdirectory(benchmark)
+
 
 # 安装静态文件
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/static DESTINATION Bin/static)

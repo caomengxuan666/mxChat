@@ -2,7 +2,7 @@
 #ifndef MAINWIDGET_H
 #define MAINWIDGET_H
 
-#include "MessageWidget.h"
+#include "Client/BubbleWidget.h"
 #include <Client/Login.h>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -11,13 +11,14 @@
 #include <QPainter>
 #include <QPropertyAnimation>
 #include <QPushButton>
+#include <QScrollArea>
 #include <QScrollBar>
 #include <QTextBrowser>
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <qtmetamacros.h>
-#include<QScrollArea>
+
 class MainWidget;
 
 class MainWidget : public QWidget {
@@ -33,10 +34,7 @@ private:
     void setupUI();
     void setupStyle();
     void addSessionItem(const QString &name, const QString &msg, const QString &time);
-    void addChatMessage(const QString &sender,
-                        const QString &time,
-                        const QString &content,
-                        MessageType type);
+    void addTestMessage(const QString &sender, const QString &time, const QString &content, MessageType type);
     void addTimeDivider(const QString &timeText);
     void onSessionItemClicked(QListWidgetItem *item);
     void updateChatArea(const QString &sessionName);
@@ -46,9 +44,9 @@ private:
     QScrollArea *chatArea;
     QLineEdit *messageInput;
     QPushButton *sendButton;
-    QWidget *inputPanel;// 声明 inputPanel 为成员变量
-    Client *m_client;   // 添加客户端成员变量
-    QVBoxLayout *chatAreaLayout; // 声明 chatAreaLayout 为成员变量
+    QWidget *inputPanel;        // 声明 inputPanel 为成员变量
+    Client *m_client;           // 添加客户端成员变量
+    QVBoxLayout *chatAreaLayout;// 声明 chatAreaLayout 为成员变量
 };
 
 

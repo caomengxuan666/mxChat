@@ -1,8 +1,10 @@
 // MainWidget.cpp
+
 #include <Client/MainWidget.h>
 #include <Client/SessionItem.hpp>
 #include <QGraphicsOpacityEffect>
 #include <QSequentialAnimationGroup>
+#include <QShortcut>
 #include <QThread>
 #include <QTime>
 #include <QTimer>
@@ -26,7 +28,21 @@ MainWidget::MainWidget(QWidget *parent)
     addSessionItem("战犯101小组", "曹宇轩：打联赛", "22:30");
     addSessionItem("吴羽薇", "吴羽薇：宝宝，喜欢你...", "15:45");
     addSessionItem("程序代做接单群", "[文件] requirements.docx", "09:12");
-    //connect(m_client, &Client::messageReceived, this, &MainWidget::addChatMessage);
+
+    // 测试消息生成器
+    auto addTestMessage = [&](const QString &sender, const QString &time, const QString &content, MessageType type) {
+        BubbleWidget *bubble = new BubbleWidget(sender, time, content, type);
+        bubble->setMinimumHeight(60);
+        bubble->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        QWidget *chatContent = chatArea->widget();
+        QVBoxLayout *chatLayout = qobject_cast<QVBoxLayout *>(chatContent->layout());
+        chatLayout->addWidget(bubble);
+    };
+
+    // 添加测试消息
+    addTestMessage("系统通知", "09:00:00", "聊天系统初始化完成", MessageType::System);
+    addTestMessage("我", "09:00:05", "大家好！测试开始", MessageType::Self);
+    addTestMessage("客服助手", "09:00:10", "您好，请问有什么可以帮助您？", MessageType::Other);
 }
 MainWidget::~MainWidget() {
 }
@@ -93,7 +109,8 @@ void MainWidget::setupUI() {
     QVBoxLayout *chatLayout = new QVBoxLayout(chatContent);
     chatLayout->setContentsMargins(0, 0, 0, 0);
     chatLayout->setSpacing(10);
-    chatLayout->addStretch();// 添加一个拉伸项，确保内容从顶部开始排列
+    //chatLayout->addStretch();// 添加一个拉伸项，确保内容从顶部开始排列
+    chatLayout->addStretch(1);// 拉伸因子设为1
 
     chatArea->setWidget(chatContent);// 将容器设置为 QScrollArea 的内容
 
@@ -119,10 +136,9 @@ void MainWidget::setupUI() {
         if (!message.isEmpty()) {
             //m_client->sendMessage(message.toStdString());// 发送消息
             messageInput->clear();
-            addChatMessage("我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
+            addTestMessage("我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
         }
     });
-
 
     inputLayout->addWidget(messageInput, 1);
     inputLayout->addLayout(btnLayout);
@@ -142,6 +158,16 @@ void MainWidget::setupUI() {
         pressAnim->setKeyValueAt(0.5, origRect.adjusted(2, 2, -2, -2));
         pressAnim->setKeyValueAt(1, origRect);
         pressAnim->start(QAbstractAnimation::DeleteWhenStopped);
+    });
+
+    // 绑定Enter键到addTestMessage
+    QShortcut *enterShortcut = new QShortcut(QKeySequence(Qt::Key_Return), this);
+    connect(enterShortcut, &QShortcut::activated, [=]() {
+        QString message = messageInput->text();
+        if (!message.isEmpty()) {
+            messageInput->clear();
+            addTestMessage("我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
+        }
     });
 }
 
@@ -179,6 +205,16 @@ void MainWidget::onSessionItemClicked(QListWidgetItem *item) {
     });
 
     fadeOut->start(QAbstractAnimation::DeleteWhenStopped);
+
+    // 绑定Enter键到addTestMessage
+    QShortcut *enterShortcut = new QShortcut(QKeySequence(Qt::Key_Return), this);
+    connect(enterShortcut, &QShortcut::activated, [=]() {
+        QString message = messageInput->text();
+        if (!message.isEmpty()) {
+            messageInput->clear();
+            addTestMessage("我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
+        }
+    });
 }
 
 void MainWidget::updateChatArea(const QString &sessionName) {
@@ -198,14 +234,6 @@ void MainWidget::updateChatArea(const QString &sessionName) {
         delete chatLayout;
         chatArea->setLayout(nullptr);
     }
-
-    // 这里添加根据会话名称加载聊天记录的逻辑
-    // 例如，可以使用一个预设的聊天数据来模拟更新聊天记录
-    addChatMessage(sessionName, "2025-1-20 10:05", "宝宝，今天怎么样？", MessageType::Other);
-    addChatMessage("我", "2025-1-20 10:10", "还不错，宝宝，我还有点事，先不聊天了，待会陪你哦", MessageType::Self);
-    addChatMessage("系统提示", "2025-1-20 10:15", "你的对象启动了英雄联盟", MessageType::System);
-    // 根据需要更新聊天内容...
-    addChatMessage(sessionName, "2025-1-20 10:05", "你居然敢玩游戏！给我爬！啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊", MessageType::Other);
 }
 void MainWidget::setupStyle() {
     // 设置全局滚动条样式
@@ -343,34 +371,41 @@ void MainWidget::onLoginSuccess() {
     QTimer::singleShot(300, this, &QWidget::show);// 延迟300ms显示主窗口
 }
 
-void MainWidget::addChatMessage(const QString &sender,
-                                const QString &time,
-                                const QString &content,
-                                MessageType type) {
+void MainWidget::addTestMessage(const QString &sender, const QString &time, const QString &content, MessageType type) {
     // 创建消息控件
-    MessageWidget *messageWidget = new MessageWidget(sender, time, content, type);
+    BubbleWidget *bubble = new BubbleWidget(sender, time, content, type);
+    bubble->setMinimumHeight(60);
+    bubble->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     // 获取聊天内容的布局
     QWidget *chatContent = chatArea->widget();
     QVBoxLayout *chatLayout = qobject_cast<QVBoxLayout *>(chatContent->layout());
 
     // 移除拉伸项
+    /*
     QLayoutItem *item = chatLayout->takeAt(chatLayout->count() - 1);
     if (item) {
         if (item->spacerItem()) {
             delete item->spacerItem();
         }
     }
+        */
     // 添加消息控件
-    chatLayout->addWidget(messageWidget);
+    chatLayout->addWidget(bubble);
 
     // 重新添加拉伸项
     chatLayout->addStretch();
 
     // 滚动到底部
-    QScrollBar *vScroll = chatArea->verticalScrollBar();
-    vScroll->setValue(vScroll->maximum());
+    //QScrollBar *vScroll = chatArea->verticalScrollBar();
+    //vScroll->setValue(vScroll->maximum());
+    // 确保滚动到底部
+    QTimer::singleShot(50, [=]() {
+        chatArea->verticalScrollBar()->setValue(
+                chatArea->verticalScrollBar()->maximum());
+    });
 }
+
 // 添加时间分割线
 void MainWidget::addTimeDivider(const QString &timeText) {
     QString divider = QStringLiteral(
@@ -386,6 +421,8 @@ void MainWidget::addTimeDivider(const QString &timeText) {
 }
 
 void MainWidget::resizeEvent(QResizeEvent *event) {
+    /*
+
     QWidget::resizeEvent(event);
 
     // 遍历所有消息控件并发送更新信号
@@ -403,4 +440,5 @@ void MainWidget::resizeEvent(QResizeEvent *event) {
             }
         }
     }
+            */
 }

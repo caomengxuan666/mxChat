@@ -1,6 +1,7 @@
 #ifndef LOGIN_H
 #define LOGIN_H
 
+#include "global.h"
 #include <Client/Client.h>
 #include <QFormLayout>
 #include <QHBoxLayout>
@@ -15,12 +16,11 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <Server/const.h>
 #include <qcolor.h>
 #include <qnamespace.h>
 #include <qpoint.h>
 #include <qpushbutton.h>
-#include "global.h"
-#include<Server/const.h>
 
 class Login : public QWidget {
     Q_OBJECT
@@ -40,6 +40,8 @@ signals:
 private slots:
     void onLoginButtonClicked();
     void slot_login_mod_finish(ReqId id, QString res, ErrorCodes err);
+signals:
+    void loginFailed(int errorCode);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -59,7 +61,7 @@ private:
     QColor m_gradientEnd;
     double m_gradientAngle;
     QTimer m_gradientTimer;
-    QMap<ReqId, std::function<void(const QJsonObject &)>>_handlers;
+    QMap<ReqId, std::function<void(const QJsonObject &)>> _handlers;
 };
 
 #endif// LOGIN_H

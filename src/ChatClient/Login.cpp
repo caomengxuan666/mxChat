@@ -25,6 +25,7 @@
 #include <qjsonobject.h>
 #include <qnamespace.h>
 #include <qpushbutton.h>
+#include <qtmetamacros.h>
 #include <spdlog/spdlog.h>
 
 
@@ -280,61 +281,79 @@ void Login::onLoginButtonClicked() {
     animationGroup->start(QAbstractAnimation::DeleteWhenStopped);
 
     // 在动画结束后处理登录逻辑
+    // 在动画结束后处理登录逻辑
     connect(animationGroup, &QSequentialAnimationGroup::finished, this, [this]() {
         QString username = usernameLineEdit->text();
         QString password = passwordLineEdit->text();
-        bool isValid = verifyUser(username, password);
-        if (isValid) {
-            emit loginSuccess();// 发射登录成功信号
-            this->hide();
-        } else {
-            QMessageBox::warning(this, "登录失败", "用户名或密码错误！");
-        }
+
+        // 调用 verifyUser 发送登录请求
+        verifyUser(username, password);
+
     });
 }
 
 bool Login::verifyUser(const QString &username, const QString &password) {
-    bool isValid = false;
-
     QJsonObject login_json;
     login_json["user"] = username;
     login_json["passwd"] = password;
+
     auto cfg = Config_Manager::getInstance();
     cfg.setYamlPath("server.yaml");
 
-    //todo 后面用这个host和port来构造完整的URL
-    HttpMgr::GetInstance()
-            ->PostHttpReq(QUrl("http://localhost:8082/user_login"),
-                          login_json, ReqId::ID_LOGIN_USER, Modules::LOGINMOD);
-    isValid = true;
-    return isValid;
+    // 发送 HTTP POST 请求
+    HttpMgr::GetInstance()->PostHttpReq(
+            QUrl("http://localhost:8082/user_login"),
+            login_json,
+            ReqId::ID_LOGIN_USER,
+            Modules::LOGINMOD);
+
+    // 返回 false，因为登录结果由异步回调处理
+    return false;
 }
 
 void Login::initHttpHandlers() {
-    //注册获取登录回包逻辑
+    // 注册获取登录回包逻辑
     _handlers.insert(ReqId::ID_LOGIN_USER, [this](QJsonObject jsonObj) {
         int error = jsonObj["error"].toInt();
         if (error != ErrorCodes::SUCCESSFUL) {
+            qWarning() << "Login failed with error code:" << error;
+
+            // 显示登录失败提示
+            QMessageBox::warning(this, "登录失败", "用户名或密码错误！");
             return;
         }
-        auto user = jsonObj["user"].toString();
+
+        // 登录成功，提取用户信息
+        QString user = jsonObj["user"].toString();
+        int uid = jsonObj["uid"].toInt();
+        QString token = jsonObj["token"].toString();
+        QString host = jsonObj["host"].toString();
+
+        // 隐藏登录窗口并发射登录成功信号
+        emit loginSuccess();// 发射登录成功信号
+        spdlog::info("用户:{}登录成功",user.toStdString());
+        this->hide();
     });
 }
 
 void Login::slot_login_mod_finish(ReqId id, QString res, ErrorCodes err) {
     if (err != ErrorCodes::SUCCESSFUL) {
+        qWarning() << "HTTP request failed with error code:" << err;
+        emit loginFailed(err);// 通知 UI HTTP 请求失败
         return;
     }
 
-    // 解析 JSON 字符串,res需转化为QByteArray
+    // 解析 JSON 字符串
     QJsonDocument jsonDoc = QJsonDocument::fromJson(res.toUtf8());
-    //json解析错误
     if (jsonDoc.isNull()) {
+        qWarning() << "Failed to parse JSON response.";
+        emit loginFailed(ErrorCodes::Error_Json);// 通知 UI JSON 解析失败
         return;
     }
 
-    //json解析错误
     if (!jsonDoc.isObject()) {
+        qWarning() << "JSON response is not an object.";
+        emit loginFailed(ErrorCodes::Error_Json);// 通知 UI JSON 格式错误
         return;
     }
 
@@ -345,8 +364,8 @@ void Login::slot_login_mod_finish(ReqId id, QString res, ErrorCodes err) {
         _handlers[id](jsonObj);
     } else {
         qWarning() << "Handler not found for ID:" << id;
+        emit loginFailed(ErrorCodes::Error_Json);
     }
-
-    return;
 }
+
 #include "Login.moc"

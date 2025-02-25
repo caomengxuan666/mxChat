@@ -18,11 +18,11 @@ void StatusMonitor::PrintServerStatus() {
     const ServerInfo &serverInfo = _statusService->serverInfo();
 
     // 打印总连接数
-    spdlog::info("Total Connections: {}", serverInfo.totalConnection);
+    spdlog::info("当前服务器连接总数: {}", serverInfo.totalConnection);
 
     // 打印绑定地址及其连接数
     spdlog::info("Bind Address Status:");
     for (const auto &[id, address]: serverInfo.bindAddressStatus) {
-        spdlog::info("服务器ID: {}, Address: {}:{}", id, address.first, address.second);
+        spdlog::info("当前运行的均衡负载服务器ID: {}, Address: {}:{}", id, address.first, address.second);
     }
 }
