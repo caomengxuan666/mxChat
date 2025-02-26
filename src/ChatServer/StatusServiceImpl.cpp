@@ -91,6 +91,6 @@ StatusServiceImpl::StatusServiceImpl() : _server_index(0) {
     addObserver(StatusMonitor::GetInstance(this));
 }
 
-const ServerInfo &StatusServiceImpl::serverInfo() const {
+const ServerStatus &StatusServiceImpl::serverInfo() const {
     return _serverInfo;
 }

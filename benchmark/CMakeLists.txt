@@ -19,7 +19,8 @@ set(BENCHMARK_SOURCE
 set(LINK_LIBS
     spdlog::spdlog
     Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Network 
+    Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Concurrent 
 )
 
 

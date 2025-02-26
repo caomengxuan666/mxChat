@@ -18,12 +18,14 @@ set(PROJECT_SOURCES
     ${INCLUDE_HEADERS_CLIENT}/../Singleton.h
     ${INCLUDE_HEADERS_CLIENT}/HttpMgr.h
     ${INCLUDE_HEADERS_CLIENT}/BubbleWidget.h
+    ${INCLUDE_HEADERS_CLIENT}/TcpMgr.h
     Regist.cpp
     main.cpp
     Login.cpp
     MainWidget.cpp
     HttpMgr.cpp
     BubbleWidget.cpp
+    TcpMgr.cpp
     ${CMAKE_SOURCE_DIR}/resources/Login.qrc
 )
 
@@ -43,7 +45,6 @@ endif()
 set(LINK_LIBS
     SQLiteCpp
     spdlog::spdlog
-    rpclib::rpc
     redis++::redis++_static
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Network 

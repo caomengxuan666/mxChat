@@ -14,8 +14,7 @@ void StatusMonitor::UpdateServerStatus() {
 }
 
 void StatusMonitor::PrintServerStatus() {
-    // 获取 ServerInfo 对象
-    const ServerInfo &serverInfo = _statusService->serverInfo();
+    const ServerStatus &serverInfo = _statusService->serverInfo();
 
     // 打印总连接数
     spdlog::info("当前服务器连接总数: {}", serverInfo.totalConnection);

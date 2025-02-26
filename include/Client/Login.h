@@ -22,6 +22,8 @@
 #include <qpoint.h>
 #include <qpushbutton.h>
 
+struct ServerInfo;
+
 class Login : public QWidget {
     Q_OBJECT
 
@@ -40,8 +42,10 @@ signals:
 private slots:
     void onLoginButtonClicked();
     void slot_login_mod_finish(ReqId id, QString res, ErrorCodes err);
+    void slot_tcp_con_finish(bool bsuccess);
 signals:
     void loginFailed(int errorCode);
+    void sig_connect_tcp(ServerInfo);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -62,6 +66,8 @@ private:
     double m_gradientAngle;
     QTimer m_gradientTimer;
     QMap<ReqId, std::function<void(const QJsonObject &)>> _handlers;
+    int _uid;
+    QString _token;
 };
 
 #endif// LOGIN_H

@@ -35,7 +35,7 @@ public:
 
 private:
     StatusServiceImpl *_statusService;
-    ServerInfo _serverInfo;
+    ServerStatus _serverInfo;
     StatusMonitor(StatusServiceImpl *statusService) : _statusService(statusService) {}
 
     static StatusMonitor *_instance;

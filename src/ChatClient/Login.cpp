@@ -1,6 +1,7 @@
 #include "Client/HttpMgr.h"
 #include <Client/Login.h>
 #include <Client/Regist.h>
+#include <Client/TcpMgr.h>
 #include <QDesktopServices>
 #include <QFormLayout>
 #include <QHBoxLayout>
@@ -23,6 +24,7 @@
 #include <cstring>
 #include <qdebug.h>
 #include <qjsonobject.h>
+#include <qmessagebox.h>
 #include <qnamespace.h>
 #include <qpushbutton.h>
 #include <qtmetamacros.h>
@@ -213,7 +215,8 @@ void Login::setupUI() {
     // 连接信号槽
     connect(loginButton, &QPushButton::clicked, this, &Login::onLoginButtonClicked);
     connect(exitButton, &QPushButton::clicked, this, &QWidget::close);// 连接退出按钮
-
+    connect(this, &Login::sig_connect_tcp, TcpMgr::GetInstance().get(), &TcpMgr::slot_tcp_connect);
+    connect(TcpMgr::GetInstance().get(), &TcpMgr::sig_con_success, this, &Login::slot_tcp_con_finish);
     connect(registerButton, &QPushButton::clicked, this, [this]() {
         // 隐藏当前窗口
         this->hide();
@@ -288,7 +291,6 @@ void Login::onLoginButtonClicked() {
 
         // 调用 verifyUser 发送登录请求
         verifyUser(username, password);
-
     });
 }
 
@@ -329,9 +331,14 @@ void Login::initHttpHandlers() {
         QString token = jsonObj["token"].toString();
         QString host = jsonObj["host"].toString();
 
+        ServerInfo si{uid, host, "8082", token};
+        _uid = si.Uid;
+        _token = si.Token;
+
+        emit sig_connect_tcp(si);
         // 隐藏登录窗口并发射登录成功信号
         emit loginSuccess();// 发射登录成功信号
-        spdlog::info("用户:{}登录成功",user.toStdString());
+        spdlog::info("用户:{}登录成功", user.toStdString());
         this->hide();
     });
 }
@@ -365,6 +372,26 @@ void Login::slot_login_mod_finish(ReqId id, QString res, ErrorCodes err) {
     } else {
         qWarning() << "Handler not found for ID:" << id;
         emit loginFailed(ErrorCodes::Error_Json);
+    }
+}
+
+void Login::slot_tcp_con_finish(bool bsuccess) {
+
+    if (bsuccess) {
+        spdlog::info("服务器连接成功");
+        QJsonObject jsonObj;
+        jsonObj["uid"] = _uid;
+        jsonObj["token"] = _token;
+
+        QJsonDocument doc(jsonObj);
+        QString jsonString = doc.toJson(QJsonDocument::Indented);
+
+        //发送tcp请求给chat server
+        TcpMgr::GetInstance()->sig_send_data(ReqId::ID_CHAT_LOGIN, jsonString);
+
+    } else {
+        spdlog::warn("服务器连接失败");
+        QMessageBox::warning(this, "服务器连接失败", "请检查网络连接");
     }
 }
 

@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-24 19:59:58
+ * @LastEditTime : 2025-02-26 13:25:07
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
@@ -37,8 +37,8 @@ public:
         : poolSize_(poolSize), port_(port), b_stop_(false) {
         auto deadline = std::chrono::system_clock::now() + std::chrono::milliseconds(100);
         for (size_t i = 0; i < poolSize_; ++i) {
-            // 硬编码为 [::1]:8083
-            std::string target_address = "[::1]:8083";
+            std::string target_address = "[::1]:";
+            target_address += port;
 
             // 创建 gRPC Channel
             std::shared_ptr<Channel> channel = grpc::CreateChannel(target_address, grpc::InsecureChannelCredentials());
@@ -137,8 +137,10 @@ private:
         auto config = cfg.loadYamlDoc();
         //std::string host = gCfgMgr["StatusServer"]["Host"];
         std::string port = config["StatusServer"]["port"].as<std::string>();
+        size_t pool_size = config["StatusServer"]["poolsize"].as<size_t>();
         spdlog::info("connect to status server at {}", port);
-        pool_.reset(new StatusConPool(5, port));
+        spdlog::info("pool size is {}", pool_size);
+        pool_.reset(new StatusConPool(pool_size, port));
     }
     std::unique_ptr<StatusConPool> pool_;
 };

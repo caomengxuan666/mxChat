@@ -110,5 +110,5 @@
             "username": "cmx"
         }
     ],
-    "cmake.buildDirectory": "${workspaceFolder}/build/${buildType}"
+    "cmake.buildDirectory": "${workspaceFolder}/build"
 }

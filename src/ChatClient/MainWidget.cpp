@@ -134,7 +134,6 @@ void MainWidget::setupUI() {
     connect(sendButton, &QPushButton::clicked, [this]() {
         QString message = messageInput->text();
         if (!message.isEmpty()) {
-            //m_client->sendMessage(message.toStdString());// 发送消息
             messageInput->clear();
             addTestMessage("我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
         }

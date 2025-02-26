@@ -45,7 +45,6 @@ private:
     QLineEdit *messageInput;
     QPushButton *sendButton;
     QWidget *inputPanel;        // 声明 inputPanel 为成员变量
-    Client *m_client;           // 添加客户端成员变量
     QVBoxLayout *chatAreaLayout;// 声明 chatAreaLayout 为成员变量
 };
 

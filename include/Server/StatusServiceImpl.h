@@ -22,7 +22,7 @@ struct ChatServer {
     std::string port;
 };
 
-struct ServerInfo {
+struct ServerStatus {
     //对应ip:port
     using Address = std::pair<std::string, size_t>;
     //绑定的ip:port各自接受的连接数
@@ -40,7 +40,7 @@ public:
     void addObserver(StatusMonitor* observer);
     void removeObserver(StatusMonitor* observer);
     void notifyObservers();
-    const ServerInfo& serverInfo()const;
+    const ServerStatus& serverInfo()const;
 
 protected:
     std::vector<ChatServer> _servers;
@@ -50,5 +50,5 @@ protected:
 private:
     void addOberver();
     StatusMonitor *_monitor;
-    ServerInfo _serverInfo;
+    ServerStatus _serverInfo;
 };

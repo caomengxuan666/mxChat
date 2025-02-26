@@ -1,14 +1,15 @@
-CServer: 
-  host: 127.0.0.1  # 冒号后添加空格
-  port: 8082       # 冒号后添加空格
+CServer:
+  host: 127.0.0.1 # 冒号后添加空格
+  port: 8082 # 冒号后添加空格
 
-StatusServer: 
+StatusServer:
   port: 8083
-
-ChatServer1: 
+  # 最大连接量
+  poolsize: 10000
+ChatServer1:
   host: 127.0.0.1
   port: 8084
 
-ChatServer2: 
+ChatServer2:
   host: 127.0.0.1
   port: 8085

@@ -10,22 +10,23 @@
     {
       "label": "Start ChatClient",
       "type": "shell",
-      "command": "cd /home/cmx/QtProjects/mxChat/build/Debug/src/ChatClient && ./ChatClient",
+      "command": "cd /home/cmx/QtProjects/mxChat/build/src/ChatClient && ./ChatClient",
       "detail": "聊天客户端的Qt应用",
       "problemMatcher": []
     },
     {
       "label": "Start ChatServer",
       "type": "shell",
-      "command": "cd /home/cmx/QtProjects/mxChat/build/Debug/src/ChatServer && ./ChatServer",
+      "command": "cd /home/cmx/QtProjects/mxChat/build/src/ChatServer && ./ChatServer",
       "detail": "1.聊天服务器 2.为邮箱验证做连接池,利用运行的grpc服务器做邮箱验证客户端 ",
       "problemMatcher": []
     },
     {
       "label": "Start StatusServer",
       "type": "shell",
-      "command": "cd /home/cmx/QtProjects/mxChat/build/Debug/src/ChatServer && ./StatusServer",
-      "detail": "利用Grpc为Qt的登录应用做StatusServer负载均衡的服务器选择"
+      "command": "cd /home/cmx/QtProjects/mxChat/build/src/ChatServer && ./StatusServer",
+      "detail": "利用Grpc为Qt的登录应用做StatusServer负载均衡的服务器选择",
+      "problemMatcher": []
     },
     {
       "label": "Start redis_server",
@@ -42,7 +43,7 @@
     {
       "label": "Start web-server",
       "type": "shell",
-      "command": "cd /home/cmx/QtProjects/mxChat && /home/cmx/QtProjects/mxChat/build/Debug/src/web/webserver",
+      "command": "cd /home/cmx/QtProjects/mxChat && /home/cmx/QtProjects/mxChat/build/src/web/webserver",
       "detail": "1.用C++ ASIO Crow 实现的高性能的Web服务器,通过向用户注册的邮箱发送重置验证码,用户提供重置验证码之后,提交表单,.即可重置Mysql数据库的密码 2.提供高性能Http流式下载,用户在此下载客户端压缩包"
     },
     {

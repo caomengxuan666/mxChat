@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 
+
 class Client : public QObject {
     Q_OBJECT
 
