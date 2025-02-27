@@ -18,7 +18,7 @@
 ![alt text]({E9EEBF17-1986-4375-8379-A5C4EC32A11E}.png)
 
 
-# 客户端
+### 客户端
 * **ChatClient** 基于新版QQ的客户端的界面设计，使用Qt Widgets进行开发
 
 ![alt text]({048277F2-1953-4D91-88FB-CA9008AC9185}.png)
@@ -29,7 +29,7 @@
 
 ![alt text]({E2691B3D-39B7-4A4E-94C6-52CF7661ACFC}.png)
 
-# WEB端
+### WEB端
 
 * **WebServer** 采用Crow,实现服务器的高速流式下载和Mysql密码修改功能
 
@@ -40,7 +40,7 @@
 
 ![alt text]({3DD73338-9B39-4767-A835-396805CD53B7}.png)
 
-# 数据库
+### 数据库
 
 * **Mysql** 用于存储用户信息
 
