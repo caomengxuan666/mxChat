@@ -8,3 +8,4 @@ out/
 */rdb
 /*.zip
 /install
+/varifyServer/config.json
