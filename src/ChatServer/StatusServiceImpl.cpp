@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-24 21:27:31
+ * @LastEditTime : 2025-02-26 21:19:47
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include "Server/StatusMonitor.h"
@@ -27,13 +27,13 @@ inline static std::string generate_unique_string() {
     return unique_string;
 }
 
+
 Status StatusServiceImpl::GetChatServer(ServerContext *context, const GetChatServerReq *request, GetChatServerRsp *reply) {
     std::string prefix("mxchat status server has received :  ");
     spdlog::info("{}", prefix + request->DebugString());
 
-
-    _server_index++;
-    _server_index %= _servers.size();
+    // 确保 _server_index 在有效范围内
+    _server_index = (_server_index + 1) % _servers.size();
 
     auto &server = _servers[_server_index];
 
@@ -47,10 +47,17 @@ Status StatusServiceImpl::GetChatServer(ServerContext *context, const GetChatSer
 
     _serverInfo.totalConnection += 1;
 
-    notifyObservers();// 通知观察者
+    // 更新对应服务器的连接数
+    size_t server_id = _server_index;
+    if (_serverInfo.bindAddressStatus.find(server_id) != _serverInfo.bindAddressStatus.end()) {
+        _serverInfo.bindAddressStatus[server_id].second += 1; // 增加连接数
+    } else {
+        _serverInfo.bindAddressStatus[server_id] = {server.host, 1}; // 初始化连接数为1
+    }
+
+    notifyObservers(); // 通知观察者
     return Status::OK;
 }
-
 void StatusServiceImpl::addObserver(StatusMonitor *observer) {
     _observers.push_back(observer);
 }
@@ -71,26 +78,27 @@ StatusServiceImpl::StatusServiceImpl() : _server_index(0) {
     ChatServer server;
     cfg.setYamlPath("server.yaml");
 
-    //服务器1
+    // 服务器1
     server.port = cfg["ChatServer1"]["port"].as<std::string>();
     server.host = cfg["ChatServer1"]["host"].as<std::string>();
     _servers.push_back(server);
     spdlog::info("ChatSever1 host:{} port:{}", server.host, server.port);
-    _serverInfo = {};
-    _serverInfo.totalConnection = 0;
-    _serverInfo.bindAddressStatus.insert(make_pair(0, make_pair(server.host, stoi(server.port))));
 
-    //服务器2
+    // 服务器2
     server.port = cfg["ChatServer2"]["port"].as<std::string>();
     server.host = cfg["ChatServer2"]["host"].as<std::string>();
     _servers.push_back(server);
     spdlog::info("ChatSever2 host:{} port:{}", server.host, server.port);
-    _serverInfo.bindAddressStatus.insert(make_pair(1, make_pair(server.host, stoi(server.port))));
 
-    //注册观察者
+    // 初始化服务器状态
+    _serverInfo = {};
+    _serverInfo.totalConnection = 0;
+    _serverInfo.bindAddressStatus.insert({0, {server.host, 0}}); // 服务器1的连接数初始化为0
+    _serverInfo.bindAddressStatus.insert({1, {server.host, 0}}); // 服务器2的连接数初始化为0
+
+    // 注册观察者
     addObserver(StatusMonitor::GetInstance(this));
 }
-
 const ServerStatus &StatusServiceImpl::serverInfo() const {
     return _serverInfo;
 }

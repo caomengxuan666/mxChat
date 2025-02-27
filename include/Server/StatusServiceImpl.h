@@ -1,3 +1,12 @@
+/**
+ * @FilePath     : /mxChat/include/Server/StatusServiceImpl.h
+ * @Description  :  echo "STATUS" | nc localhost 8080获取服务状态。
+ * @Author       : caomengxuan666 2507560089@qq.com
+ * @Version      : 0.0.1
+ * @LastEditors  : caomengxuan666 2507560089@qq.com
+ * @LastEditTime : 2025-02-26 21:02:43
+ * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
+**/
 #pragma once
 #ifdef INTERNAL
 #undef INTERNAL
@@ -23,12 +32,12 @@ struct ChatServer {
 };
 
 struct ServerStatus {
-    //对应ip:port
+    // 对应 ip:port
     using Address = std::pair<std::string, size_t>;
-    //绑定的ip:port各自接受的连接数
-    std::unordered_map<size_t, Address> bindAddressStatus;
-    //总共连接到服务器的数量
-    size_t totalConnection;
+    // 绑定的 ip:port 及其接受的连接数
+    std::unordered_map<size_t, std::pair<std::string, size_t>> bindAddressStatus;
+    // 总共连接到服务器的数量
+    size_t totalConnection = 0;
 };
 
 class StatusServiceImpl final : public StatusService::Service {

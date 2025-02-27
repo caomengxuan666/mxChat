@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-24 21:37:16
+ * @LastEditTime : 2025-02-26 20:54:01
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 
@@ -46,6 +46,8 @@ void RunStatusServer() {
     StatusServiceImpl service;
     // 绑定观察者
     StatusMonitor *monitor = StatusMonitor::GetInstance(&service);
+    monitor->StartExternalInterface(8080);
+    spdlog::info("Monitoring server started on port {}", 8080);
 
     grpc::ServerBuilder builder;
 

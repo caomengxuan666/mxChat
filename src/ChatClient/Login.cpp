@@ -1,7 +1,6 @@
 #include "Client/HttpMgr.h"
 #include <Client/Login.h>
 #include <Client/Regist.h>
-#include <Client/TcpMgr.h>
 #include <QDesktopServices>
 #include <QFormLayout>
 #include <QHBoxLayout>

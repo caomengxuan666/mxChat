@@ -21,8 +21,7 @@
 #include <qnamespace.h>
 #include <qpoint.h>
 #include <qpushbutton.h>
-
-struct ServerInfo;
+#include<Client/TcpMgr.h>
 
 class Login : public QWidget {
     Q_OBJECT
