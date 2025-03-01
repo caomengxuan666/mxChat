@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-21 22:10:48
+ * @LastEditTime : 2025-03-01 21:24:21
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
@@ -21,7 +21,8 @@ public:
     ~MysqlMgr();
     int RegUser(const std::string &name, const std::string &email, const std::string &pwd);
     bool CheckPwd(const std::string &name, const std::string &pwd, UserInfo &userinfo);
-
+	std::shared_ptr<UserInfo> GetUser(int uid);
+	std::shared_ptr<UserInfo> GetUser(std::string name);
 private:
     MysqlMgr();
     MysqlDao _dao;

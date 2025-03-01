@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-23 11:38:47
+ * @LastEditTime : 2025-03-01 21:47:24
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #ifndef MYSQL_DAO_HPP
@@ -21,7 +21,8 @@ public:
     ~MysqlDao();
     int RegUser(const std::string &name, const std::string &email, const std::string &pwd);
     bool CheckPwd(const std::string &name, const std::string &pwd, UserInfo &userInfo);
-
+    std::shared_ptr<UserInfo> GetUser(int uid);
+	std::shared_ptr<UserInfo> GetUser(std::string name);
 private:
     std::unique_ptr<MySqlPool> pool_;
 };
@@ -167,5 +168,85 @@ inline bool MysqlDao::CheckPwd(const std::string &name, const std::string &pwd, 
         return false;
     }
 }
+inline std::shared_ptr<UserInfo> MysqlDao::GetUser(int uid) {
+    auto session = pool_->getConnection();
+    if (!session) {
+        std::cerr << "Failed to get connection from pool" << std::endl;
+        return nullptr;
+    }
 
+    // 使用 std::unique_ptr 和 lambda 表达式来替代 Defer
+    auto defer = std::unique_ptr<void, std::function<void(void *)>>(nullptr, [this, &session](void *) {
+        pool_->returnConnection(session);
+    });
+
+    try {
+        // 准备SQL语句
+        auto result = session->sql("SELECT uid, name, email, pwd FROM user WHERE uid = ?")
+                              .bind(uid)
+                              .execute();
+
+        // 获取单行结果
+        auto row = result.fetchOne();
+        if (!row) {
+            std::cerr << "No user found with uid: " << uid << std::endl;
+            return nullptr;
+        }
+
+        // 构造 UserInfo 对象
+        auto user_ptr = std::make_shared<UserInfo>();
+        user_ptr->uid = row[0].get<int>();         // 第一个字段：uid
+        user_ptr->name = row[1].get<std::string>(); // 第二个字段：name
+        user_ptr->email = row[2].get<std::string>();// 第三个字段：email
+        user_ptr->pwd = row[3].get<std::string>();  // 第四个字段：pwd
+
+        return user_ptr;
+    } catch (const mysqlx::Error &e) {
+        std::cerr << "SQLException: " << e.what();
+        std::cerr << " (MySQL error code: " << e.what();
+        std::cerr << ", SQLState: " << e.what() << " )" << std::endl;
+        return nullptr;
+    }
+}
+
+inline std::shared_ptr<UserInfo> MysqlDao::GetUser(std::string name) {
+    auto session = pool_->getConnection();
+    if (!session) {
+        std::cerr << "Failed to get connection from pool" << std::endl;
+        return nullptr;
+    }
+
+    // 使用 std::unique_ptr 和 lambda 表达式来替代 Defer
+    auto defer = std::unique_ptr<void, std::function<void(void *)>>(nullptr, [this, &session](void *) {
+        pool_->returnConnection(session);
+    });
+
+    try {
+        // 准备SQL语句
+        auto result = session->sql("SELECT uid, name, email, pwd FROM user WHERE name = ?")
+                              .bind(name)
+                              .execute();
+
+        // 获取单行结果
+        auto row = result.fetchOne();
+        if (!row) {
+            std::cerr << "No user found with name: " << name << std::endl;
+            return nullptr;
+        }
+
+        // 构造 UserInfo 对象
+        auto user_ptr = std::make_shared<UserInfo>();
+        user_ptr->uid = row[0].get<int>();         // 第一个字段：uid
+        user_ptr->name = row[1].get<std::string>(); // 第二个字段：name
+        user_ptr->email = row[2].get<std::string>();// 第三个字段：email
+        user_ptr->pwd = row[3].get<std::string>();  // 第四个字段：pwd
+
+        return user_ptr;
+    } catch (const mysqlx::Error &e) {
+        std::cerr << "SQLException: " << e.what();
+        std::cerr << " (MySQL error code: " << e.what();
+        std::cerr << ", SQLState: " << e.what() << " )" << std::endl;
+        return nullptr;
+    }
+}
 #endif// MYSQL_DAO_HPP

@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-26 14:06:59
+ * @LastEditTime : 2025-03-01 21:20:34
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #ifndef TCPMGR_H
@@ -15,7 +15,7 @@
 #include <QObject>
 #include <QTcpSocket>
 
-struct ServerInfo{
+struct ServerInfo {
     int Uid;
     QString Host;
     QString Port;
@@ -29,6 +29,8 @@ public:
     TcpMgr();
 
 private:
+    void initHandlers();
+    void handleMsg(ReqId id, int len, QByteArray data);
     QTcpSocket _socket;
     QString _host;
     uint16_t _port;
@@ -36,12 +38,15 @@ private:
     bool _b_recv_pending;
     quint16 _message_id;
     quint16 _message_len;
+    QMap<ReqId, std::function<void(ReqId id, int len, QByteArray data)>> _handlers;
 public slots:
     void slot_tcp_connect(ServerInfo);
     void slot_send_data(ReqId reqId, QString data);
 signals:
     void sig_con_success(bool bsuccess);
     void sig_send_data(ReqId reqId, QString data);
+    void sig_login_failed(int err);
+    void sig_swich_chatdlg();
 };
 
 #endif// TCPMGR_H

@@ -4,10 +4,11 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-26 21:19:47
+ * @LastEditTime : 2025-03-01 21:16:12
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include "Server/StatusMonitor.h"
+#include <DataBase/RedisMgr.h>
 #include <Server/StatusServiceImpl.h>
 #include <Server/config.hpp>
 #include <Server/const.h>
@@ -44,18 +45,19 @@ Status StatusServiceImpl::GetChatServer(ServerContext *context, const GetChatSer
     reply->set_port(server.port);
     reply->set_error(ErrorCodes::SUCCESSFUL);
     reply->set_token(generate_unique_string());
+    //insertToken(request->uid(), reply->token());
 
     _serverInfo.totalConnection += 1;
 
     // 更新对应服务器的连接数
     size_t server_id = _server_index;
     if (_serverInfo.bindAddressStatus.find(server_id) != _serverInfo.bindAddressStatus.end()) {
-        _serverInfo.bindAddressStatus[server_id].second += 1; // 增加连接数
+        _serverInfo.bindAddressStatus[server_id].second += 1;// 增加连接数
     } else {
-        _serverInfo.bindAddressStatus[server_id] = {server.host, 1}; // 初始化连接数为1
+        _serverInfo.bindAddressStatus[server_id] = {server.host, 1};// 初始化连接数为1
     }
 
-    notifyObservers(); // 通知观察者
+    notifyObservers();// 通知观察者
     return Status::OK;
 }
 void StatusServiceImpl::addObserver(StatusMonitor *observer) {
@@ -93,12 +95,41 @@ StatusServiceImpl::StatusServiceImpl() : _server_index(0) {
     // 初始化服务器状态
     _serverInfo = {};
     _serverInfo.totalConnection = 0;
-    _serverInfo.bindAddressStatus.insert({0, {server.host, 0}}); // 服务器1的连接数初始化为0
-    _serverInfo.bindAddressStatus.insert({1, {server.host, 0}}); // 服务器2的连接数初始化为0
+    _serverInfo.bindAddressStatus.insert({0, {server.host, 0}});// 服务器1的连接数初始化为0
+    _serverInfo.bindAddressStatus.insert({1, {server.host, 0}});// 服务器2的连接数初始化为0
 
     // 注册观察者
     addObserver(StatusMonitor::GetInstance(this));
 }
 const ServerStatus &StatusServiceImpl::serverInfo() const {
     return _serverInfo;
+}
+
+Status StatusServiceImpl::Login(ServerContext *context, const LoginReq *request, LoginRsp *reply) {
+    auto uid = request->uid();
+    auto token = request->token();
+
+    std::string uid_str = std::to_string(uid);
+    std::string token_key = USERTOKENPREFIX + uid_str;
+    std::string token_value = "";
+    bool success = RedisMgr::GetInstance()->Get(token_key, token_value);
+    if (success) {
+        reply->set_error(ErrorCodes::UidInvalid);
+        return Status::OK;
+    }
+
+    if (token_value != token) {
+        reply->set_error(ErrorCodes::TokenInvalid);
+        return Status::OK;
+    }
+    reply->set_error(ErrorCodes::SUCCESSFUL);
+    reply->set_uid(uid);
+    reply->set_token(token);
+    return Status::OK;
+}
+
+void StatusServiceImpl::insertToken(int uid, std::string token) {
+    std::string uid_str = std::to_string(uid);
+    std::string token_key = USERTOKENPREFIX + uid_str;
+    RedisMgr::GetInstance()->Set(token_key, token);
 }

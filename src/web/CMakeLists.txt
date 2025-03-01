@@ -4,7 +4,6 @@ file(GLOB SRC_COMPLEMENTS "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
 find_package(Crow)
 find_package(yaml-cpp CONFIG REQUIRED)
-
 set(EXECUTABLE_NAME webserver)
 
 set(SRC_COMPLEMENTS ${SRC_COMPLEMENTS} ${CMAKE_SOURCE_DIR}/src/ChatServer/RedisMgr.cpp)

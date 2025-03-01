@@ -4,11 +4,12 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-26 13:25:07
+ * @LastEditTime : 2025-03-01 21:13:41
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
 
+#include "message.pb.h"
 #include <spdlog/spdlog.h>
 #ifdef INTERNAL
 #undef INTERNAL
@@ -29,6 +30,8 @@ using grpc::Status;
 
 using message::GetChatServerReq;
 using message::GetChatServerRsp;
+using message::LoginReq;
+using message::LoginRsp;
 using message::StatusService;
 
 class StatusConPool {
@@ -129,6 +132,27 @@ public:
             return reply;
         }
     }
+    LoginRsp Login(int uid, std::string token) {
+        ClientContext context;
+        LoginRsp reply;
+        LoginReq request;
+        request.set_uid(uid);
+        request.set_token(token);
+
+        auto stub = pool_->getConnection();
+        Status status = stub->Login(&context, request, &reply);
+
+        // 使用 std::unique_ptr 和 lambda 表达式来替代 Defer
+        auto defer = std::unique_ptr<void, std::function<void(void *)>>(nullptr, [&stub, this](void *) {
+            pool_->returnConnection(std::move(stub));
+        });
+        if (status.ok()) {
+            return reply;
+        } else {
+            reply.set_error(ErrorCodes::RPCGetFailed);
+            return reply;
+        }
+    }
 
 private:
     StatusGrpcClient() {
@@ -142,5 +166,6 @@ private:
         spdlog::info("pool size is {}", pool_size);
         pool_.reset(new StatusConPool(pool_size, port));
     }
+
     std::unique_ptr<StatusConPool> pool_;
 };

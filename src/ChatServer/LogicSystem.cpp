@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-23 11:45:33
+ * @LastEditTime : 2025-03-01 21:40:02
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include "Server/LogicSystem.h"
@@ -13,11 +13,24 @@
 #include "Server/HttpConnection.h"
 #include "Server/StatusGrpcClient.hpp"
 #include "Server/VarifyGrpcClient.h"
+#include <Server/CSession.h>
 #include <spdlog/spdlog.h>
 
-LogicSystem::~LogicSystem() {}
 
-LogicSystem::LogicSystem() {
+LogicSystem::~LogicSystem() {
+}
+
+
+void LogicSystem::PostMsgToQue(shared_ptr<LogicNode> msg) {
+    std::unique_lock<std::mutex> unique_lk(_mutex);
+    _msg_que.push(msg);
+    //由0变为1则发送通知信号
+    if (_msg_que.size() == 1) {
+        unique_lk.unlock();
+        _consume.notify_one();
+    }
+}
+LogicSystem::LogicSystem() : b_stop(false) {
     RegGet("/get_test", [](std::shared_ptr<HttpConnection> connection) {
         beast::ostream(connection->_response.body()) << "receive get_test req " << std::endl;
         int i = 0;
@@ -268,4 +281,56 @@ void HttpConnection::CheckDeadline() {
                     self->_socket.close(ec);
                 }
             });
+}
+
+void LogicSystem::RegisterCallBacks() {
+    _fun_callbacks[MSG_CHAT_LOGIN] = std::bind(&LogicSystem::LoginHandler, this,
+                                               placeholders::_1, placeholders::_2, placeholders::_3);
+}
+
+void LogicSystem::LoginHandler(shared_ptr<CSession> session, const short &msg_id, const string &msg_data) {
+    Json::Reader reader;
+    Json::Value root;
+    reader.parse(msg_data, root);
+    auto uid = root["uid"].asInt();
+    std::cout << "user login uid is  " << uid << " user token  is "
+              << root["token"].asString() << endl;
+
+    // 从状态服务器获取token匹配是否准确
+    auto rsp = StatusGrpcClient::GetInstance()->Login(uid, root["token"].asString());
+    Json::Value rtvalue;
+
+    // 使用 std::unique_ptr 和 std::function 实现 defer
+    auto defer = std::unique_ptr<void, std::function<void(void *)>>(nullptr, [&rtvalue, session](void *) {
+        std::string return_str = rtvalue.toStyledString();
+        session->Send(return_str, MSG_CHAT_LOGIN_RSP);
+    });
+
+    rtvalue["error"] = rsp.error();
+    if (rsp.error() != ErrorCodes::SUCCESSFUL) {
+        return;
+    }
+
+    // 内存中查询用户信息
+    //todo
+    /*
+    auto find_iter = _users.find(uid);
+    std::shared_ptr<UserInfo> user_info = nullptr;
+    if (find_iter == _users.end()) {
+        // 查询数据库
+        user_info = MysqlMgr::GetInstance()->GetUser(uid);
+        if (user_info == nullptr) {
+            rtvalue["error"] = ErrorCodes::UidInvalid;
+            return;
+        }
+
+        _users[uid] = user_info;
+    } else {
+        user_info = find_iter->second;
+    }
+*/
+    
+    rtvalue["uid"] = uid;
+    rtvalue["token"] = rsp.token();
+    //rtvalue["name"] = user_info->name;
 }

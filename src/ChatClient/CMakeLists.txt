@@ -19,6 +19,7 @@ set(PROJECT_SOURCES
     ${INCLUDE_HEADERS_CLIENT}/HttpMgr.h
     ${INCLUDE_HEADERS_CLIENT}/BubbleWidget.h
     ${INCLUDE_HEADERS_CLIENT}/TcpMgr.h
+    ${INCLUDE_HEADERS_CLIENT}/UserMgr.h
     Regist.cpp
     main.cpp
     Login.cpp
@@ -26,6 +27,7 @@ set(PROJECT_SOURCES
     HttpMgr.cpp
     BubbleWidget.cpp
     TcpMgr.cpp
+    UserMgr.cpp
     ${CMAKE_SOURCE_DIR}/resources/Login.qrc
 )
 

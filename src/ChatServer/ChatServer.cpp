@@ -3,10 +3,15 @@
 #include <Server/config.hpp>
 #include <boost/asio.hpp>
 #include <spdlog/spdlog.h>
+#include<Server/AsioIOServicePool.h>
 
 #ifdef INTERNAL
 #undef INTERNAL
 #endif
+
+bool bstop = false;
+std::condition_variable cond_quit;
+std::mutex mutex_quit;
 
 int main(int argc, char *argv[]) {
     try {
@@ -21,16 +26,19 @@ int main(int argc, char *argv[]) {
         std::string cServerHost = config["CServer"]["host"].as<std::string>();
         unsigned short cServerPort = config["CServer"]["port"].as<unsigned short>();
 
+        auto pool = AsioIOServicePool::GetInstance();
+
         // 启动CServer 服务器
         spdlog::info("Starting CServer on {}:{}", cServerHost, cServerPort);
         boost::asio::io_context io_context{1};
         boost::asio::signal_set signals(io_context, SIGINT, SIGTERM);
 
         // 设置异步等待SIGINT信号b
-        signals.async_wait([&io_context](const boost::system::error_code &error, int signal_number) {
+        signals.async_wait([&io_context,pool](const boost::system::error_code &error, int signal_number) {
             if (!error) {
                 std::cout << "Shutting down server..." << std::endl;
                 io_context.stop();  // 停止io_context
+                pool->Stop();
             }
         });
 

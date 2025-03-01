@@ -7,6 +7,7 @@ message(STATUS "Include Headers Database: ${INCLUDE_HEADERS_DATABASE}")
 
 find_package(YAML-CPP REQUIRED)
 find_package(lz4 REQUIRED) 
+
 set(HEADERS 
     ${INCLUDE_HEADERS_SERVER}/Server.h
     ${INCLUDE_HEADERS_SERVER}/CServer.h
@@ -31,6 +32,8 @@ set(CHAT_SERVER_PROJECT_SOURCES
     yamlReader.hpp
     AsioIOServicePool.cpp
     MysqlMgr.cpp
+    CSession.cpp
+    UserMgr.cpp
 )
 
 set(STATUS_SERVER_PROJECT_SOURCES
@@ -39,6 +42,7 @@ set(STATUS_SERVER_PROJECT_SOURCES
     StatusServer.cpp
     StatusServiceImpl.cpp
     StatusMonitor.cpp
+    RedisMgr.cpp
 )
 
 set(LINK_LIBS_CHAT_SERVER 
@@ -64,6 +68,7 @@ set(LINK_LIBS_STATUS_SERVER
     gRPC::grpc
     gRPC::grpc++
     gRPC::grpc++_alts
+    redis++::redis++_static
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

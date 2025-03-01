@@ -226,6 +226,9 @@ void Login::setupUI() {
         regist->show();
     });
 
+    //连接tcp管理者发出的登陆失败信号
+    connect(TcpMgr::GetInstance().get(), &TcpMgr::sig_login_failed, this, &Login::slot_login_failed);
+
     // 绑定Enter shortcut到LoginButton
     QShortcut *enterShortcut = new QShortcut(QKeySequence(Qt::Key_Enter), this);
     connect(enterShortcut, &QShortcut::activated, this, &Login::onLoginButtonClicked);
@@ -392,6 +395,12 @@ void Login::slot_tcp_con_finish(bool bsuccess) {
         spdlog::warn("服务器连接失败");
         QMessageBox::warning(this, "服务器连接失败", "请检查网络连接");
     }
+}
+
+void Login::slot_login_failed(int err) {
+    QString result = QString("登录失败, err is %1")
+                             .arg(err);
+    QMessageBox::warning(this, "登录失败", result);
 }
 
 #include "Login.moc"

@@ -4,17 +4,18 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-26 21:02:43
+ * @LastEditTime : 2025-03-01 21:15:53
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
+#include "message.pb.h"
 #ifdef INTERNAL
 #undef INTERNAL
 #endif
 #include "message.grpc.pb.h"
+#include <functional>
 #include <grpcpp/grpcpp.h>
 #include <vector>
-#include <functional>
 
 using grpc::Server;
 using grpc::ServerBuilder;
@@ -23,6 +24,8 @@ using grpc::Status;
 using message::GetChatServerReq;
 using message::GetChatServerRsp;
 using message::StatusService;
+using message::LoginRsp;
+using message::LoginReq;
 
 class StatusMonitor;
 
@@ -45,16 +48,18 @@ public:
     StatusServiceImpl();
     Status GetChatServer(ServerContext *context, const GetChatServerReq *request,
                          GetChatServerRsp *reply) override;
+    Status Login(ServerContext *context, const LoginReq *request, LoginRsp *reply)override;
+    void insertToken(int uid, std::string token);
 
-    void addObserver(StatusMonitor* observer);
-    void removeObserver(StatusMonitor* observer);
+    void addObserver(StatusMonitor *observer);
+    void removeObserver(StatusMonitor *observer);
     void notifyObservers();
-    const ServerStatus& serverInfo()const;
+    const ServerStatus &serverInfo() const;
 
 protected:
     std::vector<ChatServer> _servers;
     int _server_index;
-    std::vector<StatusMonitor*> _observers;
+    std::vector<StatusMonitor *> _observers;
 
 private:
     void addOberver();
