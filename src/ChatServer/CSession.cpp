@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-01 15:43:10
+ * @LastEditTime : 2025-03-02 12:50:39
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include <Server/CServer.h>
@@ -16,8 +16,6 @@
 #include <spdlog/spdlog.h>
 
 
-
-
 CSession::CSession(boost::asio::io_context &io_context, CServer *server) : _socket(io_context), _server(server), _b_close(false), _b_head_parse(false), _user_uid(0) {
     boost::uuids::uuid a_uuid = boost::uuids::random_generator()();
     _session_id = boost::uuids::to_string(a_uuid);
@@ -26,6 +24,15 @@ CSession::CSession(boost::asio::io_context &io_context, CServer *server) : _sock
 
 
 CSession::~CSession() {
+    Close();// 确保套接字已关闭
+
+    // 清理动态分配的资源
+    if (_recv_head_node) {
+        _recv_head_node.reset();
+    }
+    if (_recv_msg_node) {
+        _recv_msg_node.reset();
+    }
 }
 void CSession::Start() {
     AsyncReadHead(HEAD_TOTAL_LEN);
@@ -91,26 +98,34 @@ void CSession::AsyncReadFull(std::size_t maxLength, std::function<void(const boo
     AsyncReadLen(0, maxLength, handler);
 }
 
+
 //读取指定字节数
 void CSession::AsyncReadLen(std::size_t read_len, std::size_t total_len,
                             std::function<void(const boost::system::error_code &, std::size_t)> handler) {
     auto self = shared_from_this();
     _socket.async_read_some(boost::asio::buffer(_data + read_len, total_len - read_len),
                             [read_len, total_len, handler, self](const boost::system::error_code &ec, std::size_t bytesTransfered) {
-                                if (ec) {
-                                    // 出现错误，调用回调函数
-                                    handler(ec, read_len + bytesTransfered);
-                                    return;
-                                }
+                                try {
+                                    if (ec) {
+                                        if (ec == boost::asio::error::eof) {
+                                            spdlog::info("[CSession] Client disconnected, closing session.");
+                                        } else {
+                                            spdlog::error("[CSession] Read failed, error is {}", ec.what());
+                                        }
+                                        handler(ec, read_len + bytesTransfered);
+                                        return;
+                                    }
 
-                                if (read_len + bytesTransfered >= total_len) {
-                                    //长度够了就调用回调函数
-                                    handler(ec, read_len + bytesTransfered);
-                                    return;
-                                }
+                                    if (read_len + bytesTransfered >= total_len) {
+                                        handler(ec, read_len + bytesTransfered);
+                                        return;
+                                    }
 
-                                // 没有错误，且长度不足则继续读取
-                                self->AsyncReadLen(read_len + bytesTransfered, total_len, handler);
+                                    self->AsyncReadLen(read_len + bytesTransfered, total_len, handler);
+                                } catch (const std::exception &e) {
+                                    spdlog::error("[CSession] Exception in async_read_some: {}", e.what());
+                                    handler(boost::asio::error::operation_aborted, read_len + bytesTransfered);
+                                }
                             });
 }
 
@@ -152,12 +167,11 @@ void CSession::Send(std::string msg, short msgid) {
 void CSession::Send(char *msg, short max_length, short msgid) {
 }
 
-tcp::socket& CSession::GetSocket(){
+tcp::socket &CSession::GetSocket() {
     return _socket;
 }
 
-std::string & CSession::GetSessionId()
-{
+std::string &CSession::GetSessionId() {
     return _session_id;
 }
 void CSession::SetUserId(int uid) {
@@ -172,6 +186,9 @@ std::string CSession::GetUuid() {
 }
 
 void CSession::Close() {
-	_socket.close();
-	_b_close = true;
+    if (!_b_close) {
+        _socket.close();
+        _b_close = true;
+        spdlog::info("[CSession] Session {} closed.", _session_id);
+    }
 }

@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-16 15:59:30
+ * @LastEditTime : 2025-03-02 22:07:46
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
@@ -12,6 +12,7 @@
 
 class HttpConnection : public std::enable_shared_from_this<HttpConnection> {
     friend class LogicSystem;
+    friend class GateLogic;
 
 public:
     HttpConnection(tcp::socket socket);

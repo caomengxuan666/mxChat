@@ -1,3 +1,12 @@
+/**
+ * @FilePath     : /mxChat/include/Client/MainWidget.h
+ * @Description  :  主要的聊天界面
+ * @Author       : caomengxuan666 2507560089@qq.com
+ * @Version      : 0.0.1
+ * @LastEditors  : caomengxuan666 2507560089@qq.com
+ * @LastEditTime : 2025-03-02 12:23:43
+ * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
+**/
 // MainWidget.h
 #ifndef MAINWIDGET_H
 #define MAINWIDGET_H
@@ -28,24 +37,24 @@ public:
     ~MainWidget();
 public slots:
     void onLoginSuccess();
-
-
 private:
     void setupUI();
     void setupStyle();
     void addSessionItem(const QString &name, const QString &msg, const QString &time);
     void addTestMessage(const QString &sender, const QString &time, const QString &content, MessageType type);
+    
+    [[maybe_unused]]
     void addTimeDivider(const QString &timeText);
+
     void onSessionItemClicked(QListWidgetItem *item);
     void updateChatArea(const QString &sessionName);
-    void resizeEvent(QResizeEvent *event);
     // 组件
     QListWidget *sessionList;
     QScrollArea *chatArea;
     QLineEdit *messageInput;
     QPushButton *sendButton;
-    QWidget *inputPanel;        // 声明 inputPanel 为成员变量
-    QVBoxLayout *chatAreaLayout;// 声明 chatAreaLayout 为成员变量
+    QWidget *inputPanel;        
+    QVBoxLayout *chatAreaLayout;
 };
 
 

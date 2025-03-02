@@ -29,16 +29,6 @@ MainWidget::MainWidget(QWidget *parent)
     addSessionItem("吴羽薇", "吴羽薇：宝宝，喜欢你...", "15:45");
     addSessionItem("程序代做接单群", "[文件] requirements.docx", "09:12");
 
-    // 测试消息生成器
-    auto addTestMessage = [&](const QString &sender, const QString &time, const QString &content, MessageType type) {
-        BubbleWidget *bubble = new BubbleWidget(sender, time, content, type);
-        bubble->setMinimumHeight(60);
-        bubble->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        QWidget *chatContent = chatArea->widget();
-        QVBoxLayout *chatLayout = qobject_cast<QVBoxLayout *>(chatContent->layout());
-        chatLayout->addWidget(bubble);
-    };
-
     // 添加测试消息
     addTestMessage("系统通知", "09:00:00", "聊天系统初始化完成", MessageType::System);
     addTestMessage("我", "09:00:05", "大家好！测试开始", MessageType::Self);
@@ -161,7 +151,7 @@ void MainWidget::setupUI() {
 
     // 绑定Enter键到addTestMessage
     QShortcut *enterShortcut = new QShortcut(QKeySequence(Qt::Key_Return), this);
-    connect(enterShortcut, &QShortcut::activated, [=]() {
+    connect(enterShortcut, &QShortcut::activated, [this]() {
         QString message = messageInput->text();
         if (!message.isEmpty()) {
             messageInput->clear();
@@ -185,7 +175,7 @@ void MainWidget::onSessionItemClicked(QListWidgetItem *item) {
     fadeOut->setStartValue(1.0);
     fadeOut->setEndValue(0.0);
 
-    connect(fadeOut, &QPropertyAnimation::finished, this, [=]() {
+    connect(fadeOut, &QPropertyAnimation::finished, this, [this,sessionName,chatEffect]() {
         // 淡出完成后更新聊天内容
         updateChatArea(sessionName);
         spdlog::info("切换会话到：{}", sessionName.toStdString());
@@ -196,7 +186,7 @@ void MainWidget::onSessionItemClicked(QListWidgetItem *item) {
         fadeIn->setStartValue(0.0);
         fadeIn->setEndValue(1.0);
 
-        connect(fadeIn, &QPropertyAnimation::finished, this, [=]() {
+        connect(fadeIn, &QPropertyAnimation::finished, this, [this]() {
             chatArea->setGraphicsEffect(nullptr);
         });
 
@@ -207,7 +197,7 @@ void MainWidget::onSessionItemClicked(QListWidgetItem *item) {
 
     // 绑定Enter键到addTestMessage
     QShortcut *enterShortcut = new QShortcut(QKeySequence(Qt::Key_Return), this);
-    connect(enterShortcut, &QShortcut::activated, [=]() {
+    connect(enterShortcut, &QShortcut::activated, [this]() {
         QString message = messageInput->text();
         if (!message.isEmpty()) {
             messageInput->clear();
@@ -271,32 +261,6 @@ void MainWidget::setupStyle() {
                 border-left: 4px solid #00B4FF;
             }
         )");
-    }
-
-    // 更新 chatArea 样式
-    if (chatArea) {
-        chatArea->setStyleSheet(R"(
-        QTextEdit {
-            background: #F5F6F7;
-            border: none;
-            font-family: 'Microsoft YaHei';
-            font-size: 14px;
-            color: #333333;
-        }
-        a {
-            color: #00B4FF;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    )");
-
-        // 启用自动换行
-        //chatArea->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
-
-        // 设置边距
-        //chatArea->document()->setDocumentMargin(12);
     }
 
     // 设置输入区域样式
@@ -380,15 +344,6 @@ void MainWidget::addTestMessage(const QString &sender, const QString &time, cons
     QWidget *chatContent = chatArea->widget();
     QVBoxLayout *chatLayout = qobject_cast<QVBoxLayout *>(chatContent->layout());
 
-    // 移除拉伸项
-    /*
-    QLayoutItem *item = chatLayout->takeAt(chatLayout->count() - 1);
-    if (item) {
-        if (item->spacerItem()) {
-            delete item->spacerItem();
-        }
-    }
-        */
     // 添加消息控件
     chatLayout->addWidget(bubble);
 
@@ -396,16 +351,16 @@ void MainWidget::addTestMessage(const QString &sender, const QString &time, cons
     chatLayout->addStretch();
 
     // 滚动到底部
-    //QScrollBar *vScroll = chatArea->verticalScrollBar();
-    //vScroll->setValue(vScroll->maximum());
-    // 确保滚动到底部
-    QTimer::singleShot(50, [=]() {
+    QScrollBar *vScroll = chatArea->verticalScrollBar();
+    vScroll->setValue(vScroll->maximum());    QTimer::singleShot(50, [this]() {
         chatArea->verticalScrollBar()->setValue(
                 chatArea->verticalScrollBar()->maximum());
     });
 }
 
 // 添加时间分割线
+
+[[maybe_unused]]
 void MainWidget::addTimeDivider(const QString &timeText) {
     QString divider = QStringLiteral(
                               "<div style='margin: 20px auto; text-align: center;'>"
@@ -417,27 +372,4 @@ void MainWidget::addTimeDivider(const QString &timeText) {
                               .arg(timeText);
 
     //chatArea->append(divider);
-}
-
-void MainWidget::resizeEvent(QResizeEvent *event) {
-    /*
-
-    QWidget::resizeEvent(event);
-
-    // 遍历所有消息控件并发送更新信号
-    QVBoxLayout *chatLayout = qobject_cast<QVBoxLayout *>(chatArea->layout());
-    if (!chatLayout) return;
-
-    for (int i = 0; i < chatLayout->count(); ++i) {
-        QWidget *widget = chatLayout->itemAt(i)->widget();
-        if (widget) {
-            MessageWidget *messageWidget = qobject_cast<MessageWidget *>(widget);
-            if (messageWidget) {
-                // 发送信号更新气泡的高度
-                messageWidget->updateBubbleConstraints();
-                spdlog::info("更新 气泡高度 {}", i);
-            }
-        }
-    }
-            */
 }

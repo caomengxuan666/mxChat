@@ -9,11 +9,10 @@ find_package(YAML-CPP REQUIRED)
 find_package(lz4 REQUIRED) 
 
 set(HEADERS 
-    ${INCLUDE_HEADERS_SERVER}/Server.h
     ${INCLUDE_HEADERS_SERVER}/CServer.h
     ${INCLUDE_HEADERS_SERVER}/HttpConnection.h
-    ${INCLUDE_HEADERS_DATABASE}/ChatDataBase.h
     ${INCLUDE_HEADERS_SERVER}/LogicSystem.h
+    ${INCLUDE_HEADERS_SERVER}/GateLogic.h
     ${INCLUDE_HEADERS_SERVER}/VarifyGrpcClient.h
     ${CMAKE_SOURCE_DIR}/include/message.grpc.pb.cc
     ${CMAKE_SOURCE_DIR}/include/message.pb.cc
@@ -24,7 +23,6 @@ set(HEADERS
 set(CHAT_SERVER_PROJECT_SOURCES 
     ${HEADERS}
     RedisMgr.cpp
-    ChatDataBase.cpp
     CServer.cpp
     ChatServer.cpp
     HttpConnection.cpp
@@ -34,6 +32,7 @@ set(CHAT_SERVER_PROJECT_SOURCES
     MysqlMgr.cpp
     CSession.cpp
     UserMgr.cpp
+    ../GateServer/GateLogic.cpp
 )
 
 set(STATUS_SERVER_PROJECT_SOURCES
@@ -71,23 +70,14 @@ set(LINK_LIBS_STATUS_SERVER
     redis++::redis++_static
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(ChatServer
-        MANUAL_FINALIZATION
-        ${CHAT_SERVER_PROJECT_SOURCES}
-    )
-    qt_add_executable(StatusServer
-        MANUAL_FINALIZATION
-        ${STATUS_SERVER_PROJECT_SOURCES}
-    )
-else()
-    add_executable(ChatServer
-        ${CHAT_SERVER_PROJECT_SOURCES}
-    )
-    add_executable(StatusServer
-        ${STATUS_SERVER_PROJECT_SOURCES}
-    )
-endif()
+
+add_executable(ChatServer
+    ${CHAT_SERVER_PROJECT_SOURCES}
+)
+
+add_executable(StatusServer
+    ${STATUS_SERVER_PROJECT_SOURCES}
+)
 
 target_link_libraries(ChatServer PRIVATE ${LINK_LIBS_CHAT_SERVER})
 target_link_libraries(StatusServer PRIVATE ${LINK_LIBS_STATUS_SERVER})
@@ -109,3 +99,5 @@ endif()
 
 # 安装规则
 install(TARGETS ChatServer DESTINATION Bin)
+
+install(TARGETS StatusServer DESTINATION Bin)

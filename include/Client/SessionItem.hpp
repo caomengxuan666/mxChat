@@ -4,12 +4,12 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-05 15:07:54
+ * @LastEditTime : 2025-03-02 11:28:28
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
-#include<QWidget>
-#include<QHBoxLayout>
-#include<QLabel>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QWidget>
 
 class SessionItem : public QWidget {
     Q_OBJECT

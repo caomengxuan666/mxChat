@@ -4,12 +4,12 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-18 23:04:01
+ * @LastEditTime : 2025-03-02 22:34:53
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 
 #include "Server/HttpConnection.h"
-#include "Server/LogicSystem.h"
+#include <Server/GateLogic.h>
 #include <spdlog/spdlog.h>
 
 inline static char FromHex(unsigned char x) {
@@ -76,17 +76,15 @@ HttpConnection::HttpConnection(tcp::socket socket)
 void HttpConnection::Start() {
     auto self = shared_from_this();
     http::async_read(_socket, _buffer, _request, [self](beast::error_code ec, std::size_t bytes_transferred) {
+        if (ec) {
+            spdlog::info("read error: {}", ec.message());
+            return;
+        }
 
-            if (ec) {
-                spdlog::info("read error: {}", ec.message());
-                return;
-            }
-
-            //处理读到的数据
-            boost::ignore_unused(bytes_transferred);
-            self->HandleReq();
-            self->CheckDeadline();
-        
+        //处理读到的数据
+        boost::ignore_unused(bytes_transferred);
+        self->HandleReq();
+        self->CheckDeadline();
     });
 }
 
@@ -98,7 +96,7 @@ void HttpConnection::HandleReq() {
 
     if (_request.method() == http::verb::get) {
         PreParseGetParam();
-        bool success = LogicSystem::GetInstance()->HandleGet(_get_url, shared_from_this());
+        bool success = GateLogic::GetInstance()->HandleGet(_get_url, shared_from_this());
         if (!success) {
             _response.result(http::status::not_found);
             _response.set(http::field::content_type, "text/plain");
@@ -112,7 +110,7 @@ void HttpConnection::HandleReq() {
         return;
     }
     if (_request.method() == http::verb::post) {
-        bool success = LogicSystem::GetInstance()->HandlePost(_request.target(), shared_from_this());
+        bool success = GateLogic::GetInstance()->HandlePost(_request.target(), shared_from_this());
         if (!success) {
             _response.result(http::status::not_found);
             _response.set(http::field::content_type, "text/plain");

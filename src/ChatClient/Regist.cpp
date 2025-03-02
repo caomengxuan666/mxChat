@@ -200,7 +200,7 @@ void Regist::getVarifyCode() {
     if (match) {
         QJsonObject jsonObj;
         jsonObj["email"] = email;
-        HttpMgr::GetInstance()->PostHttpReq(QUrl("http://localhost:8082/get_varifycode"),
+        HttpMgr::GetInstance()->PostHttpReq(QUrl("http://localhost:8081/get_varifycode"),
                                             jsonObj, ReqId::ID_GET_VARIFY_CODE, Modules::REGISTERMOD);
     } else {
         QMessageBox::warning(this, "警告", "请输入正确的邮箱格式");
@@ -251,7 +251,7 @@ void Regist::onRegisterButtonClicked() {
         jsonObj["passwordsure"] = confirmPassword;
 
         // 发送注册请求
-        HttpMgr::GetInstance()->PostHttpReq(QUrl("http://localhost:8082/user_register"),
+        HttpMgr::GetInstance()->PostHttpReq(QUrl("http://localhost:8081/user_register"),
                                             jsonObj, ReqId::ID_REG_USER, Modules::REGISTERMOD);
     }
 }

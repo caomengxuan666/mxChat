@@ -18,11 +18,8 @@ class LogicSystem :public Singleton<LogicSystem>
 public:
 	~LogicSystem();
 	void PostMsgToQue(shared_ptr <LogicNode> msg);
-	bool HandleGet(std::string, std::shared_ptr<HttpConnection>);
-	void RegGet(std::string, HttpHandler handler);
-	void RegPost(std::string url, HttpHandler handler);
-	bool HandlePost(std::string path, std::shared_ptr<HttpConnection> con);
 	void RegisterCallBacks();
+	void DealMsg();
 	void LoginHandler(shared_ptr<CSession> session, const short &msg_id, const string &msg_data);
 private:
 	LogicSystem();

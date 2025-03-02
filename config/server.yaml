@@ -1,6 +1,11 @@
+GateServer: 
+  host: 127.0.0.1
+  port: 8081
+
 CServer:
   host: 127.0.0.1 # 冒号后添加空格
   port: 8082 # 冒号后添加空格
+
 
 StatusServer:
   port: 8083

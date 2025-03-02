@@ -306,7 +306,7 @@ bool Login::verifyUser(const QString &username, const QString &password) {
 
     // 发送 HTTP POST 请求
     HttpMgr::GetInstance()->PostHttpReq(
-            QUrl("http://localhost:8082/user_login"),
+            QUrl("http://localhost:8081/user_login"),
             login_json,
             ReqId::ID_LOGIN_USER,
             Modules::LOGINMOD);
@@ -333,7 +333,7 @@ void Login::initHttpHandlers() {
         QString token = jsonObj["token"].toString();
         QString host = jsonObj["host"].toString();
 
-        ServerInfo si{uid, host, "8082", token};
+        ServerInfo si{uid, host, "8081", token};
         _uid = si.Uid;
         _token = si.Token;
 

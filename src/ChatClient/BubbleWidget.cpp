@@ -1,10 +1,10 @@
 /**
  * @FilePath     : /mxChat/src/ChatClient/BubbleWidget.cpp
- * @Description  :  
+ * @Description  : 
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-25 21:27:25
+ * @LastEditTime : 2025-03-02 12:14:24
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include "Client/BubbleWidget.h"
@@ -167,8 +167,8 @@ void BubbleWidget::drawBubbleBackground(QPainter &painter) {
             bubbleColor = QColor("#1688FF");
             path.addRoundedRect(bubbleRect, kCornerRadius, kCornerRadius);
             path.moveTo(bubbleRight, bubbleTop + kCornerRadius);
-            path.lineTo(bubbleRight + kArrowWidth, bubbleTop + kCornerRadius - kArrowWidth / 2);
-            path.lineTo(bubbleRight + kArrowWidth, bubbleTop + kCornerRadius + kArrowWidth / 2);
+            path.lineTo(bubbleRight + kArrowWidth, bubbleTop + kCornerRadius - kArrowWidth / 2.0);
+            path.lineTo(bubbleRight + kArrowWidth, bubbleTop + kCornerRadius + kArrowWidth / 2.0);
             break;
         }
 
@@ -176,8 +176,8 @@ void BubbleWidget::drawBubbleBackground(QPainter &painter) {
             bubbleColor = QColor("#FFFFFF");
             path.addRoundedRect(bubbleRect, kCornerRadius, kCornerRadius);
             path.moveTo(bubbleLeft, bubbleTop + kCornerRadius);
-            path.lineTo(bubbleLeft - kArrowWidth, bubbleTop + kCornerRadius - kArrowWidth / 2);
-            path.lineTo(bubbleLeft - kArrowWidth, bubbleTop + kCornerRadius + kArrowWidth / 2);
+            path.lineTo(bubbleLeft - kArrowWidth, bubbleTop + kCornerRadius - kArrowWidth / 2.0);
+            path.lineTo(bubbleLeft - kArrowWidth, bubbleTop + kCornerRadius + kArrowWidth / 2.0);
             break;
         }
 

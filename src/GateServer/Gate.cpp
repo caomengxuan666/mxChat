@@ -1,9 +1,17 @@
-#include <iostream>
-#include <Server/CServer.h>
+/**
+ * @FilePath     : /mxChat/src/GateServer/Gate.cpp
+ * @Description  :  
+ * @Author       : caomengxuan666 2507560089@qq.com
+ * @Version      : 0.0.1
+ * @LastEditors  : caomengxuan666 2507560089@qq.com
+ * @LastEditTime : 2025-03-02 22:53:19
+ * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
+**/
+#include <Server/AsioIOServicePool.h>
+#include <Server/GateServer.h>
 #include <Server/config.hpp>
 #include <boost/asio.hpp>
 #include <spdlog/spdlog.h>
-#include<Server/AsioIOServicePool.h>
 
 #ifdef INTERNAL
 #undef INTERNAL
@@ -22,29 +30,28 @@ int main(int argc, char *argv[]) {
         config_manager.setYamlPath("server.yaml");
         YAML::Node config = config_manager.loadYamlDoc();
 
-        // 从配置文件中读取 CServer 的配置
-        std::string cServerHost = config["CServer"]["host"].as<std::string>();
-        unsigned short cServerPort = config["CServer"]["port"].as<unsigned short>();
+        // 从配置文件中读取 GateServer 的配置
+        std::string gateServerHost = config["GateServer"]["host"].as<std::string>();
+        unsigned short gateServerPort = config["GateServer"]["port"].as<unsigned short>();
 
         auto pool = AsioIOServicePool::GetInstance();
 
-        // 启动CServer 服务器
-        spdlog::info("Starting CServer on {}:{}", cServerHost, cServerPort);
+        // 启动GateServer 服务器
+        spdlog::info("Starting GateServer on {}:{}", gateServerHost, gateServerPort);
         boost::asio::io_context io_context{1};
         boost::asio::signal_set signals(io_context, SIGINT, SIGTERM);
 
         // 设置异步等待SIGINT信号b
-        signals.async_wait([&io_context,pool](const boost::system::error_code &error, int signal_number) {
+        signals.async_wait([&io_context, pool](const boost::system::error_code &error, int signal_number) {
             if (!error) {
                 std::cout << "Shutting down server..." << std::endl;
-                io_context.stop();  // 停止io_context
+                io_context.stop();// 停止io_context
                 pool->Stop();
             }
         });
 
-        // 启动CServers
-        auto cserver = std::make_shared<CServer>(io_context, cServerPort);
-
+        auto gateserver = std::make_shared<GateServer>(io_context, gateServerPort);
+        gateserver->Start();
         // 运行io_context
         io_context.run();
 

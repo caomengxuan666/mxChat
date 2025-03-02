@@ -47,6 +47,27 @@
       "detail": "1.用C++ ASIO Crow 实现的高性能的Web服务器,通过向用户注册的邮箱发送重置验证码,用户提供重置验证码之后,提交表单,.即可重置Mysql数据库的密码 2.提供高性能Http流式下载,用户在此下载客户端压缩包"
     },
     {
+      "label": "Start gate-server",
+      "type": "shell",
+      "command": "cd /home/cmx/QtProjects/mxChat/build/src/GateServer && ./GateServer",
+      "detail":  "网关服务器"
+    },
+    {
+      "label": "Start cs_only",
+      "dependsOrder": "parallel",
+      "dependsOn":[
+        "Start gate-server",
+        "Start ChatServer",
+        "Start StatusServer",
+        "Start ChatClient"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+
+    {
       "label": "Start All",
       "dependsOrder": "parallel",
       "dependsOn": [

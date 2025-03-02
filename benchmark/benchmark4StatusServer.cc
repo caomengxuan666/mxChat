@@ -34,7 +34,7 @@ public:
             loginJson["passwd"] = pwd;
 
             httpMgr->PostHttpReq(
-                QUrl("http://localhost:8082/user_login"),
+                QUrl("http://localhost:8081/user_login"),
                 loginJson,
                 ReqId::ID_LOGIN_USER,
                 Modules::LOGINMOD

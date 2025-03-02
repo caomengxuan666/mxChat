@@ -34,6 +34,10 @@ class RecvNode : public MsgNode {
 public:
     RecvNode(short max_len, short msg_id)
         : MsgNode(max_len), _msg_id(msg_id) {}
+	
+	~RecvNode() {
+		std::cout << "destruct RecvNode" << endl;
+	}
 
 private:
     short _msg_id;
@@ -50,6 +54,9 @@ public:
             _cur_len = static_cast<short>(strlen(msg));
         }
     }
+	~SendNode(){
+		std::cout << "destruct SendNode" << endl;
+	}
 
 private:
     short _msg_id;

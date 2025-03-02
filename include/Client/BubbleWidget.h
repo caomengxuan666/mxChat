@@ -1,10 +1,10 @@
 /**
  * @FilePath     : /mxChat/include/Client/BubbleWidget.h
- * @Description  :  
+ * @Description  :  cmx手绘的气泡类，整个聊天界面的气泡都是在这里绘制的
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-25 21:17:20
+ * @LastEditTime : 2025-03-02 11:26:39
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once

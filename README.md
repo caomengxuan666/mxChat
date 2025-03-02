@@ -13,32 +13,32 @@
 
 * **WebServer** 以Crow作为提供由代码打包二进制压缩文件的高速流式下载和密码重置功能
 
-![alt text]({972232E5-8F8C-42B8-9D95-3A1C73B621FB}.png)
+![alt text](snapshot/{972232E5-8F8C-42B8-9D95-3A1C73B621FB}.png)
 
-![alt text]({E9EEBF17-1986-4375-8379-A5C4EC32A11E}.png)
+![alt text](snapshot/{E9EEBF17-1986-4375-8379-A5C4EC32A11E}.png)
 
 
 ### 客户端
 * **ChatClient** 基于新版QQ的客户端的界面设计，使用Qt Widgets进行开发
 
-![alt text]({048277F2-1953-4D91-88FB-CA9008AC9185}.png)
+![alt text](snapshot/{048277F2-1953-4D91-88FB-CA9008AC9185}.png)
 
-![alt text]({AF88D676-F1D8-4922-A542-35A9D1AA024F}.png)
+![alt text](snapshot/{AF88D676-F1D8-4922-A542-35A9D1AA024F}.png)
 
-![alt text]({8FAD9EFB-2273-4680-99B0-C96C147296A3}.png)
+![alt text](snapshot/{8FAD9EFB-2273-4680-99B0-C96C147296A3}.png)
 
-![alt text]({E2691B3D-39B7-4A4E-94C6-52CF7661ACFC}.png)
+![alt text](snapshot/{E2691B3D-39B7-4A4E-94C6-52CF7661ACFC}.png)
 
 ### WEB端
 
 * **WebServer** 采用Crow,实现服务器的高速流式下载和Mysql密码修改功能
 
 
-![alt text]({A9912A6C-8D62-4F13-BF3B-8919D07AEC06}.png)
+![alt text](snapshot/{A9912A6C-8D62-4F13-BF3B-8919D07AEC06}.png)
 
-![alt text]({A91325C4-5DEF-41B7-8D60-F3C6A9B0C46D}.png)
+![alt text](snapshot/{A91325C4-5DEF-41B7-8D60-F3C6A9B0C46D}.png)
 
-![alt text]({3DD73338-9B39-4767-A835-396805CD53B7}.png)
+![alt text](snapshot/{3DD73338-9B39-4767-A835-396805CD53B7}.png)
 
 ### 数据库
 
