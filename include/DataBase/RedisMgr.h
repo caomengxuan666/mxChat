@@ -1,10 +1,11 @@
 #pragma once
 #include "Singleton.h"
 
+#include <spdlog/spdlog.h>
 #include <sw/redis++/redis++.h>
 
 
-constexpr std::string CODE_PREFIX="code_";
+constexpr std::string CODE_PREFIX = "code_";
 class RedisMgr : public Singleton<RedisMgr>,
                  public std::enable_shared_from_this<RedisMgr> {
     friend class Singleton<RedisMgr>;
@@ -12,7 +13,7 @@ class RedisMgr : public Singleton<RedisMgr>,
 public:
     ~RedisMgr() {}
     bool Connect(const std::string &host, int port);
-    bool Get(const std::string &key, std::string &value,const std::string &code_prefix=CODE_PREFIX);
+    bool Get(const std::string &key, std::string &value, const std::string &code_prefix = CODE_PREFIX);
     bool Set(const std::string &key, const std::string &value);
     bool Auth(const std::string &password);
     bool LPush(const std::string &key, const std::string &value);
@@ -27,7 +28,7 @@ public:
     void Close();
 
 private:
-    RedisMgr() {}
+    RedisMgr();
 
     redisContext *_connect;
     redisReply *_reply;

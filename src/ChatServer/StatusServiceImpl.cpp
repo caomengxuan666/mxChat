@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-01 21:16:12
+ * @LastEditTime : 2025-03-02 11:15:45
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include "Server/StatusMonitor.h"
@@ -45,7 +45,7 @@ Status StatusServiceImpl::GetChatServer(ServerContext *context, const GetChatSer
     reply->set_port(server.port);
     reply->set_error(ErrorCodes::SUCCESSFUL);
     reply->set_token(generate_unique_string());
-    //insertToken(request->uid(), reply->token());
+    insertToken(request->uid(), reply->token());
 
     _serverInfo.totalConnection += 1;
 

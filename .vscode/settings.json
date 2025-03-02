@@ -90,7 +90,8 @@
         "*.moc": "cpp",
         "cfenv": "cpp",
         "regex": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "netfwd": "cpp"
     },
     "cSpell.words": [
         "Varify"

@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-21 14:31:36
+ * @LastEditTime : 2025-03-02 11:20:43
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include <DataBase/RedisMgr.h>
@@ -26,19 +26,9 @@ bool RedisMgr::Connect(const std::string &host, int port) {
     return true;
 }
 
-bool RedisMgr::Get(const std::string &key, std::string &value,const std::string &code_prefix) {
+bool RedisMgr::Get(const std::string &key, std::string &value, const std::string &code_prefix) {
     //给key加上code_前缀
-    const std::string queryKey=code_prefix+key;
-    if (!Connect("127.0.0.1", 6379)) {// 默认连接本地 Redis
-        std::cerr << "Failed to connect to Redis!" << std::endl;
-    }
-    else{
-        std::cout<<"successful connect to Redis"<<std::endl;
-    }
-    if (this->_connect == NULL) {
-        std::cout << "Redis connection is not established" << std::endl;
-        return false;
-    }
+    const std::string queryKey = code_prefix + key;
     this->_reply = (redisReply *) redisCommand(this->_connect, "GET %s", queryKey.c_str());
     if (this->_reply == NULL) {
         std::cout << "[ GET " << queryKey << " ] failed" << std::endl;
@@ -55,15 +45,11 @@ bool RedisMgr::Get(const std::string &key, std::string &value,const std::string 
     value = this->_reply->str;
     freeReplyObject(this->_reply);
 
-    spdlog::info("[ GET queryKey {} ] success, value : {}",queryKey,value);
+    spdlog::info("[ GET queryKey {} ] success, value : {}", queryKey, value);
     return true;
 }
 
 bool RedisMgr::Set(const std::string &key, const std::string &value) {
-    if (this->_connect == NULL) {
-        std::cout << "Redis connection is not established" << std::endl;
-        return false;
-    }
     //执行redis命令行
 
     this->_reply = (redisReply *) redisCommand(this->_connect, "SET %s %s", key.c_str(), value.c_str());
@@ -275,5 +261,15 @@ void RedisMgr::Close() {
     if (this->_connect != NULL) {
         redisFree(_connect);
         this->_connect = NULL;
+    }
+}
+
+RedisMgr::RedisMgr() {
+    if (!Connect("127.0.0.1", 6379)) {// 默认连接本地 Redis
+        spdlog::error("Redis connection failed");
+    } else
+        spdlog::info("Redis connection closed");
+    if (this->_connect == NULL) {
+        spdlog::error("Redis connection failed");
     }
 }

@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-01 21:15:53
+ * @LastEditTime : 2025-03-02 11:21:08
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
@@ -13,7 +13,6 @@
 #undef INTERNAL
 #endif
 #include "message.grpc.pb.h"
-#include <functional>
 #include <grpcpp/grpcpp.h>
 #include <vector>
 
