@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-02 22:40:09
+ * @LastEditTime : 2025-03-03 22:16:43
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include "Server/LogicSystem.h"
@@ -20,16 +20,17 @@
 LogicSystem::~LogicSystem() {
 }
 
-
 void LogicSystem::PostMsgToQue(shared_ptr<LogicNode> msg) {
     std::unique_lock<std::mutex> unique_lk(_mutex);
     _msg_que.push(msg);
-    //由0变为1则发送通知信号
+    spdlog::info("Message with ID {} pushed to queue", msg->_recvnode->_msg_id);
+    // 由0变为1则发送通知信号
     if (_msg_que.size() == 1) {
         unique_lk.unlock();
         _consume.notify_one();
     }
 }
+
 LogicSystem::LogicSystem() : b_stop(false) {
     RegisterCallBacks();
     _worker_thread=std::thread(&LogicSystem::DealMsg,this);
@@ -113,41 +114,55 @@ void LogicSystem::LoginHandler(shared_ptr<CSession> session, const short &msg_id
 }
 
 void LogicSystem::DealMsg() {
-	for (;;) {
-		std::unique_lock<std::mutex> unique_lk(_mutex);
-		//判断队列为空则用条件变量阻塞等待，并释放锁
-		while (_msg_que.empty() && !b_stop) {
-			_consume.wait(unique_lk);
-		}
+    for (;;) {
+        std::unique_lock<std::mutex> unique_lk(_mutex);
+        // 判断队列为空则用条件变量阻塞等待，并释放锁
+        while (_msg_que.empty() && !b_stop) {
+            _consume.wait(unique_lk);
+        }
 
-		//判断是否为关闭状态，把所有逻辑执行完后则退出循环
-		if (b_stop ) {
-			while (!_msg_que.empty()) {
-				auto msg_node = _msg_que.front();
-				cout << "recv_msg id  is " << msg_node->_recvnode->_msg_id << endl;
-				auto call_back_iter = _fun_callbacks.find(msg_node->_recvnode->_msg_id);
-				if (call_back_iter == _fun_callbacks.end()) {
-					_msg_que.pop();
-					continue;
-				}
-				call_back_iter->second(msg_node->_session, msg_node->_recvnode->_msg_id,
-					std::string(msg_node->_recvnode->_data, msg_node->_recvnode->_cur_len));
-				_msg_que.pop();
-			}
-			break;
-		}
+        // 判断是否为关闭状态，把所有逻辑执行完后则退出循环
+        if (b_stop) {
+            while (!_msg_que.empty()) {
+                auto msg_node = _msg_que.front();
+                if (!msg_node || !msg_node->_recvnode) {
+                    spdlog::error("Invalid message node or recvnode in queue");
+                    _msg_que.pop();
+                    continue;
+                }
+                spdlog::info("Processing message with ID {}", msg_node->_recvnode->_msg_id);
+                auto call_back_iter = _fun_callbacks.find(msg_node->_recvnode->_msg_id);
+                if (call_back_iter == _fun_callbacks.end()) {
+                    _msg_que.pop();
+                    continue;
+                }
+                call_back_iter->second(msg_node->_session, msg_node->_recvnode->_msg_id,
+                                       std::string(msg_node->_recvnode->_data, msg_node->_recvnode->_cur_len));
+                _msg_que.pop();
+            }
+            break;
+        }
 
-		//如果没有停服，且说明队列中有数据
-		auto msg_node = _msg_que.front();
-		cout << "recv_msg id  is " << msg_node->_recvnode->_msg_id << endl;
-		auto call_back_iter = _fun_callbacks.find(msg_node->_recvnode->_msg_id);
-		if (call_back_iter == _fun_callbacks.end()) {
-			_msg_que.pop();
-			std::cout << "msg id [" << msg_node->_recvnode->_msg_id << "] handler not found" << std::endl;
-			continue;
-		}
-		call_back_iter->second(msg_node->_session, msg_node->_recvnode->_msg_id, 
-			std::string(msg_node->_recvnode->_data, msg_node->_recvnode->_cur_len));
-		_msg_que.pop();
-	}
+        // 如果没有停服，且说明队列中有数据
+        if (_msg_que.empty()) {
+            continue; // 队列为空，继续等待
+        }
+
+        auto msg_node = _msg_que.front();
+        if (!msg_node || !msg_node->_recvnode) {
+            spdlog::error("Invalid message node or recvnode in queue");
+            _msg_que.pop();
+            continue;
+        }
+        spdlog::info("Processing message with ID {}", msg_node->_recvnode->_msg_id);
+        auto call_back_iter = _fun_callbacks.find(msg_node->_recvnode->_msg_id);
+        if (call_back_iter == _fun_callbacks.end()) {
+            _msg_que.pop();
+            spdlog::error("Handler not found for message ID {}", msg_node->_recvnode->_msg_id);
+            continue;
+        }
+        call_back_iter->second(msg_node->_session, msg_node->_recvnode->_msg_id,
+                               std::string(msg_node->_recvnode->_data, msg_node->_recvnode->_cur_len));
+        _msg_que.pop();
+    }
 }

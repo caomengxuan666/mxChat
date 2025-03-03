@@ -23,7 +23,8 @@ int main(int argc, char *argv[]) {
         YAML::Node config = config_manager.loadYamlDoc();
 
         // 从配置文件中读取 CServer 的配置
-        std::string cServerHost = config["CServer"]["host"].as<std::string>();
+        //std::string cServerHost = config["CServer"]["host"].as<std::string>();
+        std::string cServerHost =ALLIPV4ADDRESS;
         unsigned short cServerPort = config["CServer"]["port"].as<unsigned short>();
 
         auto pool = AsioIOServicePool::GetInstance();
@@ -44,7 +45,7 @@ int main(int argc, char *argv[]) {
 
         // 启动CServers
         auto cserver = std::make_shared<CServer>(io_context, cServerPort);
-
+        
         // 运行io_context
         io_context.run();
 

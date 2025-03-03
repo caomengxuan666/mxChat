@@ -4,14 +4,14 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-01 21:19:48
+ * @LastEditTime : 2025-03-03 19:56:32
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include "Client/TcpMgr.h"
+#include <Client/UserMgr.h>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include<Server/const.h>
-#include<Client/UserMgr.h>
+#include <Server/const.h>
 
 
 TcpMgr::TcpMgr() : _host(""), _port(0), _b_recv_pending(false), _message_id(0), _message_len(0) {
@@ -82,6 +82,7 @@ void TcpMgr::slot_tcp_connect(ServerInfo si) {
     qDebug() << "Connecting to server...";
     _host = si.Host;
     _port = static_cast<uint16_t>(si.Port.toUInt());
+    qDebug() << "host is " << si.Host << " port is " << si.Port;
     _socket.connectToHost(si.Host, _port);
 }
 
@@ -128,14 +129,14 @@ void TcpMgr::initHandlers() {
 
         if (!jsonObj.contains("error")) {
             int err = ErrorCodes::Error_Json;
-            qDebug() << "Login Failed, err is Json Parse Err" << err;
+            qDebug() << "Login Failed, err is Json Parse Err" << std::string(NAMEOF(err));
             emit sig_login_failed(err);
             return;
         }
 
         int err = jsonObj["error"].toInt();
         if (err != ErrorCodes::SUCCESSFUL) {
-            qDebug() << "Login Failed, err is " << err;
+            qDebug() << "Login Failed, err is " << std::string(NAMEOF(err));
             emit sig_login_failed(err);
             return;
         }

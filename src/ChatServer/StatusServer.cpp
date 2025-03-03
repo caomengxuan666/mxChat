@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-26 20:54:01
+ * @LastEditTime : 2025-03-03 19:44:51
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 
@@ -41,7 +41,7 @@ void RunStatusServer() {
     //std::string host = trim(cfg["StatusServer"]["host"].as<std::string>());
     std::string port = trim(cfg["StatusServer"]["port"].as<std::string>());
 
-    std::string server_address = "0.0.0.0:" + port;
+    std::string server_address = ALLIPV4ADDRESS + port;
 
     StatusServiceImpl service;
     // 绑定观察者

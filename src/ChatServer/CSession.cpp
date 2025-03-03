@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-02 12:50:39
+ * @LastEditTime : 2025-03-03 22:17:26
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include <Server/CServer.h>
@@ -28,10 +28,10 @@ CSession::~CSession() {
 
     // 清理动态分配的资源
     if (_recv_head_node) {
-        _recv_head_node.reset();
+        //_recv_head_node.reset();
     }
     if (_recv_msg_node) {
-        _recv_msg_node.reset();
+        //_recv_msg_node.reset();
     }
 }
 void CSession::Start() {
@@ -191,4 +191,8 @@ void CSession::Close() {
         _b_close = true;
         spdlog::info("[CSession] Session {} closed.", _session_id);
     }
+}
+
+LogicNode::LogicNode(shared_ptr<CSession> session,
+                     shared_ptr<RecvNode> recvnode) : _session(session), _recvnode(recvnode) {
 }

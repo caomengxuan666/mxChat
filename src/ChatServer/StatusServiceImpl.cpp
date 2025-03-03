@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-02 11:15:45
+ * @LastEditTime : 2025-03-03 23:20:30
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include "Server/StatusMonitor.h"
@@ -110,9 +110,9 @@ Status StatusServiceImpl::Login(ServerContext *context, const LoginReq *request,
     auto token = request->token();
 
     std::string uid_str = std::to_string(uid);
-    std::string token_key = USERTOKENPREFIX + uid_str;
+    std::string token_key = uid_str;
     std::string token_value = "";
-    bool success = RedisMgr::GetInstance()->Get(token_key, token_value);
+    bool success = RedisMgr::GetInstance()->Get(token_key, token_value,USERTOKENPREFIX);
     if (success) {
         reply->set_error(ErrorCodes::UidInvalid);
         return Status::OK;

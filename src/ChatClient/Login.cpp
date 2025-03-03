@@ -332,8 +332,11 @@ void Login::initHttpHandlers() {
         int uid = jsonObj["uid"].toInt();
         QString token = jsonObj["token"].toString();
         QString host = jsonObj["host"].toString();
+        QString port = jsonObj["port"].toString();
 
-        ServerInfo si{uid, host, "8081", token};
+        qDebug()<<"uid:"<<uid<<"token:"<<token<<"host:"<<host<<"port:"<<port;
+
+        ServerInfo si{uid, host, "8082", token};
         _uid = si.Uid;
         _token = si.Token;
 

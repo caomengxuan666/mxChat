@@ -9,7 +9,7 @@ set(CMAKE_PREFIX_PATH
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-
+ 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -42,6 +42,10 @@ find_package(redis++ CONFIG REQUIRED)
 
 # mysql connector
 find_package(unofficial-mysql-connector-cpp CONFIG REQUIRED)
+
+# nameof
+
+find_package(nameof CONFIG REQUIRED)
 
 function(copy_config_files)
     file(COPY "config/" DESTINATION ${CMAKE_BINARY_DIR}/config)

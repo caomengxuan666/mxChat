@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-01 15:35:01
+ * @LastEditTime : 2025-03-03 22:17:09
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
@@ -61,7 +61,7 @@ class LogicNode {
     friend class LogicSystem;
 
 public:
-    LogicNode(shared_ptr<CSession>, shared_ptr<RecvNode>){}
+    LogicNode(shared_ptr<CSession>, shared_ptr<RecvNode>);
 
 private:
     shared_ptr<CSession> _session;
