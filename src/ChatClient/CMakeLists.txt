@@ -51,7 +51,6 @@ set(LINK_LIBS
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Network 
     Qt${QT_VERSION_MAJOR}::Gui
-    nameof::nameof
 )
 
 target_link_libraries(ChatClient PRIVATE ${LINK_LIBS})

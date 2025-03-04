@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-03 22:17:26
+ * @LastEditTime : 2025-03-04 16:31:43
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include <Server/CServer.h>
@@ -34,6 +34,36 @@ CSession::~CSession() {
         //_recv_msg_node.reset();
     }
 }
+
+void CSession::HandleWrite(const boost::system::error_code& error, std::shared_ptr<CSession> shared_self) {
+	//增加异常处理
+	try {
+		if (!error) {
+			std::lock_guard<std::mutex> lock(_send_lock);
+			//cout << "send data " << _send_que.front()->_data+HEAD_LENGTH << endl;
+			_send_que.pop();
+			if (!_send_que.empty()) {
+				auto& msgnode = _send_que.front();
+				boost::asio::async_write(_socket, boost::asio::buffer(msgnode->_data, msgnode->_total_len),
+					std::bind(&CSession::HandleWrite, this, std::placeholders::_1, shared_self));
+			}
+		}
+		else {
+			std::cout << "handle write failed, error is " << error.what() << endl;
+			Close();
+			_server->ClearSession(_session_id);
+		}
+	}
+	catch (std::exception& e) {
+		std::cerr << "Exception code : " << e.what() << endl;
+	}
+	
+}
+
+std::shared_ptr<CSession>CSession::SharedSelf() {
+	return shared_from_this();
+}
+
 void CSession::Start() {
     AsyncReadHead(HEAD_TOTAL_LEN);
 }
@@ -162,9 +192,38 @@ void CSession::AsyncReadBody(int total_len) {
 }
 
 void CSession::Send(std::string msg, short msgid) {
+	std::lock_guard<std::mutex> lock(_send_lock);
+	int send_que_size = _send_que.size();
+	if (send_que_size > MAX_SENDQUE) {
+		std::cout << "session: " << _session_id << " send que fulled, size is " << MAX_SENDQUE << endl;
+		return;
+	}
+
+	_send_que.push(make_shared<SendNode>(msg.c_str(), msg.length(), msgid));
+	if (send_que_size > 0) {
+		return;
+	}
+	auto& msgnode = _send_que.front();
+	boost::asio::async_write(_socket, boost::asio::buffer(msgnode->_data, msgnode->_total_len),
+		std::bind(&CSession::HandleWrite, this, std::placeholders::_1, SharedSelf()));
 }
 
-void CSession::Send(char *msg, short max_length, short msgid) {
+
+void CSession::Send(char* msg, short max_length, short msgid) {
+	std::lock_guard<std::mutex> lock(_send_lock);
+	int send_que_size = _send_que.size();
+	if (send_que_size > MAX_SENDQUE) {
+		std::cout << "session: " << _session_id << " send que fulled, size is " << MAX_SENDQUE << endl;
+		return;
+	}
+
+	_send_que.push(make_shared<SendNode>(msg, max_length, msgid));
+	if (send_que_size>0) {
+		return;
+	}
+	auto& msgnode = _send_que.front();
+	boost::asio::async_write(_socket, boost::asio::buffer(msgnode->_data, msgnode->_total_len), 
+		std::bind(&CSession::HandleWrite, this, std::placeholders::_1, SharedSelf()));
 }
 
 tcp::socket &CSession::GetSocket() {

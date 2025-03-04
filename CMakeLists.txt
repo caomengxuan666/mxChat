@@ -43,9 +43,7 @@ find_package(redis++ CONFIG REQUIRED)
 # mysql connector
 find_package(unofficial-mysql-connector-cpp CONFIG REQUIRED)
 
-# nameof
 
-find_package(nameof CONFIG REQUIRED)
 
 function(copy_config_files)
     file(COPY "config/" DESTINATION ${CMAKE_BINARY_DIR}/config)

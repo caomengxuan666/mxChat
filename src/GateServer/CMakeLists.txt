@@ -50,7 +50,6 @@ set(LINK_LIBS_CHAT_SERVER
     gRPC::grpc++_alts
     redis++::redis++_static
     unofficial::mysql-connector-cpp::connector
-    nameof::nameof
     /lib/x86_64-linux-gnu/libzstd.so
     resolv
     lz4::lz4

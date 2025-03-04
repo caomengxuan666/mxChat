@@ -5,7 +5,7 @@ out/
 开发文档/
 /varifyServer/node_modules
 *.out
-*/rdb
+*.rdb
 /*.zip
 /install
 /varifyServer/config.json

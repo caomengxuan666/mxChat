@@ -129,14 +129,14 @@ void TcpMgr::initHandlers() {
 
         if (!jsonObj.contains("error")) {
             int err = ErrorCodes::Error_Json;
-            qDebug() << "Login Failed, err is Json Parse Err" << std::string(NAMEOF(err));
+            qDebug() << "Login Failed, err is Json Parse Err" << err;
             emit sig_login_failed(err);
             return;
         }
 
         int err = jsonObj["error"].toInt();
         if (err != ErrorCodes::SUCCESSFUL) {
-            qDebug() << "Login Failed, err is " << std::string(NAMEOF(err));
+            qDebug() << "Login Failed, err is " << err;
             emit sig_login_failed(err);
             return;
         }

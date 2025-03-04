@@ -5,11 +5,16 @@
 #include <QGraphicsOpacityEffect>
 #include <QSequentialAnimationGroup>
 #include <QShortcut>
+#include <QSplitter>
 #include <QThread>
 #include <QTime>
 #include <QTimer>
+#include <QToolButton>
+#include <qnamespace.h>
+#include <qpainterpath.h>
 #include <qpropertyanimation.h>
 #include <qtextbrowser.h>
+#include <qtoolbutton.h>
 #include <spdlog/spdlog.h>
 
 MainWidget::MainWidget(QWidget *parent)
@@ -30,28 +35,149 @@ MainWidget::MainWidget(QWidget *parent)
     addSessionItem("程序代做接单群", "[文件] requirements.docx", "09:12");
 
     // 添加测试消息
-    addTestMessage("系统通知", "09:00:00", "聊天系统初始化完成", MessageType::System);
-    addTestMessage("我", "09:00:05", "大家好！测试开始", MessageType::Self);
-    addTestMessage("客服助手", "09:00:10", "您好，请问有什么可以帮助您？", MessageType::Other);
+    addMessasge("系统通知", "09:00:00", "聊天系统初始化完成", MessageType::System);
+    addMessasge("我", "09:00:05", "大家好！测试开始", MessageType::Self);
+    addMessasge("客服助手", "09:00:10", "您好，请问有什么可以帮助您？", MessageType::Other);
 }
 MainWidget::~MainWidget() {
+}
+// 新增导航按钮创建函数
+QToolButton *MainWidget::createNavButton(const QString &iconName,bool isAvatar) {
+    QToolButton *btn = new QToolButton;
+    btn->setIconSize(QSize(24, 24));
+    btn->setToolButtonStyle(Qt::ToolButtonIconOnly); // 只显示图标，不显示文字
+    btn->setFixedSize(60, 60);
+    btn->setStyleSheet(R"(
+        QToolButton {
+            color: #A0A4AD;
+            border: none;
+            padding: 5px;
+        }
+        QToolButton:hover {
+            background: #373B44;
+        }
+        QToolButton[active="true"] {
+            color: #00B4FF;
+            background: #373B44;
+        }
+    )");
+
+    if (isAvatar) {
+        // 如果是用户头像，加载图片并设置为圆形
+        QPixmap avatar(":/images/avatar.png");
+        QPixmap circularAvatar(24, 24); // 创建一个正方形画布
+        circularAvatar.fill(Qt::transparent); // 设置透明背景
+
+        QPainter painter(&circularAvatar);
+        painter.setRenderHint(QPainter::Antialiasing);
+
+        // 绘制圆形裁剪区域
+        QPainterPath path;
+        path.addEllipse(0, 0, 24, 24);
+        painter.setClipPath(path);
+
+        // 将头像图片绘制到圆形区域
+        painter.drawPixmap(0, 0, avatar.scaled(24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        painter.end();
+
+        btn->setIcon(QIcon(circularAvatar)); // 设置圆形头像图标
+    } else {
+        // 使用 QPainter 绘制其他图标
+        QPixmap icon(24, 24);
+        icon.fill(Qt::transparent); // 设置透明背景
+        QPainter painter(&icon);
+        painter.setRenderHint(QPainter::Antialiasing);
+
+        if (iconName == "chat") {
+            // 绘制“聊”图标（圆形尖角气泡）
+            painter.setPen(QPen(QColor("#FFFFFF"), 2)); // 白色粗轮廓线
+            QPainterPath path;
+            path.addRoundedRect(QRectF(4, 4, 16, 16), 8, 8); // 圆角矩形
+            path.moveTo(20, 12); // 尖角起点
+            path.lineTo(24, 16); // 尖角顶点
+            path.lineTo(20, 20); // 尖角终点
+            painter.drawPath(path); // 绘制路径
+        } else if (iconName == "contacts") {
+            // 绘制“友”图标（用户头像）
+            painter.setPen(QPen(QColor("#FFFFFF"), 2)); // 白色粗轮廓线
+            painter.setBrush(Qt::transparent); // 透明填充
+            painter.drawEllipse(4, 4, 16, 16); // 外部圆形
+            painter.drawLine(12, 8, 12, 16); // 垂直线表示头部
+            painter.drawLine(8, 12, 16, 12); // 水平线表示肩膀
+        } else if (iconName == "files") {
+            // 绘制“文”图标（文件形状）
+            painter.setPen(QPen(QColor("#FFFFFF"), 2)); // 白色粗轮廓线
+            QPainterPath path;
+            path.moveTo(4, 4); // 左上角
+            path.lineTo(20, 4); // 右上角
+            path.lineTo(20, 20); // 右下角
+            path.lineTo(4, 20); // 左下角
+            path.lineTo(4, 4); // 回到左上角
+            path.moveTo(20, 4); // 文件折角起点
+            path.lineTo(16, 8); // 折角中间
+            path.lineTo(16, 4); // 折角终点
+            painter.drawPath(path); // 绘制路径
+        } else if (iconName == "settings") {
+            // 绘制“设”图标（齿轮）
+            painter.setPen(QPen(QColor("#FFFFFF"), 2)); // 白色粗轮廓线
+            painter.setBrush(Qt::transparent); // 透明填充
+            painter.drawEllipse(4, 4, 16, 16); // 齿轮主体
+            for (int i = 0; i < 8; ++i) {
+                qreal angle = i * M_PI / 4; // 每隔 45 度绘制一个齿
+                qreal x1 = 12 + 6 * cos(angle);
+                qreal y1 = 12 + 6 * sin(angle);
+                qreal x2 = 12 + 8 * cos(angle);
+                qreal y2 = 12 + 8 * sin(angle);
+                painter.drawLine(x1, y1, x2, y2); // 绘制齿
+            }
+        }
+
+        painter.end();
+        btn->setIcon(QIcon(icon));
+    }
+
+    return btn;
 }
 void MainWidget::setupUI() {
     QHBoxLayout *rootLayout = new QHBoxLayout(this);
     rootLayout->setContentsMargins(0, 0, 0, 0);
     rootLayout->setSpacing(0);
 
-    // 左侧导航
-    QWidget *leftPanel = new QWidget(this);
-    leftPanel->setFixedWidth(280);
-    leftPanel->setStyleSheet("background: #2E323B;");
+    // 左侧导航栏
+    QWidget *navBar = new QWidget(this);
+    navBar->setFixedWidth(60);
+    navBar->setStyleSheet("background: #23262E;");
 
-    QVBoxLayout *leftLayout = new QVBoxLayout(leftPanel);
+    QVBoxLayout *navLayout = new QVBoxLayout(navBar);
+    navLayout->setContentsMargins(0, 10, 0, 10);
+    navLayout->setSpacing(10);
+    navLayout->addStretch();
+
+    // 创建导航按钮
+    QToolButton *avt=createNavButton("avt",true);
+    QToolButton *chatBtn = createNavButton("chat");
+    QToolButton *contactsBtn = createNavButton("contacts");
+    QToolButton *filesBtn = createNavButton("files");
+    QToolButton *settingsBtn = createNavButton("settings");
+
+    navLayout->addWidget(avt);
+    navLayout->addWidget(chatBtn);
+    navLayout->addWidget(contactsBtn);
+    navLayout->addWidget(filesBtn);
+    navLayout->addWidget(settingsBtn);
+    navLayout->addStretch();
+
+    // 左侧内容区域（包含用户信息和会话列表）
+    QWidget *leftContent = new QWidget(this);
+    leftContent->setFixedWidth(280);
+    leftContent->setStyleSheet("background: #2E323B;");
+
+    QVBoxLayout *leftLayout = new QVBoxLayout(leftContent);
     leftLayout->setContentsMargins(0, 0, 0, 0);
     leftLayout->setSpacing(0);
 
-    // 用户信息栏
-    QWidget *userBar = new QWidget(leftPanel);
+    // 用户信息栏（保持原有代码）
+    QWidget *userBar = new QWidget(leftContent);
     userBar->setFixedHeight(60);
     userBar->setStyleSheet("background: #23262E; border-bottom: 1px solid #3A3D45;");
 
@@ -72,17 +198,21 @@ void MainWidget::setupUI() {
     userLayout->addWidget(avatar);
     userLayout->addStretch();
 
-    // 会话列表
-    sessionList = new QListWidget(leftPanel);
+    // 会话列表（保持原有代码）
+    sessionList = new QListWidget(leftContent);
     sessionList->setFrameShape(QFrame::NoFrame);
     sessionList->setVerticalScrollMode(QListWidget::ScrollPerPixel);
 
-    connect(sessionList, &QListWidget::itemClicked, this, &MainWidget::onSessionItemClicked);// 监听点击事件
+    connect(sessionList, &QListWidget::itemClicked, this, &MainWidget::onSessionItemClicked);
 
     leftLayout->addWidget(userBar);
     leftLayout->addWidget(sessionList);
 
-    // 右侧主区域
+    // 将导航栏和内容区域添加到主布局
+    rootLayout->addWidget(navBar);
+    rootLayout->addWidget(leftContent);
+
+    // 右侧主区域（保持原有代码）
     QWidget *rightPanel = new QWidget(this);
     rightPanel->setStyleSheet("background: #F5F6F7;");
 
@@ -90,29 +220,40 @@ void MainWidget::setupUI() {
     rightLayout->setContentsMargins(0, 0, 0, 0);
     rightLayout->setSpacing(0);
 
+    // 使用 QSplitter 实现拖拽功能
+    QSplitter *splitter = new QSplitter(Qt::Vertical, rightPanel);
+
     // 聊天区域
-    chatArea = new QScrollArea(rightPanel);
-    chatArea->setWidgetResizable(true);// 自动调整内容大小
+    chatArea = new QScrollArea(splitter);
+    chatArea->setWidgetResizable(true);
     chatArea->setFrameShape(QFrame::NoFrame);
 
-    QWidget *chatContent = new QWidget;// 创建一个容器用于存放聊天内容
+    QWidget *chatContent = new QWidget;
     QVBoxLayout *chatLayout = new QVBoxLayout(chatContent);
     chatLayout->setContentsMargins(0, 0, 0, 0);
     chatLayout->setSpacing(10);
-    //chatLayout->addStretch();// 添加一个拉伸项，确保内容从顶部开始排列
-    chatLayout->addStretch(1);// 拉伸因子设为1
+    chatLayout->addStretch(1);
 
-    chatArea->setWidget(chatContent);// 将容器设置为 QScrollArea 的内容
+    chatArea->setWidget(chatContent);
 
     // 输入区域
-    inputPanel = new QWidget(rightPanel);
-    inputPanel->setFixedHeight(120);
+    inputPanel = new QWidget(splitter);
+    inputPanel->setMinimumHeight(120);// 设置最小高度
+    inputPanel->setMaximumHeight(300);// 设置最大高度
+
+    // 初始化inputpannel的初始高度
+    QList<int> splitterSizes;
+    splitterSizes << 430 << 120;// 聊天区430px，输入区120px
+    splitter->setSizes(splitterSizes);
 
     QVBoxLayout *inputLayout = new QVBoxLayout(inputPanel);
     inputLayout->setContentsMargins(12, 12, 12, 12);
 
-    messageInput = new QLineEdit(inputPanel);
+    messageInput = new QTextEdit(inputPanel);
     messageInput->setPlaceholderText("输入消息...");
+    messageInput->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+    messageInput->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    messageInput->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
     QHBoxLayout *btnLayout = new QHBoxLayout;
     btnLayout->addStretch();
@@ -122,24 +263,27 @@ void MainWidget::setupUI() {
 
     btnLayout->addWidget(sendButton);
     connect(sendButton, &QPushButton::clicked, [this]() {
-        QString message = messageInput->text();
+        QString message = messageInput->toPlainText();
         if (!message.isEmpty()) {
             messageInput->clear();
-            addTestMessage("我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
+            addMessasge("我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
         }
     });
 
     inputLayout->addWidget(messageInput, 1);
     inputLayout->addLayout(btnLayout);
 
-    rightLayout->addWidget(chatArea, 1);
-    rightLayout->addWidget(inputPanel);
+    splitter->addWidget(chatArea);
+    splitter->addWidget(inputPanel);
+    splitter->setStretchFactor(0, 3);// 聊天区域占更多空间
+    splitter->setStretchFactor(1, 1);// 输入区域占较少空间
 
-    rootLayout->addWidget(leftPanel);
+    rightLayout->addWidget(splitter);
+
     rootLayout->addWidget(rightPanel, 1);
 
+    // 按钮按压动画
     connect(sendButton, &QPushButton::clicked, [this]() {
-        // 按钮按压动画
         QPropertyAnimation *pressAnim = new QPropertyAnimation(sendButton, "geometry");
         pressAnim->setDuration(150);
         QRect origRect = sendButton->geometry();
@@ -149,13 +293,13 @@ void MainWidget::setupUI() {
         pressAnim->start(QAbstractAnimation::DeleteWhenStopped);
     });
 
-    // 绑定Enter键到addTestMessage
-    QShortcut *enterShortcut = new QShortcut(QKeySequence(Qt::Key_Return), this);
+    // 绑定 CTRL+Enter 键到发送消息
+    QShortcut *enterShortcut = new QShortcut(QKeySequence(Qt::Key_Return, Qt::ControlModifier), this);
     connect(enterShortcut, &QShortcut::activated, [this]() {
-        QString message = messageInput->text();
+        QString message = messageInput->toPlainText();
         if (!message.isEmpty()) {
             messageInput->clear();
-            addTestMessage("我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
+            addMessasge("我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
         }
     });
 }
@@ -175,7 +319,7 @@ void MainWidget::onSessionItemClicked(QListWidgetItem *item) {
     fadeOut->setStartValue(1.0);
     fadeOut->setEndValue(0.0);
 
-    connect(fadeOut, &QPropertyAnimation::finished, this, [this,sessionName,chatEffect]() {
+    connect(fadeOut, &QPropertyAnimation::finished, this, [this, sessionName, chatEffect]() {
         // 淡出完成后更新聊天内容
         updateChatArea(sessionName);
         spdlog::info("切换会话到：{}", sessionName.toStdString());
@@ -197,11 +341,13 @@ void MainWidget::onSessionItemClicked(QListWidgetItem *item) {
 
     // 绑定Enter键到addTestMessage
     QShortcut *enterShortcut = new QShortcut(QKeySequence(Qt::Key_Return), this);
+
+
     connect(enterShortcut, &QShortcut::activated, [this]() {
-        QString message = messageInput->text();
+        QString message = messageInput->toPlainText();
         if (!message.isEmpty()) {
             messageInput->clear();
-            addTestMessage("我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
+            addMessasge("我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
         }
     });
 }
@@ -271,13 +417,13 @@ void MainWidget::setupStyle() {
     // 设置消息输入框样式
     if (messageInput) {
         messageInput->setStyleSheet(R"(
-            QLineEdit {
+            QTextEdit {
                 border: 2px solid #E0E0E0;
                 border-radius: 6px;
                 padding: 10px;
                 font-size: 14px;
             }
-            QLineEdit:focus {
+            QTextEdit:focus {
                 border-color: #00B4FF;
             }
         )");
@@ -334,9 +480,26 @@ void MainWidget::onLoginSuccess() {
     QTimer::singleShot(300, this, &QWidget::show);// 延迟300ms显示主窗口
 }
 
-void MainWidget::addTestMessage(const QString &sender, const QString &time, const QString &content, MessageType type) {
+void MainWidget::addMessasge(const QString &sender, const QString &time, const QString &content, MessageType type) {
+    // 自动换行处理
+    QFontMetrics fm(QFont("Microsoft YaHei", 12));
+    int maxWidth = 600;// 最大宽度限制
+    QString wrappedContent = "";
+    QStringList words = content.split(' ');
+    QString line = "";
+
+    for (const QString &word: words) {
+        if (fm.horizontalAdvance(line + word) > maxWidth) {
+            wrappedContent += line.trimmed() + "\n";
+            line = word + " ";
+        } else {
+            line += word + " ";
+        }
+    }
+    wrappedContent += line.trimmed();
+
     // 创建消息控件
-    BubbleWidget *bubble = new BubbleWidget(sender, time, content, type);
+    BubbleWidget *bubble = new BubbleWidget(sender, time, wrappedContent, type);
     bubble->setMinimumHeight(60);
     bubble->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
@@ -352,11 +515,12 @@ void MainWidget::addTestMessage(const QString &sender, const QString &time, cons
 
     // 滚动到底部
     QScrollBar *vScroll = chatArea->verticalScrollBar();
-    vScroll->setValue(vScroll->maximum());    QTimer::singleShot(50, [this]() {
-        chatArea->verticalScrollBar()->setValue(
-                chatArea->verticalScrollBar()->maximum());
+    vScroll->setValue(vScroll->maximum());
+    QTimer::singleShot(50, [this]() {
+        chatArea->verticalScrollBar()->setValue(chatArea->verticalScrollBar()->maximum());
     });
 }
+
 
 // 添加时间分割线
 

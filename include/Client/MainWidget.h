@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-02 12:23:43
+ * @LastEditTime : 2025-03-04 17:09:10
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 // MainWidget.h
@@ -26,6 +26,7 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <qtextedit.h>
 #include <qtmetamacros.h>
 
 class MainWidget;
@@ -35,25 +36,28 @@ class MainWidget : public QWidget {
 public:
     explicit MainWidget(QWidget *parent = nullptr);
     ~MainWidget();
+
 public slots:
     void onLoginSuccess();
+
 private:
     void setupUI();
     void setupStyle();
     void addSessionItem(const QString &name, const QString &msg, const QString &time);
-    void addTestMessage(const QString &sender, const QString &time, const QString &content, MessageType type);
-    
+    void addMessasge(const QString &sender, const QString &time, const QString &content, MessageType type);
+
     [[maybe_unused]]
     void addTimeDivider(const QString &timeText);
 
+    QToolButton *createNavButton(const QString &iconName, bool isAvatar = false);
     void onSessionItemClicked(QListWidgetItem *item);
     void updateChatArea(const QString &sessionName);
     // 组件
     QListWidget *sessionList;
     QScrollArea *chatArea;
-    QLineEdit *messageInput;
+    QTextEdit *messageInput;
     QPushButton *sendButton;
-    QWidget *inputPanel;        
+    QWidget *inputPanel;
     QVBoxLayout *chatAreaLayout;
 };
 
