@@ -1,10 +1,10 @@
 /**
  * @FilePath     : /mxChat/include/DataBase/MySqlPool.hpp
- * @Description  :  
+ * @Description  :  MySQL 连接池
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-18 23:35:15
+ * @LastEditTime : 2025-03-05 17:15:52
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #ifndef MYSQLPOOL_HPP
@@ -20,9 +20,25 @@
 #include <spdlog/spdlog.h>
 #include <string>
 
+
+/**
+ * @author       : caomengxuan
+ * @brief        : MySQL连接池
+**/
 class MySqlPool {
-public:
-    // 构造函数
+    public:
+
+    /**
+     * @author       : caomengxuan
+     * @brief        : MySQL的连接池初始化
+     * @param         {string} &host:
+     * @param         {int} port:
+     * @param         {string} &user:
+     * @param         {string} &pass:
+     * @param         {string} &schema:
+     * @param         {int} poolSize:
+     * @return        {*}
+    **/
     MySqlPool(const std::string &host, int port, const std::string &user, const std::string &pass, const std::string &schema, int poolSize)
         : host_(host), port_(port), user_(user), pass_(pass), schema_(schema), poolSize_(poolSize), b_stop_(false) {
         try {
@@ -40,7 +56,11 @@ public:
         }
     }
 
-    // 获取连接
+    /**
+     * @author       : caomengxuan
+     * @brief        : 获取与MySQL数据库的连接
+     * @return        {std::shared_ptr<mysqlx::Session>} 连接的会话
+    **/
     std::shared_ptr<mysqlx::Session> getConnection() {
         std::unique_lock<std::mutex> lock(mutex_);
         cond_.wait(lock, [this] {
@@ -57,7 +77,12 @@ public:
         return session;
     }
 
-    // 归还连接
+    /**
+     * @author       : caomengxuan
+     * @brief        : 向连接池归还连接
+     * @param         {shared_ptr<mysqlx::Session>} session:
+     * @return        {*}
+    **/
     void returnConnection(std::shared_ptr<mysqlx::Session> session) {
         std::unique_lock<std::mutex> lock(mutex_);
         if (b_stop_) {
@@ -67,13 +92,21 @@ public:
         cond_.notify_one();
     }
 
-    // 关闭连接池
+    /**
+     * @author       : caomengxuan
+     * @brief        : 关闭连接池
+     * @return        {*}
+    **/
     void Close() {
         b_stop_ = true;
         cond_.notify_all();
     }
 
-    // 析构函数
+    /**
+     * @author       : caomengxuan
+     * @brief        : 析构函数，销毁连接池
+     * @return        {*}
+    **/
     ~MySqlPool() {
         std::unique_lock<std::mutex> lock(mutex_);
         while (!pool_.empty()) {

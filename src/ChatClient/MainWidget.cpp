@@ -1,5 +1,3 @@
-// MainWidget.cpp
-
 #include <Client/MainWidget.h>
 #include <Client/SessionItem.hpp>
 #include <QGraphicsOpacityEffect>
@@ -41,7 +39,9 @@ MainWidget::MainWidget(QWidget *parent)
 }
 MainWidget::~MainWidget() {
 }
-// 新增导航按钮创建函数
+
+
+
 QToolButton *MainWidget::createNavButton(const QString &iconName,bool isAvatar) {
     QToolButton *btn = new QToolButton;
     btn->setIconSize(QSize(24, 24));
@@ -138,6 +138,8 @@ QToolButton *MainWidget::createNavButton(const QString &iconName,bool isAvatar) 
 
     return btn;
 }
+
+
 void MainWidget::setupUI() {
     QHBoxLayout *rootLayout = new QHBoxLayout(this);
     rootLayout->setContentsMargins(0, 0, 0, 0);
@@ -304,6 +306,12 @@ void MainWidget::setupUI() {
     });
 }
 
+/**
+ * @author       : caomengxuan
+ * @brief        : 
+ * @param         {QListWidgetItem} *item:
+ * @return        {*}
+**/
 void MainWidget::onSessionItemClicked(QListWidgetItem *item) {
     QString sessionName = item->data(Qt::UserRole).toString();
     if (sessionName.isEmpty()) {

@@ -1,16 +1,20 @@
 /**
  * @FilePath     : /mxChat/include/Client/SessionItem.hpp
- * @Description  :  
+ * @Description  :  主页面的会话界面
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-02 11:28:28
+ * @LastEditTime : 2025-03-05 17:02:31
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QWidget>
 
+/**
+ * @author       : caomengxuan
+ * @brief        : 会话列表项
+**/
 class SessionItem : public QWidget {
     Q_OBJECT
 public:
@@ -21,6 +25,14 @@ public:
     }
 
 private:
+    /**
+     * @author       : caomengxuan
+     * @brief        : 初始化列表项的UI
+     * @param         {QString} &name:
+     * @param         {QString} &lastMsg:
+     * @param         {QString} &time:
+     * @return        {*}
+    **/
     void setupUI(const QString &name, const QString &lastMsg, const QString &time) {
         QHBoxLayout *layout = new QHBoxLayout(this);
         layout->setContentsMargins(12, 8, 12, 8);

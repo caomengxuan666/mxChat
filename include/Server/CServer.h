@@ -2,13 +2,37 @@
 
 #include "const.h"
 #include <Server/CSession.h>
+
+/**
+ * @author       : caomengxuan
+ * @brief        : 聊天服务器，管理会话Session
+**/
 class CServer : public std::enable_shared_from_this<CServer> {
 public:
     CServer(boost::asio::io_context &ioc, unsigned short &port);
-    void ClearSession(std::string);
+
+    /**
+     * @author       : caomengxuan
+     * @brief        : 根据uuid清除Session
+     * @param         {string} uuid:
+     * @return        {*}
+    **/    
+    void ClearSession(std::string uuid);
 
 private:
+    /**
+     * @author       : caomengxuan
+     * @brief        : 管理会话的连接
+     * @param         {error_code} &error:
+     * @return        {*}
+    **/
     void HandleAccept(std::shared_ptr<CSession>, const boost::system::error_code &error);
+
+    /**
+     * @author       : caomengxuan
+     * @brief        : 进行和会话的连接，创建Socket
+     * @return        {*}
+    **/    
     void StartAccept();
 
 private:

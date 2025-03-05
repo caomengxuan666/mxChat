@@ -51,3 +51,7 @@
 
 # 引用
 本项目部分服务器端的风格和邮件发送源码参考了llfchat的设计，详见项目地址：https://gitee.com/secondtonone1/llfcchat
+
+## 注意事项
+
+本项目提供了doxygen支持，你可以通过doxywizard或者是项目本身的Doxyfile生成文档。

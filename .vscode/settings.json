@@ -111,5 +111,8 @@
             "username": "cmx"
         }
     ],
-    "cmake.buildDirectory": "${workspaceFolder}/build"
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "editor.tokenColorCustomizations":{
+        "comments": "#08bdee"
+    }
 }

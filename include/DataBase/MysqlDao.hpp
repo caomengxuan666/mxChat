@@ -1,10 +1,10 @@
 /**
  * @FilePath     : /mxChat/include/DataBase/MysqlDao.hpp
- * @Description  :  
+ * @Description  :  MySQL的查询实现层
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-01 21:47:24
+ * @LastEditTime : 2025-03-04 23:42:17
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #ifndef MYSQL_DAO_HPP
@@ -15,13 +15,54 @@
 #include "global.h"
 #include <string>
 
+/**
+ * @author       : caomengxuan
+ * @brief        : 实现MySQL的具体操作
+**/
 class MysqlDao {
 public:
+    /**
+     * @author       : caomengxuan
+     * @brief        : MySQL的构造函数,读取yaml配置文档并且初始化连接池，自动连接到数据库
+    **/
     MysqlDao();
+    /**
+     * @author       : caomengxuan
+     * @brief        : MySQL的析构函数，进行MySQL连接池的回收
+     * @return        {*}
+    **/    
     ~MysqlDao();
+    /**
+     * @author       : caomengxuan
+     * @brief        : 注册用户，将信息写入MySQL
+     * @param         {string} &name:
+     * @param         {string} &email:
+     * @param         {string} &pwd:
+     * @return        {int} resut 注册成功->uid 注册失败-> -1
+    **/    
     int RegUser(const std::string &name, const std::string &email, const std::string &pwd);
+    /**
+     * @author       : caomengxuan
+     * @brief        : 密码检测，返回一个检测的结果
+     * @param         {string} &name:
+     * @param         {string} &pwd:
+     * @param         {UserInfo} &userInfo:
+     * @return        {bool} 密码检测的结果
+    **/    
     bool CheckPwd(const std::string &name, const std::string &pwd, UserInfo &userInfo);
+    /**
+     * @author       : caomengxuan
+     * @brief        : 通过uid获取用户所有信息
+     * @param         {int} uid:
+     * @return        {shared_ptr<_NonArray<UserInfo>>} 相关用户在数据库中所有的信息
+    **/    
     std::shared_ptr<UserInfo> GetUser(int uid);
+    /**
+    * @author       : caomengxuan
+    * @brief        : 通过name获取用户所有信息
+    * @param         {string} name:
+    * @return        {shared_ptr<_NonArray<UserInfo>>} 相关用户在数据库中所有的信息
+    **/    
 	std::shared_ptr<UserInfo> GetUser(std::string name);
 private:
     std::unique_ptr<MySqlPool> pool_;
@@ -192,7 +233,6 @@ inline std::shared_ptr<UserInfo> MysqlDao::GetUser(int uid) {
             std::cerr << "No user found with uid: " << uid << std::endl;
             return nullptr;
         }
-
         // 构造 UserInfo 对象
         auto user_ptr = std::make_shared<UserInfo>();
         user_ptr->uid = row[0].get<int>();         // 第一个字段：uid

@@ -1,8 +1,17 @@
+/**
+ * @FilePath     : /mxChat/include/Server/VarifyGrpcClient.h
+ * @Description  :  验证邮箱的grpc调用方
+ * @Author       : caomengxuan666 2507560089@qq.com
+ * @Version      : 0.0.1
+ * @LastEditors  : caomengxuan666 2507560089@qq.com
+ * @LastEditTime : 2025-03-05 21:19:19
+ * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
+**/
 #pragma once
 
 // 取消定义所有可能冲突的宏
 #ifdef INTERNAL
-# undef INTERNAL
+#undef INTERNAL
 #endif
 #include "Singleton.h"
 #include "config.hpp"
@@ -22,8 +31,20 @@ using message::GetVarifyReq;
 using message::GetVarifyRsp;
 using message::VarifyService;
 
+/**
+ * @author       : caomengxuan
+ * @brief        : grpc邮件发送客户端的RPC连接池
+**/
 class RPConPool {
 public:
+    /**
+     * @author       : caomengxuan
+     * @brief        : 构造函数,创造和js的grpc服务器的channel
+     * @param         {size_t} poolSize:
+     * @param         {string} host:
+     * @param         {string} port:
+     * @return        {*}
+    **/
     RPConPool(size_t poolSize, std::string host, std::string port)
         : poolSize_(poolSize), host_(host), port_(port), b_stop_(false) {
         for (size_t i = 0; i < poolSize_; ++i) {
@@ -33,6 +54,11 @@ public:
         }
     }
 
+    /**
+     * @author       : caomengxuan
+     * @brief        : 析构函数,关闭连接池
+     * @return        {*}
+    **/
     ~RPConPool() {
         std::lock_guard<std::mutex> lock(mutex_);
         Close();
@@ -41,6 +67,11 @@ public:
         }
     }
 
+    /**
+     * @author       : caomengxuan
+     * @brief        : 获取一个调用远程邮件发送服务的代理对象
+     * @return        {std::unique_ptr<VarifyService::Stub>} :一个调用远程邮件发送服务的代理对象
+    **/
     std::unique_ptr<VarifyService::Stub> getConnection() {
         std::unique_lock<std::mutex> lock(mutex_);
         cond_.wait(lock, [this] {
@@ -57,6 +88,12 @@ public:
         return context;
     }
 
+    /**
+     * @author       : caomengxuan
+     * @brief        : 将一个调用远程邮件发送服务的代理对象放回连接池
+     * @param         {unique_ptr<VarifyService::Stub>} context:
+     * @return        {*}
+    **/
     void returnConnection(std::unique_ptr<VarifyService::Stub> context) {
         std::lock_guard<std::mutex> lock(mutex_);
         if (b_stop_) {
@@ -66,13 +103,18 @@ public:
         cond_.notify_one();
     }
 
+    /**
+     * @author       : caomengxuan
+     * @brief        : 关闭连接池
+     * @return        {*}
+    **/
     void Close() {
         b_stop_ = true;
         cond_.notify_all();
     }
 
 private:
-    atomic<bool> b_stop_;
+    std::atomic<bool> b_stop_;
     size_t poolSize_;
     std::string host_;
     std::string port_;
@@ -81,10 +123,20 @@ private:
     std::condition_variable cond_;
 };
 
+/**
+ * @author       : caomengxuan
+ * @brief        : 验证邮箱的grpc调用方
+**/
 class VerifyGrpcClient : public Singleton<VerifyGrpcClient> {
     friend class Singleton<VerifyGrpcClient>;
 
 public:
+    /**
+     * @author       : caomengxuan
+     * @brief        : 获取验证码的远程调用
+     * @param         {string} email:
+     * @return        {GetVarifyRsp}:验证码的reply返回
+    **/
     GetVarifyRsp GetVarifyCode(std::string email) {
         ClientContext context;
         GetVarifyRsp reply;
@@ -103,6 +155,12 @@ public:
         }
     }
 
+    /**
+     * @author       : caomengxuan
+     * @brief        : 重置密码的远程调用
+     * @param         {string} email:
+     * @return        {GetVarifyRsp}:重置密码的reply返回
+    **/
     GetVarifyRsp SendResetPasswordCode(std::string email) {
         ClientContext context;
         GetVarifyRsp reply;
@@ -122,6 +180,11 @@ public:
     }
 
 private:
+    /**
+     * @author       : caomengxuan
+     * @brief        : 构造函数，加载配置文件并且初始化连接池
+     * @return        {*}
+    **/
     VerifyGrpcClient() {
         try {
             // 获取 Config_Manager 单例实例
@@ -144,10 +207,10 @@ private:
             spdlog::info("VerifyGrpcClient initialized with poolSize: {}, host: {}, port: {}", poolSize, host, port);
         } catch (const YAML::Exception &yamlEx) {
             spdlog::critical("YAML parsing error: {}", yamlEx.what());
-            assert(false); // 终止程序
+            assert(false);// 终止程序
         } catch (const std::exception &ex) {
             spdlog::critical("Failed to initialize VerifyGrpcClient: {}", ex.what());
-            assert(false); // 终止程序
+            assert(false);// 终止程序
         }
     }
 

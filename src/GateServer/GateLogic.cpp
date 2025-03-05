@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-02 22:46:21
+ * @LastEditTime : 2025-03-05 17:24:58
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include <Server/GateLogic.h>
@@ -43,7 +43,7 @@ GateLogic::GateLogic() {
 
         //直接调用grpc，我们的端口是50051
         GetVarifyRsp rsp = VerifyGrpcClient::GetInstance()->GetVarifyCode(email);
-        cout << "email is " << email << endl;
+        std::cout << "email is " << email << std::endl;
         root["error"] = 0;
         root["email"] = src_root["email"];
         std::string jsonstr = root.toStyledString();

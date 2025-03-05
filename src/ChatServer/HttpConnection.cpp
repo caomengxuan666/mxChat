@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-02 22:34:53
+ * @LastEditTime : 2025-03-05 18:10:00
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 
@@ -12,6 +12,12 @@
 #include <Server/GateLogic.h>
 #include <spdlog/spdlog.h>
 
+/**
+ * @author       : caomengxuan
+ * @brief        : Hex转换十进制函数
+ * @param         {unsigned char} x:一个Hex字符
+ * @return        {char} :转换后的十进制数
+**/
 inline static char FromHex(unsigned char x) {
     unsigned char y;
     if (x >= 'A' && x <= 'Z') y = x - 'A' + 10;
@@ -24,10 +30,22 @@ inline static char FromHex(unsigned char x) {
     return y;
 }
 
+/**
+ * @author       : caomengxuan
+ * @brief        : 十进制转换Hex函数
+ * @param         {unsigned char} x:一个十进制字符
+ * @return        {*}
+**/
 inline static unsigned char ToHex(unsigned char x) {
     return x > 9 ? x + 55 : x + 48;
 }
 
+/**
+ * @author       : caomengxuan
+ * @brief        : url编码函数
+ * @param         {string} &str: 需要编码的字符串
+ * @return        {std::string} :编码后的字符串
+**/
 inline static std::string UrlEncode(const std::string &str) {
     std::string strTemp = "";
     size_t length = str.length();
@@ -51,6 +69,12 @@ inline static std::string UrlEncode(const std::string &str) {
     return strTemp;
 }
 
+/**
+ * @author       : caomengxuan
+ * @brief        : Url解码函数
+ * @param         {string} &str:
+ * @return        {std::string} :解码后的字符串
+**/
 inline static std::string UrlDecode(const std::string &str) {
     std::string strTemp = "";
     size_t length = str.length();

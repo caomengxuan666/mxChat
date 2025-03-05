@@ -1,10 +1,10 @@
 /**
  * @FilePath     : /mxChat/src/web/utils.hpp
- * @Description  :  
+ * @Description  :  常用的工具函数
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-02-20 10:25:24
+ * @LastEditTime : 2025-03-05 21:25:10
  * @Copyright    : PERSONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
@@ -13,6 +13,12 @@
 #include <spdlog/spdlog.h>
 
 namespace utilFunc {
+    /**
+     * @author       : caomengxuan
+     * @brief        : 提供一个文件流式下载功能
+     * @param         {string} &file_path:
+     * @return        {crow::response}:response,包含大文件本身
+    **/    
     inline static crow::response downloadFile(const std::string &file_path) noexcept {
         std::ifstream file(file_path, std::ios::binary);
         if (!file.is_open()) {

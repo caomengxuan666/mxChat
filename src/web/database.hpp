@@ -1,6 +1,6 @@
 /**
  * @FilePath     : /mxChat/src/web/database.hpp
- * @Description  :  
+ * @Description  :  web端的database操作层
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com

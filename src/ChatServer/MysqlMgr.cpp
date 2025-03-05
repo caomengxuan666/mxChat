@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-01 21:24:38
+ * @LastEditTime : 2025-03-05 16:48:24
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include "DataBase/MysqlMgr.h"
@@ -13,6 +13,7 @@
 MysqlMgr::~MysqlMgr() {
 
 }
+
 
 int MysqlMgr::RegUser(const std::string& name, const std::string& email, const std::string& pwd)
 {

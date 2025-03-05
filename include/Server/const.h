@@ -1,10 +1,10 @@
 /**
  * @FilePath     : /mxChat/include/Server/const.h
- * @Description  :  
+ * @Description  :  服务器端的const 定义
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-04 11:43:02
+ * @LastEditTime : 2025-03-05 17:36:44
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
@@ -33,6 +33,10 @@ constexpr short MAX_RECVQUE = 10000;
 constexpr short MAX_SENDQUE = 1000;
 constexpr std::string ALLIPV4ADDRESS = "0.0.0.0:";
 
+/**
+ * @author       : caomengxuan
+ * @brief        : 错误码
+**/
 enum ErrorCodes {
     SUCCESSFUL = 0,
     Error_Json = 1001,  //Json解析错误
@@ -46,6 +50,10 @@ enum ErrorCodes {
     TokenInvalid = 1009
 };
 
+/**
+ * @author       : caomengxuan
+ * @brief        : 消息ID
+**/
 enum MSG_IDS {
 	MSG_CHAT_LOGIN = 1005, //用户登陆
 	MSG_CHAT_LOGIN_RSP = 1006, //用户登陆回包

@@ -4,14 +4,13 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-02 11:27:03
+ * @LastEditTime : 2025-03-04 22:24:56
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #ifndef LOGIN_H
 #define LOGIN_H
 
 #include "global.h"
-#include <Client/Client.h>
 #include <QFormLayout>
 #include <QHBoxLayout>
 #include <QLinearGradient>

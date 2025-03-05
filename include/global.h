@@ -1,17 +1,20 @@
 /**
  * @FilePath     : /mxChat/include/global.h
- * @Description  :  
+ * @Description  :  全局定义，服务器和客户端共享
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-04 11:49:55
+ * @LastEditTime : 2025-03-05 21:20:27
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
 #include <string>
 
 //todo
-
+/**
+ * @author       : caomengxuan
+ * @brief        : 请求的ID
+**/
 enum ReqId {
     ID_GET_VARIFY_CODE = 1001,//获取验证码
     ID_REG_USER = 1002,       //注册用户
@@ -22,13 +25,20 @@ enum ReqId {
     ID_CHAT_LOGIN_RSP=1008,     
 };
 
-
+/**
+ * @author       : caomengxuan
+ * @brief        : 请求的模式
+**/
 enum Modules {
-    REGISTERMOD = 0,
+    REGISTERMOD = 0,  
     RESETMOD = 1,
     LOGINMOD = 2
 };
 
+/**
+ * @author       : caomengxuan
+ * @brief        : 通信中的用户信息结构体
+**/
 struct UserInfo {
     std::string name;
     std::string email;
