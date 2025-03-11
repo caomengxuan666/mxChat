@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-11 17:25:53
+ * @LastEditTime : 2025-03-11 19:52:10
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include "Client/SessionManager.h"
@@ -82,6 +82,12 @@ SessionChatData SessionManager::getMessagesForSession(const QString &session_nam
     for (auto it = _sessionData.begin(); it != _sessionData.end(); ++it) {
         qDebug() << "Session name:" << it.key();
         qDebug() << "Number of messages:" << it.value().messages.size();
+        //输出具体的消息
+        for (const auto &msg : it.value().messages) {
+            qDebug() << "Message content:" << msg.content;
+            qDebug() << "Message sender:" << msg.sender;
+            qDebug() << "Message time:" << msg.time;
+        }
     }
 
     // 检查是否存在该会话

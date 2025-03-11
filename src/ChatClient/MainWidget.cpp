@@ -30,11 +30,11 @@ MainWidget::MainWidget(QWidget *parent)
     // 添加测试数据
     addSessionItem({.name = "wyw", .lastMessage = "宝宝你是一个宝宝", .lastTime = "22:30"});
     addSessionItem({.name = "现代C++卢瑟群", .lastMessage = "感觉不如Rust", .lastTime = "22:31"});
-
     // 添加测试消息
     addMessasge("wyw", "系统通知", "09:00", "聊天系统初始化完成", MessageType::System);
     addMessasge("wyw", "wyw", "09:00", "宝宝在吗", MessageType::Self);
     addMessasge("wyw", "我", "09:00", "宝宝我爱你哦！", MessageType::Other);
+
 }
 
 MainWidget::~MainWidget() {
@@ -374,12 +374,29 @@ void MainWidget::updateChatArea(const QString &sessionName) {
     spdlog::info("Loading messages for session: {}", sessionName.toStdString());
     spdlog::info("Number of messages: {}", chatData.messages.size());
 
-
     // 遍历消息列表并添加到聊天区域
     for (const auto &msg: chatData.messages) {
-        addMessasge(sessionName, chatData.name, msg.time, msg.content, msg.type);
+        // 检查消息是否已经存在（防止重复加载）
+        bool exists = false;
+        for (int i = 0; i < chatLayout->count(); ++i) {
+            QWidget *widget = chatLayout->itemAt(i)->widget();
+            if (widget && widget->property("messageContent") == msg.content &&
+                widget->property("messageSender") == msg.sender &&
+                widget->property("messageTime") == msg.time) {
+                exists = true;
+                break;
+            }
+        }
+        if (!exists) {
+            BubbleWidget *bubble = new BubbleWidget(msg.sender, msg.time, msg.content, msg.type);
+            bubble->setMinimumHeight(60);
+            bubble->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+            bubble->setProperty("messageContent", msg.content);
+            bubble->setProperty("messageSender", msg.sender);
+            bubble->setProperty("messageTime", msg.time);
+            chatLayout->addWidget(bubble);
+        }
     }
-
 
     // 重新添加拉伸项
     chatLayout->addStretch();
