@@ -139,6 +139,8 @@ private:
     **/
     void updateChatArea(const QString &sessionName);
 
+    void clearUnreaded();
+
     /**
      * @author       : caomengxuan666
      * @brief        : 获取当前会话的名称
@@ -148,6 +150,8 @@ private:
     
     [[maybe_unused]]
     void addTimeDivider(const QString &timeText);
+
+    void insertTestCase();
 
     // 组件
     SessionManager *sessionManager;

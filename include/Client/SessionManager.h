@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-11 17:17:08
+ * @LastEditTime : 2025-03-11 23:23:16
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
@@ -72,8 +72,19 @@ public:
     **/    
     SessionChatData getMessagesForSession(const QString &session_name);
 
+    /**
+     * @author       : caomengxuan
+     * @brief        : 清楚指定会话的未读消息数量
+     * @param         {QString} &session_name:
+     * @return        {*}
+    **/    
+    void clearUnreadedCount(const QString &session_name);
+
+    void updateSessionLastMessage(const QString &session_name, const QString &message, const QString &time) ;
+
 private:
     QListWidget *_sessionListWidget;
     QList<QListWidgetItem *> _sessionList;
     QMap<QString, SessionChatData> _sessionData;
+    QMap<QString, SessionItem *> _sessionItem;
 };

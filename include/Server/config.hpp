@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-05 21:22:08
+ * @LastEditTime : 2025-03-11 20:35:02
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include <cassert>
@@ -79,7 +79,7 @@ public:
             spdlog::info("Loading YAML file: {}", _configName);
             return YAML::LoadFile(_configName);
         } catch (const YAML::Exception& e) {
-            spdlog::error("Failed to load YAML file: {}", e.what());
+            spdlog::error("YAML parsing error: {} at line {}, column {}", e.what(), e.mark.line, e.mark.column);
             throw;
         }
     }

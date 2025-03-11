@@ -1,20 +1,14 @@
-/**
- * @FilePath     : /mxChat/include/Client/SessionItem.hpp
- * @Description  :  主页面的会话界面
- * @Author       : caomengxuan666 2507560089@qq.com
- * @Version      : 0.0.1
- * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-11 17:25:22
- * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
-**/
 #pragma once
 
 #include "Client/BubbleWidget.h"
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QWidget>
+#include <cstdint>
 #include <qcontainerfwd.h>
 #include <qvariant.h>
+#include<QPropertyAnimation>
+#include<QGraphicsOpacityEffect>
 
 /**
  * @author       : caomengxuan666
@@ -67,6 +61,45 @@ public:
         : QWidget(parent), _sessionData(data) {
         setupUI(data);
     }
+    void updateUnreadCount(int count) {
+        _sessionData.unreadCount = count;
+        if (unreadLabel) {
+            count = std::min(count, 99);
+            unreadLabel->setText(count > 0 ? QString::number(count) : "");
+            unreadLabel->setVisible(count > 0);
+            
+            // 添加动画效果
+            QPropertyAnimation *animation = new QPropertyAnimation(unreadLabel, "geometry");
+            animation->setDuration(150);
+            animation->setKeyValueAt(0, QRect(unreadLabel->x()+2, unreadLabel->y()+2, 16, 16));
+            animation->setKeyValueAt(1, unreadLabel->geometry());
+            animation->start();
+        }
+    }
+
+    void updateLastMessage(const QString &msg, const QString &time) {
+        _sessionData.lastMessage = msg;
+        _sessionData.lastTime = time;
+        
+        // 限制消息长度
+        QString elidedMsg = msgLabel->fontMetrics().elidedText(
+            msg, Qt::ElideRight, msgLabel->width() - 20
+        );
+        
+        msgLabel->setText(elidedMsg);
+        timeLabel->setText(time);
+        
+        // 添加渐变动画
+        QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect(msgLabel);
+        msgLabel->setGraphicsEffect(effect);
+        
+        QPropertyAnimation *animation = new QPropertyAnimation(effect, "opacity");
+        animation->setDuration(500);
+        animation->setStartValue(0);
+        animation->setEndValue(1);
+        animation->start();
+    }
+
 
 private:
     /**
@@ -78,8 +111,8 @@ private:
     void setupUI(const SessionItemData &data) {
         QHBoxLayout *layout = new QHBoxLayout(this);
         layout->setContentsMargins(12, 8, 12, 8);
-
-        // 头像
+    
+        // 头像区域
         QLabel *avatar = new QLabel(this);
         avatar->setFixedSize(48, 48);
         avatar->setStyleSheet(R"(
@@ -90,35 +123,51 @@ private:
         )");
         avatar->setText(data.name.left(1));
         avatar->setAlignment(Qt::AlignCenter);
-
-        // 右侧信息
+    
+        // 未读消息标签（提升为成员变量）
+        unreadLabel = new QLabel(this);
+        unreadLabel->setFixedSize(20, 20);
+        unreadLabel->setStyleSheet(R"(
+            background-color: red;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            qproperty-alignment: 'AlignCenter';
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        )");
+        unreadLabel->move(avatar->width() - unreadLabel->width() + 10, 10);
+        unreadLabel->setText(data.unreadCount > 0 ? QString::number(std::min(data.unreadCount, 99)) : "");
+        unreadLabel->setVisible(data.unreadCount > 0);
+    
+        // 右侧信息区域
         QWidget *infoWidget = new QWidget(this);
         QVBoxLayout *infoLayout = new QVBoxLayout(infoWidget);
         infoLayout->setContentsMargins(0, 0, 0, 0);
-
-        // 名称和时间
+    
+        // 顶部（名称 + 时间）
         QWidget *topWidget = new QWidget(infoWidget);
         QHBoxLayout *topLayout = new QHBoxLayout(topWidget);
         topLayout->setContentsMargins(0, 0, 0, 0);
-
+    
         QLabel *nameLabel = new QLabel(data.name, topWidget);
         nameLabel->setStyleSheet("color: #DCDDDE; font-weight: 600;");
-
-        QLabel *timeLabel = new QLabel(data.lastTime, topWidget);
+    
+        timeLabel = new QLabel(data.lastTime, topWidget); // 提升为成员变量
         timeLabel->setStyleSheet("color: #7A7C80; font-size: 12px;");
-
+    
         topLayout->addWidget(nameLabel);
         topLayout->addWidget(timeLabel);
-
+    
         // 最后消息
-        QLabel *msgLabel = new QLabel(data.lastMessage, infoWidget);
+        msgLabel = new QLabel(data.lastMessage, infoWidget); // 提升为成员变量
         msgLabel->setStyleSheet("color: #7A7C80; font-size: 13px;");
         msgLabel->setMaximumWidth(200);
         msgLabel->setWordWrap(true);
-
+    
         infoLayout->addWidget(topWidget);
         infoLayout->addWidget(msgLabel);
-
+    
         layout->addWidget(avatar);
         layout->addWidget(infoWidget, 1);
     }
@@ -129,4 +178,7 @@ private:
 
 private:
     SessionItemData _sessionData;
+    QLabel *unreadLabel;    
+    QLabel *msgLabel;       
+    QLabel *timeLabel;      
 };

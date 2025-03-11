@@ -7,7 +7,6 @@ set(CHAT_SERVER_PROJECT_SOURCES
     ../ChatServer/CServer.cpp
     ../ChatServer/HttpConnection.cpp
     ../ChatServer/LogicSystem.cpp
-    ../ChatServer/yamlReader.hpp
     ../ChatServer/AsioIOServicePool.cpp
     ../ChatServer/MysqlMgr.cpp
     ../ChatServer/CSession.cpp

@@ -1,3 +1,4 @@
+#include "Client/BubbleWidget.h"
 #include <Client/MainWidget.h>
 #include <Client/SessionItem.hpp>
 #include <QGraphicsOpacityEffect>
@@ -27,14 +28,7 @@ MainWidget::MainWidget(QWidget *parent)
     setupStyle();
     //设置为最大化
 
-    // 添加测试数据
-    addSessionItem({.name = "wyw", .lastMessage = "宝宝你是一个宝宝", .lastTime = "22:30"});
-    addSessionItem({.name = "现代C++卢瑟群", .lastMessage = "感觉不如Rust", .lastTime = "22:31"});
-    // 添加测试消息
-    addMessasge("wyw", "系统通知", "09:00", "聊天系统初始化完成", MessageType::System);
-    addMessasge("wyw", "wyw", "09:00", "宝宝在吗", MessageType::Self);
-    addMessasge("wyw", "我", "09:00", "宝宝我爱你哦！", MessageType::Other);
-
+    insertTestCase();
 }
 
 MainWidget::~MainWidget() {
@@ -314,7 +308,11 @@ void MainWidget::onSessionItemClicked(QListWidgetItem *item) {
         sessionName = item->text();
     }
     // 更新会话
-    _currentSessionName= sessionName;
+    _currentSessionName = sessionName;
+
+    // 将所有的未读消息置为已读
+    sessionManager->clearUnreadedCount(sessionName);
+
 
     QGraphicsOpacityEffect *chatEffect = new QGraphicsOpacityEffect(chatArea);
     chatArea->setGraphicsEffect(chatEffect);
@@ -554,8 +552,10 @@ void MainWidget::querySearchBar() {
 }
 
 
-// 添加时间分割线
+void MainWidget::clearUnreaded() {
+}
 
+// 添加时间分割线
 [[maybe_unused]]
 void MainWidget::addTimeDivider(const QString &timeText) {
     QString divider = QStringLiteral(
@@ -572,4 +572,141 @@ void MainWidget::addTimeDivider(const QString &timeText) {
 
 QString MainWidget::getCurrentSessionName() const {
     return _currentSessionName;
+}
+
+void MainWidget::insertTestCase() {
+    // 添加测试数据
+    addSessionItem({.name = "wyw", .lastMessage = "宝宝你是一个宝宝", .lastTime = "22:30", .unreadCount = 99});
+    addSessionItem({.name = "现代C++卢瑟群", .lastMessage = "感觉不如Rust", .lastTime = "22:31", .unreadCount = 5});
+    addSessionItem({.name = "Alice", .lastMessage = "你好，世界", .lastTime = "22:32", .unreadCount = 3});
+    addSessionItem({.name = "Bob", .lastMessage = "明天会更好", .lastTime = "22:33", .unreadCount = 0});
+    addSessionItem({.name = "Charlie", .lastMessage = "一起吃饭吧", .lastTime = "22:34", .unreadCount = 2});
+    addSessionItem({.name = "David", .lastMessage = "周末一起玩吧", .lastTime = "22:35", .unreadCount = 1});
+    addSessionItem({.name = "Eve", .lastMessage = "学习新东西", .lastTime = "22:36", .unreadCount = 4});
+    addSessionItem({.name = "Frank", .lastMessage = "看电影", .lastTime = "22:37", .unreadCount = 6});
+    addSessionItem({.name = "Grace", .lastMessage = "旅行计划", .lastTime = "22:38", .unreadCount = 7});
+    addSessionItem({.name = "Hannah", .lastMessage = "生日快乐", .lastTime = "22:39", .unreadCount = 8});
+
+    // 添加测试消息
+    addMessasge("wyw", "系统通知", "09:00", "聊天系统初始化完成", MessageType::System);
+    addMessasge("wyw", "wyw", "09:00", "宝宝在吗", MessageType::Self);
+    addMessasge("wyw", "我", "09:00", "宝宝我爱你哦！", MessageType::Other);
+    addMessasge("wyw", "系统通知", "09:01", "新消息提醒", MessageType::System);
+    addMessasge("wyw", "wyw", "09:02", "宝宝，吃饭了吗？", MessageType::Self);
+    addMessasge("wyw", "我", "09:03", "吃了，你呢？", MessageType::Other);
+    addMessasge("wyw", "系统通知", "09:04", "新消息提醒", MessageType::System);
+    addMessasge("wyw", "wyw", "09:05", "明天一起去公园吧", MessageType::Self);
+    addMessasge("wyw", "我", "09:06", "好啊，明天见", MessageType::Other);
+    addMessasge("wyw", "系统通知", "09:07", "新消息提醒", MessageType::System);
+
+    addMessasge("现代C++卢瑟群", "国王", "10:21", "我觉得Rust还是太loser了", MessageType::Other);
+    addMessasge("现代C++卢瑟群", "群友1", "10:21", "国王说得对", MessageType::Other);
+    addMessasge("现代C++卢瑟群", "群友2", "10:22", "国王说得对", MessageType::Other);
+    addMessasge("现代C++卢瑟群", "我", "10:23", "国王说得对", MessageType::Other);
+    addMessasge("现代C++卢瑟群", "系统通知", "10:23", "群友1被国王禁言十分钟", MessageType::System);
+    addMessasge("现代C++卢瑟群", "国王", "10:24", "今天天气真好", MessageType::Other);
+    addMessasge("现代C++卢瑟群", "群友1", "10:25", "是啊，出去走走吧", MessageType::Other);
+    addMessasge("现代C++卢瑟群", "群友2", "10:26", "好主意", MessageType::Other);
+    addMessasge("现代C++卢瑟群", "我", "10:27", "一起吧", MessageType::Other);
+    addMessasge("现代C++卢瑟群", "系统通知", "10:28", "群友2退出群聊", MessageType::System);
+
+    addMessasge("Alice", "Alice", "11:00", "你好，Bob", MessageType::Self);
+    addMessasge("Alice", "Bob", "11:01", "你在干嘛呢？", MessageType::Other);
+    addMessasge("Alice", "Alice", "11:02", "我在看书", MessageType::Self);
+    addMessasge("Alice", "Bob", "11:03", "一起去看书吧", MessageType::Other);
+    addMessasge("Alice", "Alice", "11:04", "好啊", MessageType::Self);
+    addMessasge("Alice", "Bob", "11:05", "这本书不错", MessageType::Other);
+    addMessasge("Alice", "Alice", "11:06", "是啊，推荐一下", MessageType::Self);
+    addMessasge("Alice", "Bob", "11:07", "下次再聊", MessageType::Other);
+    addMessasge("Alice", "Alice", "11:08", "好的", MessageType::Self);
+    addMessasge("Alice", "Bob", "11:09", "明天见", MessageType::Other);
+
+    addMessasge("Bob", "Bob", "11:05", "好的，明天见", MessageType::Self);
+    addMessasge("Bob", "Alice", "11:06", "明天一起吃饭吧", MessageType::Other);
+    addMessasge("Bob", "Alice", "11:07", "这本书不错", MessageType::Other);
+    addMessasge("Bob", "Alice", "11:08", "是啊，推荐一下", MessageType::Other);
+    addMessasge("Bob", "Alice", "11:09", "下次再聊", MessageType::Other);
+    addMessasge("Bob", "Alice", "11:10", "好的", MessageType::Self);
+    addMessasge("Bob", "Alice", "11:11", "明天见", MessageType::Other);
+    addMessasge("Bob", "Alice", "11:12", "一起吃饭吧", MessageType::Other);
+    addMessasge("Bob", "Alice", "11:13", "好啊", MessageType::Self);
+    addMessasge("Bob", "Alice", "11:14", "这本书不错", MessageType::Other);
+
+    addMessasge("Charlie", "Charlie", "11:10", "晚上一起吃饭吧", MessageType::Self);
+    addMessasge("Charlie", "Alice", "11:11", "Alice，你呢？", MessageType::Other);
+    addMessasge("Charlie", "Bob", "11:12", "Bob，你呢？", MessageType::Other);
+    addMessasge("Charlie", "Alice", "11:13", "好啊", MessageType::Self);
+    addMessasge("Charlie", "Bob", "11:14", "好啊", MessageType::Self);
+    addMessasge("Charlie", "Alice", "11:15", "这本书不错", MessageType::Other);
+    addMessasge("Charlie", "Bob", "11:16", "是啊，推荐一下", MessageType::Other);
+    addMessasge("Charlie", "Alice", "11:17", "下次再聊", MessageType::Other);
+    addMessasge("Charlie", "Bob", "11:18", "好的", MessageType::Self);
+    addMessasge("Charlie", "Alice", "11:19", "明天见", MessageType::Other);
+
+    addMessasge("David", "David", "11:20", "周末一起玩吧", MessageType::Self);
+    addMessasge("David", "Alice", "11:21", "Alice，你呢？", MessageType::Other);
+    addMessasge("David", "Bob", "11:22", "Bob，你呢？", MessageType::Other);
+    addMessasge("David", "Alice", "11:23", "好啊", MessageType::Self);
+    addMessasge("David", "Bob", "11:24", "好啊", MessageType::Self);
+    addMessasge("David", "Alice", "11:25", "这本书不错", MessageType::Other);
+    addMessasge("David", "Bob", "11:26", "是啊，推荐一下", MessageType::Other);
+    addMessasge("David", "Alice", "11:27", "下次再聊", MessageType::Other);
+    addMessasge("David", "Bob", "11:28", "好的", MessageType::Self);
+    addMessasge("David", "Alice", "11:29", "明天见", MessageType::Other);
+
+    addMessasge("Eve", "Eve", "11:30", "学习新东西", MessageType::Self);
+    addMessasge("Eve", "Alice", "11:31", "Alice，你呢？", MessageType::Other);
+    addMessasge("Eve", "Bob", "11:32", "Bob，你呢？", MessageType::Other);
+    addMessasge("Eve", "Alice", "11:33", "好啊", MessageType::Self);
+    addMessasge("Eve", "Bob", "11:34", "好啊", MessageType::Self);
+    addMessasge("Eve", "Alice", "11:35", "这本书不错", MessageType::Other);
+    addMessasge("Eve", "Bob", "11:36", "是啊，推荐一下", MessageType::Other);
+    addMessasge("Eve", "Alice", "11:37", "下次再聊", MessageType::Other);
+    addMessasge("Eve", "Bob", "11:38", "好的", MessageType::Self);
+    addMessasge("Eve", "Alice", "11:39", "明天见", MessageType::Other);
+
+    addMessasge("Frank", "Frank", "11:40", "看电影", MessageType::Self);
+    addMessasge("Frank", "Alice", "11:41", "Alice，你呢？", MessageType::Other);
+    addMessasge("Frank", "Bob", "11:42", "Bob，你呢？", MessageType::Other);
+    addMessasge("Frank", "Alice", "11:43", "好啊", MessageType::Self);
+    addMessasge("Frank", "Bob", "11:44", "好啊", MessageType::Self);
+    addMessasge("Frank", "Alice", "11:45", "这本书不错", MessageType::Other);
+    addMessasge("Frank", "Bob", "11:46", "是啊，推荐一下", MessageType::Other);
+    addMessasge("Frank", "Alice", "11:47", "下次再聊", MessageType::Other);
+    addMessasge("Frank", "Bob", "11:48", "好的", MessageType::Self);
+    addMessasge("Frank", "Alice", "11:49", "明天见", MessageType::Other);
+
+    addMessasge("Grace", "Grace", "11:50", "旅行计划", MessageType::Self);
+    addMessasge("Grace", "Alice", "11:51", "Alice，你呢？", MessageType::Other);
+    addMessasge("Grace", "Bob", "11:52", "Bob，你呢？", MessageType::Other);
+    addMessasge("Grace", "Alice", "11:53", "好啊", MessageType::Self);
+    addMessasge("Grace", "Bob", "11:54", "好啊", MessageType::Self);
+    addMessasge("Grace", "Alice", "11:55", "这本书不错", MessageType::Other);
+    addMessasge("Grace", "Bob", "11:56", "是啊，推荐一下", MessageType::Other);
+    addMessasge("Grace", "Alice", "11:57", "下次再聊", MessageType::Other);
+    addMessasge("Grace", "Bob", "11:58", "好的", MessageType::Self);
+    addMessasge("Grace", "Alice", "11:59", "明天见", MessageType::Other);
+
+    addMessasge("Hannah", "Hannah", "12:00", "生日快乐", MessageType::Self);
+    addMessasge("Hannah", "Alice", "12:01", "Alice，你呢？", MessageType::Other);
+    addMessasge("Hannah", "Bob", "12:02", "Bob，你呢？", MessageType::Other);
+    addMessasge("Hannah", "Alice", "12:03", "好啊", MessageType::Self);
+    addMessasge("Hannah", "Bob", "12:04", "好啊", MessageType::Self);
+    addMessasge("Hannah", "Alice", "12:05", "这本书不错", MessageType::Other);
+    addMessasge("Hannah", "Bob", "12:06", "是啊，推荐一下", MessageType::Other);
+    addMessasge("Hannah", "Alice", "12:07", "下次再聊", MessageType::Other);
+    addMessasge("Hannah", "Bob", "12:08", "好的", MessageType::Self);
+    addMessasge("Hannah", "Alice", "12:09", "明天见", MessageType::Other);
+
+    // 暂时清理掉所有的测试数据,保证在我们没有选择任何会话的时候页面是空的
+    updateChatArea("wyw");
+    updateChatArea("现代C++卢瑟群");
+    updateChatArea("Alice");
+    updateChatArea("Bob");
+    updateChatArea("Charlie");
+    updateChatArea("David");
+    updateChatArea("Eve");
+    updateChatArea("Frank");
+    updateChatArea("Grace");
+    updateChatArea("Hannah");
 }

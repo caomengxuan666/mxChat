@@ -27,7 +27,6 @@ set(CHAT_SERVER_PROJECT_SOURCES
     ChatServer.cpp
     HttpConnection.cpp
     LogicSystem.cpp
-    yamlReader.hpp
     AsioIOServicePool.cpp
     MysqlMgr.cpp
     CSession.cpp
