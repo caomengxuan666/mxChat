@@ -35,14 +35,14 @@ using message::LoginRsp;
 using message::StatusService;
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 状态服务器的线程池
  * @date         : grpc默认使用IPV6地址，这里使用的也是IPV6
 **/
 class StatusConPool {
 public:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 创建grpc channel,并且构造的时候进行一次连接测试
      * @param         {size_t} poolSize:
      * @param         {string} port:
@@ -70,7 +70,7 @@ public:
     }
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 析构函数，关闭连接池并清空连接队列
      * @return        {*}
     **/
@@ -83,7 +83,7 @@ public:
     }
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 获取一个连接
      * @return        {std::unique_ptr<StatusService::Stub>} :通过std::move返回客户端上下文对象
     **/    
@@ -105,7 +105,7 @@ public:
     }
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 向状态服务器归还连接
      * @param         {unique_ptr<StatusService::Stub>} context:
      * @return        {*}
@@ -120,7 +120,7 @@ public:
     }
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 关闭连接
      * @return        {*}
     **/    
@@ -140,7 +140,7 @@ private:
 };
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 状态服务器,从配置文件中读取最大连接数,并且对所有ChatServer服务器进行负载均衡的连接管理
 **/
 class StatusGrpcClient : public Singleton<StatusGrpcClient> {
@@ -150,7 +150,7 @@ public:
     ~StatusGrpcClient() {
     }
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 通过uid,以grpc远程调用获取ChatServer服务器的连接
      * @param         {int} uid:
      * @return        {GetChatServerRsp} :grpc返回的ChatServer服务器信息
@@ -177,7 +177,7 @@ public:
     }
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 通过uid,以grpc远程调用获取ChatServer服务器的连接
      * @param         {int} uid:
      * @param         {string} token:
@@ -207,7 +207,7 @@ public:
 
 private:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 构造函数，读取配置文件,初始化连接池
      * @return        {*}
     **/

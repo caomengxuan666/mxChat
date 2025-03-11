@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-03 22:16:43
+ * @LastEditTime : 2025-03-05 23:29:38
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include "Server/LogicSystem.h"
@@ -15,6 +15,7 @@
 #include "Server/VarifyGrpcClient.h"
 #include <Server/CSession.h>
 #include <spdlog/spdlog.h>
+#include <string>
 
 
 LogicSystem::~LogicSystem() {
@@ -33,7 +34,7 @@ void LogicSystem::PostMsgToQue(shared_ptr<LogicNode> msg) {
 
 LogicSystem::LogicSystem() : b_stop(false) {
     RegisterCallBacks();
-    _worker_thread=std::thread(&LogicSystem::DealMsg,this);
+    _worker_thread = std::thread(&LogicSystem::DealMsg, this);
 }
 
 
@@ -71,6 +72,7 @@ void LogicSystem::LoginHandler(shared_ptr<CSession> session, const short &msg_id
     Json::Value root;
     reader.parse(msg_data, root);
     auto uid = root["uid"].asInt();
+    auto token = root["token"].asString();
     std::cout << "user login uid is  " << uid << " user token  is "
               << root["token"].asString() << endl;
 
@@ -88,29 +90,35 @@ void LogicSystem::LoginHandler(shared_ptr<CSession> session, const short &msg_id
     if (rsp.error() != ErrorCodes::SUCCESSFUL) {
         return;
     }
-
-    // 内存中查询用户信息
-    //todo
-    /*
-    auto find_iter = _users.find(uid);
-    std::shared_ptr<UserInfo> user_info = nullptr;
-    if (find_iter == _users.end()) {
-        // 查询数据库
-        user_info = MysqlMgr::GetInstance()->GetUser(uid);
-        if (user_info == nullptr) {
-            rtvalue["error"] = ErrorCodes::UidInvalid;
-            return;
-        }
-
-        _users[uid] = user_info;
-    } else {
-        user_info = find_iter->second;
+    std::string uid_str = std::to_string(uid);
+    std::string token_key = USERTOKENPREFIX + uid_str;
+    std::string token_value = "";
+    bool success = RedisMgr::GetInstance()->Get(token_key, token_value);
+    if (!success) {
+        rtvalue["error"] = ErrorCodes::UidInvalid;
+        return;
     }
-*/
-    
+
+    if (token_value != token) {
+        rtvalue["error"] = ErrorCodes::TokenInvalid;
+        return;
+    }
+    rtvalue["error"] = ErrorCodes::SUCCESSFUL;
+    std::string base_key = USER_BASE_INFO + uid_str;
+    auto user_info = std::make_shared<UserInfo>();
+    /* //todo
+    bool b_base = GetBaseInfo(base_key, uid, user_info);
+    if (!b_base) {
+		rtvalue["error"] = ErrorCodes::UidInvalid;
+		return;
+	}
+    */
     rtvalue["uid"] = uid;
     rtvalue["token"] = rsp.token();
-    //rtvalue["name"] = user_info->name;
+    rtvalue["name"] = user_info->name;
+
+    //获取好友列表
+
 }
 
 void LogicSystem::DealMsg() {
@@ -145,7 +153,7 @@ void LogicSystem::DealMsg() {
 
         // 如果没有停服，且说明队列中有数据
         if (_msg_que.empty()) {
-            continue; // 队列为空，继续等待
+            continue;// 队列为空，继续等待
         }
 
         auto msg_node = _msg_que.front();

@@ -16,7 +16,7 @@
 class CSession;
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 
 **/
 class UserMgr : public Singleton<UserMgr> {
@@ -25,14 +25,14 @@ class UserMgr : public Singleton<UserMgr> {
 public:
     ~UserMgr();
     /**
-	* @author       : caomengxuan
+	* @author       : caomengxuan666
 	* @brief        : 通过uid获取用户session
 	* @param         {int} uid:
 	* @return        {std::shared_ptr<CSession>} 用户与服务器建立的的Session
 	**/
     std::shared_ptr<CSession> GetSession(int uid);
     /**
-	* @author       : caomengxuan
+	* @author       : caomengxuan666
 	* @brief        : 
 	* @param         {int} uid:
 	* @param         {shared_ptr<CSession>} session:
@@ -40,7 +40,7 @@ public:
 	**/
     void SetUserSession(int uid, std::shared_ptr<CSession> session);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 删除用户session
      * @param         {int} uid:
      * @return        {*}

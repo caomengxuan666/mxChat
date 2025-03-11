@@ -24,7 +24,7 @@ class HttpConnection;
 typedef std::function<void(std::shared_ptr<HttpConnection>)> HttpHandler;
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : GateServer的Logic处理单例类，处理来自客户端的Http/Https请求
 **/
 class GateLogic : public Singleton<GateLogic> {
@@ -33,7 +33,7 @@ class GateLogic : public Singleton<GateLogic> {
 public:
     ~GateLogic();
     /**
-	* @author       : caomengxuan
+	* @author       : caomengxuan666
 	* @brief        : 解析来自客户端的Get请求
 	* @note 		: 从外部注册即可使用所有的Get请求
 	* @param         {shared_ptr<HttpConnection>} con: 管理客户端的Http连接类的shared_ptr
@@ -41,7 +41,7 @@ public:
     **/
     bool HandleGet(std::string url, std::shared_ptr<HttpConnection> con);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 动态注册Get请求,在GateLogic的构造函数中被使用
 	 * @param         {string} url: 绑定的路由url
      * @param         {HttpHandler} handler: 路由对应的处理函数
@@ -49,7 +49,7 @@ public:
     **/
     void RegGet(std::string url, HttpHandler handler);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 动态注册Post请求,在GateLogic的构造函数中被使用
 	 * @param         {string} url: 绑定的路由url
      * @param         {HttpHandler} handler: 路由对应的处理函数
@@ -57,7 +57,7 @@ public:
     **/
     void RegPost(std::string url, HttpHandler handler);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 解析来自客户端的Post请求
 	 * @note 		 : 从外部注册即可使用所有的Get请求
      * @param         {HttpHandler} handler: 路由对应的处理函数
@@ -68,7 +68,7 @@ public:
 
 private:
     /**
-	 * @author       : caomengxuan
+	 * @author       : caomengxuan666
 	 * @brief        : 在这里初始化所有的逻辑处理部分,如获取验证码和用户注册,重置密码,登录,所有解析后的操作在这里定义和实现
 	 * @return        {*}
 	**/

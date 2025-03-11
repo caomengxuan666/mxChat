@@ -16,14 +16,14 @@ using namespace std;
 using boost::asio::ip::tcp;
 class LogicSystem;
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 消息节点,包含[当前接受长度,总长度,数据]
  * @note         : 消息节点作为基类，派生出两个子类，一个用于接受消息，一个用于发送消息
 **/
 class MsgNode {
 public:
     /**
-	* @author       : caomengxuan
+	* @author       : caomengxuan666
 	* @brief        : 构造函数
 	* @param         {short} max_len: 最大长度
 	* @note 		: 所有的派生类也都遵循开始的时候创建一个空的数组，并设置数组最后一个字符为'\0',构造时当前长度都为1
@@ -50,7 +50,7 @@ public:
 };
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 接收消息节点
 **/
 class RecvNode : public MsgNode {
@@ -58,7 +58,7 @@ class RecvNode : public MsgNode {
 
 public:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 构造函数
      * @param         {short} max_len: 最大消息长度
      * @param         {short} msg_id:  消息的id
@@ -76,7 +76,7 @@ private:
 };
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 发送消息节点
 **/
 class SendNode : public MsgNode {
@@ -84,7 +84,7 @@ class SendNode : public MsgNode {
 
 public:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 构造函数
      * @param         {char*} msg: 消息数据指针
      * @param         {short} max_len: 消息最大长度

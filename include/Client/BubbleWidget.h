@@ -13,7 +13,7 @@
 #include <QWidget>
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 具体的消息类型，分为[自我，他人，系统，文件]
 **/
 enum class MessageType {
@@ -24,7 +24,7 @@ enum class MessageType {
 };
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 用于创建聊天气泡
 **/
 class BubbleWidget : public QWidget {
@@ -51,41 +51,41 @@ private:
     };
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 用于计算气泡的布局
      * @return        {*}
     **/    
     void calculateLayout();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 绘制气泡的背景
      * @param         {QPainter} &painter:
      * @return        {*}
     **/    
     void drawBubbleBackground(QPainter &painter);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 绘制气泡的头像
      * @param         {QPainter} &painter:
      * @return        {*}
     **/    
     void drawAvatar(QPainter &painter);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 绘制气泡的内容
      * @param         {QPainter} &painter:
      * @return        {*}
     **/    
     void drawTextContent(QPainter &painter);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 绘制气泡的时间戳
      * @param         {QPainter} &painter:
      * @return        {*}
     **/    
     void drawTimestamp(QPainter &painter);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 绘制文件图标
      * @param         {QPainter} &painter:
      * @param         {QRect} &rect:

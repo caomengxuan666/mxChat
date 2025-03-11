@@ -16,7 +16,7 @@
 #include <QTcpSocket>
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 客户端管理的服务器信息，有{Uid,主机，端口号，Token}
  * @return        {*}
 **/
@@ -29,7 +29,7 @@ struct ServerInfo {
 
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 客户端管理服务器的类，负责连接服务器，发送消息，接收消息，断开连接，重连等操作
 **/
 class TcpMgr : public QObject, public Singleton<TcpMgr>, public std::enable_shared_from_this<TcpMgr> {
@@ -39,13 +39,13 @@ public:
 
 private:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 初始化处理函数
      * @return        {*}
     **/
     void initHandlers();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 处理数据
      * @param         {ReqId} id:
      * @param         {int} len:
@@ -57,13 +57,13 @@ private:
     QMap<ReqId, std::function<void(ReqId id, int len, QByteArray data)>> _handlers;
 public slots:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 连接成功
      * @return        {*}
     **/
     void slot_tcp_connect(ServerInfo);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 发送数据
      * @param         {ReqId} reqId:
      * @param         {QString} data:
@@ -72,14 +72,14 @@ public slots:
     void slot_send_data(ReqId reqId, QString data);
 signals:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 连接成功
      * @param         {bool} bsuccess:
      * @return        {*}
     **/
     void sig_con_success(bool bsuccess);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 发送信息
      * @param         {ReqId} reqId:
      * @param         {QString} data:
@@ -87,14 +87,14 @@ signals:
     **/    
     void sig_send_data(ReqId reqId, QString data);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 登录失败
      * @param         {int} err:
      * @return        {*}
     **/
     void sig_login_failed(int err);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 切换聊天窗口
      * @return        {*}
     **/    

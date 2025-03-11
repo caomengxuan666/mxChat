@@ -21,7 +21,7 @@
 #include <memory>
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 用户通过Http与GateServer交互的类
 **/
 class HttpMgr : public QObject, public Singleton<HttpMgr>, public std::enable_shared_from_this<HttpMgr> {
@@ -30,7 +30,7 @@ class HttpMgr : public QObject, public Singleton<HttpMgr>, public std::enable_sh
 public:
     ~HttpMgr();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 向GateServer发送Post请求体
      * @param         {QUrl} url:
      * @param         {QJsonObject} json:
@@ -46,7 +46,7 @@ private:
     QNetworkAccessManager _manager;
 private slots:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : http请求结束的槽函数
      * @param         {ReqId} id:
      * @param         {QString} res:
@@ -58,7 +58,7 @@ private slots:
 
 signals:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : http请求结束的信号
      * @param         {ReqId} id:
      * @param         {QString} res:
@@ -68,7 +68,7 @@ signals:
     **/
     void sig_http_finish(ReqId id, QString res, ErrorCodes err, Modules mod);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 注册请求结束的信号
      * @param         {ReqId} id:
      * @param         {QString} res:
@@ -77,7 +77,7 @@ signals:
     **/    
     void sig_reg_mod_finish(ReqId id, QString res, ErrorCodes err);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 重置密码请求结束的信号
      * @param         {ReqId} id:
      * @param         {QString} res:
@@ -86,7 +86,7 @@ signals:
     **/    
     void sig_reset_mod_finish(ReqId id, QString res, ErrorCodes err);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 登录请求结束的信号
      * @param         {ReqId} id:
      * @param         {QString} res:

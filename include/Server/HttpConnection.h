@@ -16,14 +16,14 @@ class HttpConnection : public std::enable_shared_from_this<HttpConnection> {
 
 public:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 构造函数,通过move将socket所有权转移到HttpConnetcion类
      * @param         {socket} socket:
      * @return        {*}
     **/
     HttpConnection(tcp::socket socket);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 开始异步进行读操作，并通过别的函数处理读到的数据
      * @return        {*}
     **/   
@@ -32,25 +32,25 @@ public:
 
 private:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 启动一个计时器检查超时
      * @return        {*}
     **/
     void CheckDeadline();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 异步写入响应，并将计时器重置。
      * @return        {*}
     **/    
     void WriteResponse();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 根据请求选择对应的Http标准，设置Http为短链接,转发给gatelogic处理get和post请求
      * @return        {*}
     **/    
     void HandleReq();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : // 解析GET请求参数
      * @return        {*}
     **/    

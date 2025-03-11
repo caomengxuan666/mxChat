@@ -11,13 +11,13 @@
 #include "const.h"
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : GateServer服务器,作为网关接受服务器的连接,处理来自客户端的注册,登录，重置密码等等Http请求
 **/
 class GateServer : public std::enable_shared_from_this<GateServer> {
 public:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 初始化网关服务器
      * @param         {io_context} &ioc:
      * @param         {unsigned short} &port:
@@ -25,7 +25,7 @@ public:
     **/
     GateServer(boost::asio::io_context &ioc, unsigned short &port);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 启动网关服务器
      * @return        {*}
     **/    

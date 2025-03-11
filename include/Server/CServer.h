@@ -4,7 +4,7 @@
 #include <Server/CSession.h>
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 聊天服务器，管理会话Session
 **/
 class CServer : public std::enable_shared_from_this<CServer> {
@@ -12,7 +12,7 @@ public:
     CServer(boost::asio::io_context &ioc, unsigned short &port);
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 根据uuid清除Session
      * @param         {string} uuid:
      * @return        {*}
@@ -21,7 +21,7 @@ public:
 
 private:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 管理会话的连接
      * @param         {error_code} &error:
      * @return        {*}
@@ -29,7 +29,7 @@ private:
     void HandleAccept(std::shared_ptr<CSession>, const boost::system::error_code &error);
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 进行和会话的连接，创建Socket
      * @return        {*}
     **/    

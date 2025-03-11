@@ -12,7 +12,7 @@
 
 //todo
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 请求的ID
 **/
 enum ReqId {
@@ -26,7 +26,7 @@ enum ReqId {
 };
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 请求的模式
 **/
 enum Modules {
@@ -36,7 +36,7 @@ enum Modules {
 };
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 通信中的用户信息结构体
 **/
 struct UserInfo {

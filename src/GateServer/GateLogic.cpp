@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-05 17:24:58
+ * @LastEditTime : 2025-03-05 21:51:52
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include <Server/GateLogic.h>
@@ -211,6 +211,7 @@ GateLogic::GateLogic() {
         root["uid"] = userInfo.uid;
         root["token"] = reply.token();
         root["host"] = reply.host();
+        root["port"] = reply.port();
         std::string jsonstr = root.toStyledString();
         beast::ostream(connection->_response.body()) << jsonstr;
         return true;

@@ -13,7 +13,7 @@
 #include <vector>
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : ASIO io_service 线程池
 **/
 class AsioIOServicePool : public Singleton<AsioIOServicePool> {
@@ -28,13 +28,13 @@ public:
     AsioIOServicePool &operator=(const AsioIOServicePool &) = delete;
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 使用 round-robin 的方式返回一个 io_service
      * @return        {*}
     **/    
     boost::asio::io_context &GetIOService();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 使得 io_service从run的状态退出
      * @return        {*}
     **/    
@@ -42,7 +42,7 @@ public:
 
 private:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 构造函数，初始化线程池，每个线程内部启动一个io_service
      * @param         {size_t} size:
      * @return        {*}

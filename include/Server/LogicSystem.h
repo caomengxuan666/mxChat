@@ -21,7 +21,7 @@ class CSession;
 
 typedef std::function<void(std::shared_ptr<CSession>, const short &msg_id, const std::string &msg_data)> FunCallBack;
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : Chatserver的业务逻辑处理类
 **/
 class LogicSystem : public Singleton<LogicSystem> {
@@ -30,26 +30,26 @@ class LogicSystem : public Singleton<LogicSystem> {
 public:
     ~LogicSystem();
     /**
-	* @author       : caomengxuan
+	* @author       : caomengxuan666
 	* @brief        : 将消息push到队列
 	* @param         {shared_ptr <LogicNode>} msg:
 	* @return        {*}
 	**/
     void PostMsgToQue(std::shared_ptr<LogicNode> msg);
     /**
-	* @author       : caomengxuan
+	* @author       : caomengxuan666
 	* @brief        : 用std::bind来注册不同消息处理的回调函数,处理消息队列的时候,不同的消息直接触发不同的函数
 	* @return        {*}
 	**/
     void RegisterCallBacks();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 解析Msg,通过Msg来触发对应先前注册的回调
      * @return        {*}
     **/	
     void DealMsg();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 登录的处理函数,从状态服务器获取token,并且在内存中查询核对用户信息,完成之后通过CSession->Send返回状态json
      * @param         {shared_ptr<CSession>} session:
      * @param         {short} &msg_id:

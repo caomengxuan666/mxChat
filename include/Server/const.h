@@ -34,7 +34,7 @@ constexpr short MAX_SENDQUE = 1000;
 constexpr std::string ALLIPV4ADDRESS = "0.0.0.0:";
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 错误码
 **/
 enum ErrorCodes {
@@ -51,7 +51,7 @@ enum ErrorCodes {
 };
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 消息ID
 **/
 enum MSG_IDS {

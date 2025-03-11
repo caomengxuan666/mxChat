@@ -22,14 +22,14 @@
 
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : MySQL连接池
 **/
 class MySqlPool {
     public:
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : MySQL的连接池初始化
      * @param         {string} &host:
      * @param         {int} port:
@@ -57,7 +57,7 @@ class MySqlPool {
     }
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 获取与MySQL数据库的连接
      * @return        {std::shared_ptr<mysqlx::Session>} 连接的会话
     **/
@@ -78,7 +78,7 @@ class MySqlPool {
     }
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 向连接池归还连接
      * @param         {shared_ptr<mysqlx::Session>} session:
      * @return        {*}
@@ -93,7 +93,7 @@ class MySqlPool {
     }
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 关闭连接池
      * @return        {*}
     **/
@@ -103,7 +103,7 @@ class MySqlPool {
     }
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 析构函数，销毁连接池
      * @return        {*}
     **/

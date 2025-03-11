@@ -16,24 +16,24 @@
 #include <string>
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 实现MySQL的具体操作
 **/
 class MysqlDao {
 public:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : MySQL的构造函数,读取yaml配置文档并且初始化连接池，自动连接到数据库
     **/
     MysqlDao();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : MySQL的析构函数，进行MySQL连接池的回收
      * @return        {*}
     **/    
     ~MysqlDao();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 注册用户，将信息写入MySQL
      * @param         {string} &name:
      * @param         {string} &email:
@@ -42,7 +42,7 @@ public:
     **/    
     int RegUser(const std::string &name, const std::string &email, const std::string &pwd);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 密码检测，返回一个检测的结果
      * @param         {string} &name:
      * @param         {string} &pwd:
@@ -51,14 +51,14 @@ public:
     **/    
     bool CheckPwd(const std::string &name, const std::string &pwd, UserInfo &userInfo);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 通过uid获取用户所有信息
      * @param         {int} uid:
      * @return        {shared_ptr<_NonArray<UserInfo>>} 相关用户在数据库中所有的信息
     **/    
     std::shared_ptr<UserInfo> GetUser(int uid);
     /**
-    * @author       : caomengxuan
+    * @author       : caomengxuan666
     * @brief        : 通过name获取用户所有信息
     * @param         {string} name:
     * @return        {shared_ptr<_NonArray<UserInfo>>} 相关用户在数据库中所有的信息

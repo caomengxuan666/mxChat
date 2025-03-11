@@ -3,7 +3,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
-
+find_package(YAML-CPP REQUIRED)
 
 set(INCLUDE_HEADERS_CLIENT ${CMAKE_SOURCE_DIR}/include/Client)
 set(INCLUDE_HEADERS_DATABASE ${CMAKE_SOURCE_DIR}/include/DataBase)
@@ -12,6 +12,7 @@ set(PROJECT_SOURCES
     ${INCLUDE_HEADERS_CLIENT}/Login.h
     ${INCLUDE_HEADERS_CLIENT}/MainWidget.h
     ${INCLUDE_HEADERS_CLIENT}/SessionItem.hpp
+    ${INCLUDE_HEADERS_CLIENT}/SessionManager.h
     ${INCLUDE_HEADERS_CLIENT}/Regist.ui
     ${INCLUDE_HEADERS_CLIENT}/Regist.h
     ${INCLUDE_HEADERS_CLIENT}/../Singleton.h
@@ -27,6 +28,7 @@ set(PROJECT_SOURCES
     BubbleWidget.cpp
     TcpMgr.cpp
     UserMgr.cpp
+    SessionManager.cpp
     ${CMAKE_SOURCE_DIR}/resources/Login.qrc
 )
 
@@ -50,6 +52,7 @@ set(LINK_LIBS
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Network 
     Qt${QT_VERSION_MAJOR}::Gui
+    yaml-cpp::yaml-cpp
 )
 
 target_link_libraries(ChatClient PRIVATE ${LINK_LIBS})

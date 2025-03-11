@@ -15,7 +15,7 @@
 #include "global.h"
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : Mysql的封装层，通过封装具体实现类MysqlDao,将具体接口暴露给服务器使用
 **/
 class MysqlMgr : public Singleton<MysqlMgr> {
@@ -24,7 +24,7 @@ class MysqlMgr : public Singleton<MysqlMgr> {
 public:
     ~MysqlMgr();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 
      * @param         {string} &name:
      * @param         {string} &email:
@@ -33,7 +33,7 @@ public:
     **/
     int RegUser(const std::string &name, const std::string &email, const std::string &pwd);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 
      * @param         {string} &name:
      * @param         {string} &pwd:
@@ -42,14 +42,14 @@ public:
     **/
     bool CheckPwd(const std::string &name, const std::string &pwd, UserInfo &userinfo);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 通过uid获取用户所有信息
      * @param         {int} uid:
      * @return        {shared_ptr<_NonArray<UserInfo>>} 相关用户在数据库中所有的信息
     **/
     std::shared_ptr<UserInfo> GetUser(int uid);
     /**
-    * @author       : caomengxuan
+    * @author       : caomengxuan666
     * @brief        : 通过name获取用户所有信息
     * @param         {string} name:
     * @return        {shared_ptr<UserInfo>} 相关用户在数据库中所有的信息

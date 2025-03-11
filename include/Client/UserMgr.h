@@ -15,7 +15,7 @@
 
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 用户管理类，用于管理客户端发送到服务端的用户信息
 **/
 class UserMgr:public QObject,public Singleton<UserMgr>,
@@ -26,21 +26,21 @@ public:
     friend class Singleton<UserMgr>;
     ~ UserMgr();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 设置用户名
      * @param         {QString} name:
      * @return        {*}
     **/    
     void SetName(QString name);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 设置Uid
      * @param         {int} uid:
      * @return        {*}
     **/    
     void SetUid(int uid);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 设置Token
      * @param         {QString} token:
      * @return        {*}

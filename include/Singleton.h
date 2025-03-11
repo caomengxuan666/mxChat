@@ -15,7 +15,7 @@
 
 template <typename T>
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 单例模式的封装类,采用CTPR模式
  * @return        {*}
 **/
@@ -28,7 +28,7 @@ protected:
     static std::shared_ptr<T> _instance;
 public:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 获取单例对象
      * @return        {*}
     **/
@@ -41,7 +41,7 @@ public:
         return _instance;
     }
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 打印单例对象的地址
      * @return        {*}
     **/    
@@ -49,7 +49,7 @@ public:
         std::cout << _instance.get() << std::endl;
     }
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 单例类的析构函数
      * @return        {*}
     **/    

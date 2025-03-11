@@ -20,13 +20,13 @@
 class CServer;
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 会话对象类，被CServer直接管理。会话具体控制每一个来自客户端的连接
 **/
 class CSession : public std::enable_shared_from_this<CSession> {
 public:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : Csession的构造函数，每次调用自动进行对_session_id的初始化
      * @param         {io_context} &io_context:
      * @param         {CServer} *server:
@@ -34,49 +34,49 @@ public:
     **/
     CSession(boost::asio::io_context &io_context, CServer *server);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 关闭套接字，清理动态分配的资源
     **/    
     ~CSession();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 返回这个会话的socket对象引用
      * @return        {tcp::socket &} 会话中存储的socket对象引用
     **/    
     tcp::socket &GetSocket();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 获取当前的会话ID
      * @return        {std::string &} 会话的ID的字符串
     **/    
     std::string &GetSessionId();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 设置当前会话的用户ID
      * @param         {int} uid:
      * @return        {*}
     **/    
     void SetUserId(int uid);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 获取当前会话的用户ID
      * @return        {*}
     **/    
     int GetUserId();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 获取这个对话产生时候生成的Uuid
      * @return        {std::string &}} 此会话的Uuid
     **/    
     std::string GetUuid();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 启动会话，执行异步读TCP报文头部操作
      * @return        {*}
     **/    
     void Start();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 向客户端发送msg消息，可以设置最大消息长度
      * @param         {char} *msg:
      * @param         {short} max_length:
@@ -85,7 +85,7 @@ public:
     **/    
     void Send(char *msg, short max_length, short msgid);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 向客户端发送msg消息
      * @param         {string} msg:
      * @param         {short} msgid:
@@ -93,26 +93,26 @@ public:
     **/    
     void Send(std::string msg, short msgid);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 关闭服务器会话
      * @return        {*}
     **/    
     void Close();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 返回当前会话的共享指针
      * @return        {std::shared_ptr<CSession>} 此会话的共享指针
     **/    
     std::shared_ptr<CSession> SharedSelf();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 异步读取报文内容
      * @param         {int} length:
      * @return        {*}
     **/    
     void AsyncReadBody(int length);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 异步读取报文头部
      * @param         {int} total_len:
      * @return        {*}
@@ -142,7 +142,7 @@ private:
 };
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 逻辑节点，用于存放逻辑处理所需要的会话和报文
 **/
 class LogicNode {

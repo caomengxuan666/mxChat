@@ -29,7 +29,7 @@ using message::StatusService;
 class StatusMonitor;
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 服务器的ip和端口
 **/
 struct ChatServer {
@@ -38,7 +38,7 @@ struct ChatServer {
 };
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 服务器的状态结构体
 **/
 struct ServerStatus {
@@ -51,21 +51,21 @@ struct ServerStatus {
 };
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 状态服务器的实现类
 **/
 class StatusServiceImpl final : public StatusService::Service {
 public:
     StatusServiceImpl();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 获取服务器的状态信息,设置rpc的reply,返回选中的负载均衡服务器的host和port,并且将Token写入redis
      * @return        {Status}:服务器的状态
     **/
     Status GetChatServer(ServerContext *context, const GetChatServerReq *request,
                          GetChatServerRsp *reply) override;
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 登录请求,设置rpc的reply,设置reply,返回登录成功与否
      * @param         {ServerContext} *context:
      * @param         {LoginReq} *request:
@@ -75,7 +75,7 @@ public:
     Status Login(ServerContext *context, const LoginReq *request, LoginRsp *reply) override;
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 执行操作,拼接uid和token,将其写入redis
      * @param         {int} uid:
      * @param         {string} token:
@@ -84,7 +84,7 @@ public:
     void insertToken(int uid, std::string token);
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 绑定观察者对象,用于添加StatusMonitor
      * @param         {StatusMonitor} *observer:
      * @return        {*}
@@ -92,20 +92,20 @@ public:
 
     void addObserver(StatusMonitor *observer);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 移除观察者对象,用于移除StatusMonitor
      * @param         {StatusMonitor} *observer:
      * @return        {*}
     **/    
     void removeObserver(StatusMonitor *observer);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 通知观察者,更新服务器状态
      * @return        {*}
     **/
     void notifyObservers();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 获取服务器状态
      * @return        {const ServerStatus &}服务器状态结构体
     **/    

@@ -21,7 +21,7 @@ class Regist : public QWidget {
     Q_OBJECT
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 错误列表，分为[无错误，密码不匹配，邮箱格式错误]
     **/    
     enum ErrorType {
@@ -36,19 +36,19 @@ public:
 
 private slots:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 检查密码是否匹配
      * @return        {*}
     **/
     void checkPasswordMatch();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 检查邮箱格式是否正确
      * @return        {*}
     **/    
     void checkEmailFormat();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 处理注册请求的响应
      * @param         {ReqId} id:
      * @param         {QString} res:
@@ -57,39 +57,39 @@ private slots:
     **/    
     void slot_reg_mod_finish(ReqId id, QString res, ErrorCodes err);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 向GateServer发送一个携带了注册信息json的http请求
      * @return        {*}
     **/    
     void getVarifyCode();
 private:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 重置样式
      * @return        {*}
     **/
     void resetStyleSheet();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 设置不同错误的样式
      * @param         {QLineEdit} *lineEdit:
      * @return        {*}
     **/    
     void setErrorSheet(QLineEdit *lineEdit);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 更新错误信息
      * @return        {*}
     **/    
     void updateErrorMessage();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 初始化http请求处理
      * @return        {*}
     **/    
     void initHttpHandlers();
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 注册按钮点击事件
      * @return        {*}
     **/    

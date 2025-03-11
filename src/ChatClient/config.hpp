@@ -1,10 +1,10 @@
 /**
- * @FilePath     : /mxChat/include/Server/config.hpp
+ * @FilePath     : /mxChat/src/ChatClient/config.hpp
  * @Description  :  YAML配置管理类
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-05 21:22:08
+ * @LastEditTime : 2025-03-05 22:03:05
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #include <cassert>

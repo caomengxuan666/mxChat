@@ -32,13 +32,13 @@ using message::GetVarifyRsp;
 using message::VarifyService;
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : grpc邮件发送客户端的RPC连接池
 **/
 class RPConPool {
 public:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 构造函数,创造和js的grpc服务器的channel
      * @param         {size_t} poolSize:
      * @param         {string} host:
@@ -55,7 +55,7 @@ public:
     }
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 析构函数,关闭连接池
      * @return        {*}
     **/
@@ -68,7 +68,7 @@ public:
     }
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 获取一个调用远程邮件发送服务的代理对象
      * @return        {std::unique_ptr<VarifyService::Stub>} :一个调用远程邮件发送服务的代理对象
     **/
@@ -89,7 +89,7 @@ public:
     }
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 将一个调用远程邮件发送服务的代理对象放回连接池
      * @param         {unique_ptr<VarifyService::Stub>} context:
      * @return        {*}
@@ -104,7 +104,7 @@ public:
     }
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 关闭连接池
      * @return        {*}
     **/
@@ -124,7 +124,7 @@ private:
 };
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 验证邮箱的grpc调用方
 **/
 class VerifyGrpcClient : public Singleton<VerifyGrpcClient> {
@@ -132,7 +132,7 @@ class VerifyGrpcClient : public Singleton<VerifyGrpcClient> {
 
 public:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 获取验证码的远程调用
      * @param         {string} email:
      * @return        {GetVarifyRsp}:验证码的reply返回
@@ -156,7 +156,7 @@ public:
     }
 
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 重置密码的远程调用
      * @param         {string} email:
      * @return        {GetVarifyRsp}:重置密码的reply返回
@@ -181,7 +181,7 @@ public:
 
 private:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 构造函数，加载配置文件并且初始化连接池
      * @return        {*}
     **/

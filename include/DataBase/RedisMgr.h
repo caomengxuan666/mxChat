@@ -16,7 +16,7 @@
 
 constexpr std::string CODE_PREFIX = "code_";
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : Redis的操作封装层
 **/
 class RedisMgr : public Singleton<RedisMgr>,
@@ -26,7 +26,7 @@ class RedisMgr : public Singleton<RedisMgr>,
 public:
     ~RedisMgr() {}
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 连接redis服务器
      * @param         {string} &host:
      * @param         {int} port:
@@ -34,7 +34,7 @@ public:
     **/    
     bool Connect(const std::string &host, int port);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 获取redis服务器中的数据
      * @param         {string} &key:
      * @param         {string} &value:
@@ -43,7 +43,7 @@ public:
     **/    
     bool Get(const std::string &key, std::string &value, const std::string &code_prefix = CODE_PREFIX);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 设置redis中的数据
      * @param         {string} &key:
      * @param         {string} &value:
@@ -51,14 +51,14 @@ public:
     **/    
     bool Set(const std::string &key, const std::string &value);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 验证redis数据库的密码
      * @param         {string} &password:
      * @return        {*}
     **/    
     bool Auth(const std::string &password);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 队列操作向左Push
      * @param         {string} &key:
      * @param         {string} &value:
@@ -66,7 +66,7 @@ public:
     **/    
     bool LPush(const std::string &key, const std::string &value);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 队列操作向左Pop
      * @param         {string} &key:
      * @param         {string} &value:
@@ -74,7 +74,7 @@ public:
     **/
     bool LPop(const std::string &key, std::string &value);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 
      * @param         {string} &key:
      * @param         {string} &value:
@@ -82,7 +82,7 @@ public:
     **/    
     bool RPush(const std::string &key, const std::string &value);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 队列操作向右Pop
      * @param         {string} &key:
      * @param         {string} &value:
@@ -90,7 +90,7 @@ public:
     **/    
     bool RPop(const std::string &key, std::string &value);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : Hash操作，设置
      * @param         {string} &key:
      * @param         {string} &hkey:
@@ -99,7 +99,7 @@ public:
     **/    
     bool HSet(const std::string &key, const std::string &hkey, const std::string &value);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : Hash操作，设置
      * @param         {char} *key:
      * @param         {char} *hkey:
@@ -109,7 +109,7 @@ public:
     **/    
     bool HSet(const char *key, const char *hkey, const char *hvalue, size_t hvaluelen);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : Hash操作，获取
      * @param         {string} &key:
      * @param         {string} &hkey:
@@ -117,21 +117,21 @@ public:
     **/    
     std::string HGet(const std::string &key, const std::string &hkey);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 删除Redis中的键
      * @param         {string} &key:
      * @return        {*}
     **/    
     bool Del(const std::string &key);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 判断键是否存在
      * @param         {string} &key:
      * @return        {*}
     **/    
     bool ExistsKey(const std::string &key);
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 关闭Redis连接
      * @return        {*}
     **/    
@@ -139,7 +139,7 @@ public:
 
 private:
     /**
-     * @author       : caomengxuan
+     * @author       : caomengxuan666
      * @brief        : 构造函数，构造时进行连接
      * @return        {*}
     **/

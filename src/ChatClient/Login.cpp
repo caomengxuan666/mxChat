@@ -19,7 +19,7 @@
 #include <QStyleOption>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <Server/config.hpp>
+#include "config.hpp"
 #include <cstring>
 #include <qdebug.h>
 #include <qjsonobject.h>
@@ -303,10 +303,15 @@ bool Login::verifyUser(const QString &username, const QString &password) {
 
     auto cfg = Config_Manager::getInstance();
     cfg.setYamlPath("server.yaml");
+    auto config = cfg.loadYamlDoc();
+
+    std::string host = config["GateServer"]["host"].as<std::string>();
+    std::string port = config["GateServer"]["port"].as<std::string>();
+    auto url = QString::fromStdString("http://" + host + ":" + port + "/user_login");
 
     // 发送 HTTP POST 请求
     HttpMgr::GetInstance()->PostHttpReq(
-            QUrl("http://localhost:8081/user_login"),
+            QUrl(url),
             login_json,
             ReqId::ID_LOGIN_USER,
             Modules::LOGINMOD);
@@ -334,9 +339,9 @@ void Login::initHttpHandlers() {
         QString host = jsonObj["host"].toString();
         QString port = jsonObj["port"].toString();
 
-        qDebug()<<"uid:"<<uid<<"token:"<<token<<"host:"<<host<<"port:"<<port;
+        qDebug() << "uid:" << uid << "token:" << token << "host:" << host << "port:" << port;
 
-        ServerInfo si{uid, host, "8082", token};
+        ServerInfo si{uid, host, port, token};
         _uid = si.Uid;
         _token = si.Token;
 

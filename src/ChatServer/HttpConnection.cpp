@@ -13,7 +13,7 @@
 #include <spdlog/spdlog.h>
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : Hex转换十进制函数
  * @param         {unsigned char} x:一个Hex字符
  * @return        {char} :转换后的十进制数
@@ -31,7 +31,7 @@ inline static char FromHex(unsigned char x) {
 }
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : 十进制转换Hex函数
  * @param         {unsigned char} x:一个十进制字符
  * @return        {*}
@@ -41,7 +41,7 @@ inline static unsigned char ToHex(unsigned char x) {
 }
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : url编码函数
  * @param         {string} &str: 需要编码的字符串
  * @return        {std::string} :编码后的字符串
@@ -70,7 +70,7 @@ inline static std::string UrlEncode(const std::string &str) {
 }
 
 /**
- * @author       : caomengxuan
+ * @author       : caomengxuan666
  * @brief        : Url解码函数
  * @param         {string} &str:
  * @return        {std::string} :解码后的字符串
