@@ -4,7 +4,7 @@
  * @Author       : caomengxuan666 2507560089@qq.com
  * @Version      : 0.0.1
  * @LastEditors  : caomengxuan666 2507560089@qq.com
- * @LastEditTime : 2025-03-05 16:51:03
+ * @LastEditTime : 2025-03-12 12:39:12
  * @Copyright    : PESONAL DEVELOPER CMX., Copyright (c) 2025.
 **/
 #pragma once
@@ -39,6 +39,8 @@ public:
 protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *event)override;
+    void copyContent();
 
 private:
     struct LayoutMetrics {

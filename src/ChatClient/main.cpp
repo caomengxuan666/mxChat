@@ -3,7 +3,6 @@
 #include <QApplication>
 #include <QGuiApplication>
 #include <QScreen>
-
 int main(int argc, char *argv[]) {
     // 设置缩放比例，1080P为1.0基准
     qputenv("QT_SCALE_FACTOR", QByteArray::number(1.5));

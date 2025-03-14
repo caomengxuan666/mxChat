@@ -20,6 +20,7 @@ set(PROJECT_SOURCES
     ${INCLUDE_HEADERS_CLIENT}/BubbleWidget.h
     ${INCLUDE_HEADERS_CLIENT}/TcpMgr.h
     ${INCLUDE_HEADERS_CLIENT}/UserMgr.h
+    ${INCLUDE_HEADERS_CLIENT}/LeftNavButtonFactory.hpp
     Regist.cpp
     main.cpp
     Login.cpp

@@ -1,7 +1,10 @@
 #include "Client/BubbleWidget.h"
+#include <Client/LeftNavButtonFactory.hpp>
 #include <Client/MainWidget.h>
 #include <Client/SessionItem.hpp>
+#include <QDockWidget>
 #include <QGraphicsOpacityEffect>
+#include <QRandomGenerator>
 #include <QSequentialAnimationGroup>
 #include <QShortcut>
 #include <QSplitter>
@@ -9,6 +12,7 @@
 #include <QTime>
 #include <QTimer>
 #include <QToolButton>
+#include <qmainwindow.h>
 #include <qnamespace.h>
 #include <qpainterpath.h>
 #include <qpropertyanimation.h>
@@ -16,130 +20,76 @@
 #include <qtoolbutton.h>
 #include <spdlog/spdlog.h>
 
-MainWidget::MainWidget(QWidget *parent)
-    : QWidget(parent),
+MainWidget::MainWidget(QMainWindow *parent)
+    : QMainWindow(parent),
       sessionManager(nullptr),
       chatArea(nullptr),
       messageInput(nullptr),
       sendButton(nullptr),
-      inputPanel(nullptr), searchBar(nullptr) {
+      inputPanel(nullptr),
+      cachedChatPage(nullptr),
+      cachedContactsPage(nullptr),
+      cachedSearchBar(nullptr),
+      cachedLeftContent(nullptr) {// 初始化缓存聊天区域的成员变量
     setMinimumSize(900, 600);
     setupUI();// 确保在 setupStyle 之前调用 setupUI
     setupStyle();
     //设置为最大化
 
     insertTestCase();
+
+    // 安装事件过滤器
+    sessionListWidget = sessionManager->getSessionListWidget();
+    if (sessionListWidget) {
+        sessionListWidget->installEventFilter(this);
+    }
+    this->installEventFilter(this);// 安装事件过滤器到 MainWidget
 }
 
 MainWidget::~MainWidget() {
 }
 
-
-QToolButton *MainWidget::createNavButton(const QString &iconName, bool isAvatar) {
-    QToolButton *btn = new QToolButton;
-    btn->setIconSize(QSize(24, 24));
-    btn->setToolButtonStyle(Qt::ToolButtonIconOnly);// 只显示图标，不显示文字
-    btn->setFixedSize(60, 60);
-    btn->setStyleSheet(R"(
-        QToolButton {
-            color: #A0A4AD;
-            border: none;
-            padding: 5px;
+bool MainWidget::eventFilter(QObject *watched, QEvent *event) {
+    if (watched == sessionListWidget) {
+        if (event->type() == QEvent::Enter) {
+            // 鼠标进入时显示滚动条
+            showScrollBars(true);
+            return true;
+        } else if (event->type() == QEvent::Leave) {
+            // 鼠标离开时隐藏滚动条
+            showScrollBars(false);
+            return true;
         }
-        QToolButton:hover {
-            background: #373B44;
-        }
-        QToolButton[active="true"] {
-            color: #00B4FF;
-            background: #373B44;
-        }
-    )");
-
-    if (isAvatar) {
-        // 如果是用户头像，加载图片并设置为圆形
-        QPixmap avatar(":/images/avatar.png");
-        QPixmap circularAvatar(24, 24);      // 创建一个正方形画布
-        circularAvatar.fill(Qt::transparent);// 设置透明背景
-
-        QPainter painter(&circularAvatar);
-        painter.setRenderHint(QPainter::Antialiasing);
-
-        // 绘制圆形裁剪区域
-        QPainterPath path;
-        path.addEllipse(0, 0, 24, 24);
-        painter.setClipPath(path);
-
-        // 将头像图片绘制到圆形区域
-        painter.drawPixmap(0, 0, avatar.scaled(24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-        painter.end();
-
-        btn->setIcon(QIcon(circularAvatar));// 设置圆形头像图标
-    } else {
-        // 使用 QPainter 绘制其他图标
-        QPixmap icon(24, 24);
-        icon.fill(Qt::transparent);// 设置透明背景
-        QPainter painter(&icon);
-        painter.setRenderHint(QPainter::Antialiasing);
-
-        if (iconName == "chat") {
-            // 绘制“聊”图标（圆形尖角气泡）
-            painter.setPen(QPen(QColor("#FFFFFF"), 2));// 白色粗轮廓线
-            QPainterPath path;
-            path.addRoundedRect(QRectF(4, 4, 16, 16), 8, 8);// 圆角矩形
-            path.moveTo(20, 12);                            // 尖角起点
-            path.lineTo(24, 16);                            // 尖角顶点
-            path.lineTo(20, 20);                            // 尖角终点
-            painter.drawPath(path);                         // 绘制路径
-        } else if (iconName == "contacts") {
-            // 绘制“友”图标（用户头像）
-            painter.setPen(QPen(QColor("#FFFFFF"), 2));// 白色粗轮廓线
-            painter.setBrush(Qt::transparent);         // 透明填充
-            painter.drawEllipse(4, 4, 16, 16);         // 外部圆形
-            painter.drawLine(12, 8, 12, 16);           // 垂直线表示头部
-            painter.drawLine(8, 12, 16, 12);           // 水平线表示肩膀
-        } else if (iconName == "files") {
-            // 绘制“文”图标（文件形状）
-            painter.setPen(QPen(QColor("#FFFFFF"), 2));// 白色粗轮廓线
-            QPainterPath path;
-            path.moveTo(4, 4);     // 左上角
-            path.lineTo(20, 4);    // 右上角
-            path.lineTo(20, 20);   // 右下角
-            path.lineTo(4, 20);    // 左下角
-            path.lineTo(4, 4);     // 回到左上角
-            path.moveTo(20, 4);    // 文件折角起点
-            path.lineTo(16, 8);    // 折角中间
-            path.lineTo(16, 4);    // 折角终点
-            painter.drawPath(path);// 绘制路径
-        } else if (iconName == "settings") {
-            // 绘制“设”图标（齿轮）
-            painter.setPen(QPen(QColor("#FFFFFF"), 2));// 白色粗轮廓线
-            painter.setBrush(Qt::transparent);         // 透明填充
-            painter.drawEllipse(4, 4, 16, 16);         // 齿轮主体
-            for (int i = 0; i < 8; ++i) {
-                qreal angle = i * M_PI / 4;// 每隔 45 度绘制一个齿
-                qreal x1 = 12 + 6 * cos(angle);
-                qreal y1 = 12 + 6 * sin(angle);
-                qreal x2 = 12 + 8 * cos(angle);
-                qreal y2 = 12 + 8 * sin(angle);
-                painter.drawLine(x1, y1, x2, y2);// 绘制齿
-            }
-        }
-
-        painter.end();
-        btn->setIcon(QIcon(icon));
     }
+    return QWidget::eventFilter(watched, event);
+}
 
-    return btn;
+void MainWidget::showScrollBars(bool show) {
+    if (sessionListWidget) {
+        sessionListWidget->setVerticalScrollBarPolicy(
+                show ? Qt::ScrollBarAsNeeded : Qt::ScrollBarAlwaysOff);
+        sessionListWidget->setHorizontalScrollBarPolicy(
+                show ? Qt::ScrollBarAsNeeded : Qt::ScrollBarAlwaysOff);
+    }
 }
 
 
 void MainWidget::setupUI() {
-    QHBoxLayout *rootLayout = new QHBoxLayout(this);
+    centralWidget = new QWidget(this);
+    rootLayout = new QHBoxLayout(centralWidget);
     rootLayout->setContentsMargins(0, 0, 0, 0);
     rootLayout->setSpacing(0);
 
     // 左侧导航栏
-    QWidget *navBar = new QWidget(this);
+    leftPanel = new QWidget(this);
+    leftPanel->setFixedWidth(340);// 修改宽度以容纳导航栏和会话内容
+    leftPanel->setStyleSheet("background: #23262E;");
+
+    leftPanelLayout = new QHBoxLayout(leftPanel);
+    leftPanelLayout->setContentsMargins(0, 0, 0, 0);
+    leftPanelLayout->setSpacing(0);
+
+    navBar = new QWidget(this);
     navBar->setFixedWidth(60);
     navBar->setStyleSheet("background: #23262E;");
 
@@ -149,30 +99,169 @@ void MainWidget::setupUI() {
     navLayout->addStretch();
 
     // 创建导航按钮
-    QToolButton *avt = createNavButton("avt", true);
-    QToolButton *chatBtn = createNavButton("chat");
-    QToolButton *contactsBtn = createNavButton("contacts");
-    QToolButton *filesBtn = createNavButton("files");
-    QToolButton *settingsBtn = createNavButton("settings");
+    LeftNavButtonCreator exportFactory;
+    auto [avt, chatBtn, contactsBtn, filesBtn, settingsBtn,infoBtn] = exportFactory.getLeftNavButtons();
 
     navLayout->addWidget(avt);
     navLayout->addWidget(chatBtn);
     navLayout->addWidget(contactsBtn);
     navLayout->addWidget(filesBtn);
     navLayout->addWidget(settingsBtn);
+    navLayout->addWidget(infoBtn);
     navLayout->addStretch();
 
-    // 左侧内容区域（包含用户信息和会话列表）
-    QWidget *leftContent = new QWidget(this);
-    leftContent->setFixedWidth(280);
-    leftContent->setStyleSheet("background: #2E323B;");
+    // 绑定每一个按钮的点击事件
+    connect(chatBtn, &QToolButton::clicked, this, &MainWidget::showChatPage);
+    connect(contactsBtn, &QToolButton::clicked, this, &MainWidget::showContactsPage);
+    connect(filesBtn, &QToolButton::clicked, this, &MainWidget::showFilesPage);
+    connect(settingsBtn, &QToolButton::clicked, this, &MainWidget::showSettingsPage);
+    connect(avt, &QToolButton::clicked, this, &MainWidget::showUserHomePage);
 
-    QVBoxLayout *leftLayout = new QVBoxLayout(leftContent);
+    // 将 navBar 添加到 leftPanel
+    leftPanelLayout->addWidget(navBar);
+
+    // 将 leftPanel 添加到 rootLayout
+    rootLayout->addWidget(leftPanel);
+
+    // 设置 centralWidget 为 QMainWindow 的中心部件
+
+    setCentralWidget(centralWidget);
+    showChatPage();
+}
+
+void MainWidget::showContactsPage() {
+    // 显示新增好友界面
+    spdlog::info("显示新增好友界面");
+
+    // 如果已经有了其他的主页面元素，隐藏起来
+    if (cachedChatPage) {
+        rootLayout->removeWidget(cachedChatPage);
+        cachedChatPage->hide();
+    }
+
+    // 隐藏 cachedLeftContent
+    if (cachedLeftContent) {
+        leftPanelLayout->removeWidget(cachedLeftContent);
+        cachedLeftContent->hide();
+    }
+
+    // 临时将 leftPanel 的宽度设置为Nav bar的宽度
+    leftPanel->setFixedWidth(navBar->width());
+
+    // 检查缓存的好友页面是否存在
+    if (cachedContactsPage) {
+        // 如果缓存存在，直接使用缓存的好友页面
+        rootLayout->addWidget(cachedContactsPage, 1);
+        cachedContactsPage->show();
+        return;
+    }
+
+    // 创建好友页面
+    QWidget *contactsPage = new QWidget(this);
+    contactsPage->setStyleSheet("background: #F5F6F7;");
+
+    QVBoxLayout *contactsLayout = new QVBoxLayout(contactsPage);
+    contactsLayout->setContentsMargins(0, 0, 0, 0);
+    contactsLayout->setSpacing(0);
+
+    // 创建添加好友的搜索框
+    QLineEdit *contactsSearchBar = new QLineEdit(contactsPage);
+    contactsSearchBar->setPlaceholderText("添加新好友...");
+    contactsSearchBar->setStyleSheet(R"(
+            QLineEdit {
+                background: #FFFFFF;
+                border: 2px solid #E0E0E0;
+                border-radius: 6px;
+                padding: 10px;
+                font-size: 14px;
+            }
+            QLineEdit:focus {
+                border-color: #00B4FF;
+            }
+        )");
+
+    // 在搜索框右侧添加一个[+]按钮,并且设置样式
+    QHBoxLayout *searchLayout = new QHBoxLayout;
+    searchLayout->setContentsMargins(0, 0, 0, 0);
+    searchLayout->setSpacing(0);
+    searchLayout->addWidget(contactsSearchBar);
+
+    QPushButton *addButton = new QPushButton("+", contactsPage);
+    addButton->setFixedSize(40, 40);
+    addButton->setStyleSheet(R"(
+            QPushButton {
+                background: #00B4FF;
+                color: white;
+                border: none;
+                border-radius: 20px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background: #0099D6;
+            }
+            QPushButton:pressed {
+                background: #0080B3;
+            }
+        )");
+    searchLayout->addWidget(addButton);
+
+    contactsLayout->addLayout(searchLayout);
+
+    // 新增的好友列表
+    QListWidget *contactsListWidget = new QListWidget(contactsPage);
+    contactsListWidget->setFrameShape(QFrame::NoFrame);
+    contactsListWidget->setVerticalScrollMode(QListWidget::ScrollPerPixel);
+
+    contactsLayout->addWidget(contactsListWidget);
+
+    // 将 contactsPage 添加到 rootLayout
+    rootLayout->addWidget(contactsPage, 1);
+
+    // 缓存联系人页面
+    cachedContactsPage = contactsPage;
+
+    // 显示会话列表
+    sessionListWidget->setVisible(true);
+}
+
+void MainWidget::showChatPage() {
+    // 显示聊天主页面
+    spdlog::info("显示聊天主页面");
+
+    // 如果已经有了其他的主页面元素，隐藏起来
+    if (cachedContactsPage) {
+        rootLayout->removeWidget(cachedContactsPage);
+        cachedContactsPage->hide();
+    }
+
+    // 恢复 leftPanel 的宽度
+    leftPanel->setFixedWidth(340);
+
+    // 检查缓存的聊天页面是否存在
+    if (cachedChatPage) {
+        // 如果缓存存在，直接使用缓存的聊天页面
+        rootLayout->addWidget(cachedChatPage, 1);
+        cachedChatPage->show();
+
+        // 确保 cachedLeftContent 存在并显示
+        if (cachedLeftContent) {
+            leftPanelLayout->addWidget(cachedLeftContent);
+            cachedLeftContent->show();
+        }
+        return;
+    }
+
+    // 初始化 cachedLeftContent
+    cachedLeftContent = new QWidget(this);
+    cachedLeftContent->setFixedWidth(280);
+    cachedLeftContent->setStyleSheet("background: #2E323B;");
+
+    QVBoxLayout *leftLayout = new QVBoxLayout(cachedLeftContent);
     leftLayout->setContentsMargins(0, 0, 0, 0);
     leftLayout->setSpacing(0);
 
     // 用户信息栏
-    QWidget *userBar = new QWidget(leftContent);
+    QWidget *userBar = new QWidget(cachedLeftContent);
     userBar->setFixedHeight(60);
     userBar->setStyleSheet("background: #23262E; border-bottom: 1px solid #3A3D45;");
 
@@ -190,28 +279,26 @@ void MainWidget::setupUI() {
     searchLogo->setText("Q");
     searchLogo->setAlignment(Qt::AlignCenter);
 
-    // 在 searchLogo 右侧添加一个可以伸缩的搜索框
-    searchBar = new QLineEdit(userBar);
-    searchBar->setStyleSheet(R"(
+    // 创建新的 searchBar
+    cachedSearchBar = new QLineEdit(userBar);
+    cachedSearchBar->setPlaceholderText("搜索联系人...");
+    cachedSearchBar->setStyleSheet(R"(
         QLineEdit {
-            background: #00B4FF;
-            border-radius: 20px;
-            color: white;
-            font-weight: bold;
-            border: none;
-            selection-background-color: #FF5733;
-            selection-color: white;
+            background: #FFFFFF;
+            border: 2px solid #E0E0E0;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 14px;
         }
         QLineEdit:focus {
-            border: 2px solid #FF5733;
-            border-radius: 20px;
+            border-color: #00B4FF;
         }
     )");
     userLayout->addWidget(searchLogo);
-    userLayout->addWidget(searchBar);
+    userLayout->addWidget(cachedSearchBar);
 
     // 会话列表
-    QListWidget *sessionListWidget = new QListWidget(leftContent);
+    sessionListWidget = new QListWidget(cachedLeftContent);
     sessionListWidget->setFrameShape(QFrame::NoFrame);
     sessionListWidget->setVerticalScrollMode(QListWidget::ScrollPerPixel);
 
@@ -220,9 +307,8 @@ void MainWidget::setupUI() {
     leftLayout->addWidget(userBar);
     leftLayout->addWidget(sessionListWidget);
 
-    // 将导航栏和内容区域添加到主布局
-    rootLayout->addWidget(navBar);
-    rootLayout->addWidget(leftContent);
+    // 将 cachedLeftContent 添加到 leftPanel
+    leftPanelLayout->addWidget(cachedLeftContent);
 
     // 右侧主区域
     QWidget *rightPanel = new QWidget(this);
@@ -250,13 +336,13 @@ void MainWidget::setupUI() {
 
     // 输入区域
     inputPanel = new QWidget(splitter);
-    inputPanel->setMinimumHeight(120);// 设置最小高度
+    inputPanel->setMinimumHeight(80); // 设置最小高度
     inputPanel->setMaximumHeight(300);// 设置最大高度
-
     // 初始化 inputPanel 的初始高度
     QList<int> splitterSizes;
     splitterSizes << 430 << 120;// 聊天区 430px，输入区 120px
     splitter->setSizes(splitterSizes);
+
 
     QVBoxLayout *inputLayout = new QVBoxLayout(inputPanel);
     inputLayout->setContentsMargins(12, 12, 12, 12);
@@ -278,7 +364,7 @@ void MainWidget::setupUI() {
         QString message = messageInput->toPlainText();
         if (!message.isEmpty()) {
             messageInput->clear();
-            addMessasge("wyw", "我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
+            addMessage("wyw", "我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
         }
     });
 
@@ -292,20 +378,31 @@ void MainWidget::setupUI() {
 
     rightLayout->addWidget(splitter);
 
+    // 将 rightPanel 添加到 rootLayout
     rootLayout->addWidget(rightPanel, 1);
 
+    // 缓存聊天页面
+    cachedChatPage = rightPanel;
+
     // 绑定搜索框的回调
-    connect(searchBar, &QLineEdit::textChanged, this, &MainWidget::querySearchBar);
+    connect(cachedSearchBar, &QLineEdit::textChanged, this, &MainWidget::querySearchBar);
 
     // 初始化 SessionManager
     sessionManager = new SessionManager(sessionListWidget);
-}
 
+    // 显示会话列表
+    sessionListWidget->setVisible(true);
+}
 
 void MainWidget::onSessionItemClicked(QListWidgetItem *item) {
     QString sessionName = item->data(Qt::UserRole).toString();
     if (sessionName.isEmpty()) {
         sessionName = item->text();
+    }
+
+    //如果此时当前主页面为contactsPage，则切换回chatPage
+    if (cachedChatPage) {
+        showChatPage();
     }
     // 更新会话
     _currentSessionName = sessionName;
@@ -350,7 +447,7 @@ void MainWidget::onSessionItemClicked(QListWidgetItem *item) {
         QString message = messageInput->toPlainText();
         if (!message.isEmpty()) {
             messageInput->clear();
-            addMessasge("wyw", "我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
+            addMessage("wyw", "我", QTime::currentTime().toString("hh:mm"), message, MessageType::Self);
         }
     });
 }
@@ -498,7 +595,8 @@ void MainWidget::onLoginSuccess() {
     QTimer::singleShot(300, this, &QWidget::show);// 延迟300ms显示主窗口
 }
 
-void MainWidget::addMessasge(const QString &session_name, const QString &sender, const QString &time, const QString &content, MessageType type) {
+void MainWidget::addMessage(const QString &session_name, const QString &sender, const QString &time,
+                            const QString &content, MessageType type) {
     // 自动换行处理
     QFontMetrics fm(QFont("Microsoft YaHei", 12));
     int maxWidth = 600;// 最大宽度限制
@@ -548,165 +646,143 @@ void MainWidget::addMessasge(const QString &session_name, const QString &sender,
 }
 
 void MainWidget::querySearchBar() {
-    // 在session里面搜索会话名称和聊天记录(//todo)
+    QString searchText = cachedSearchBar->text();
+    if (searchText.isEmpty()) {
+        // 如果搜索文本为空，显示所有会话
+        for (QListWidgetItem *item: sessionListWidget->findItems("", Qt::MatchContains)) {
+            item->setHidden(false);
+        }
+    } else {
+        // 隐藏所有会话
+        for (QListWidgetItem *item: sessionListWidget->findItems("", Qt::MatchContains)) {
+            item->setHidden(true);
+        }
+        // 显示匹配的会话
+        for (int i = 0; i < sessionListWidget->count(); ++i) {
+            QListWidgetItem *item = sessionListWidget->item(i);
+            QString sessionName = item->data(Qt::UserRole).toString();
+            if (sessionName.contains(searchText, Qt::CaseInsensitive)) {
+                item->setHidden(false);
+            }
+        }
+    }
 }
 
-
-void MainWidget::clearUnreaded() {
-}
-
-// 添加时间分割线
-[[maybe_unused]]
-void MainWidget::addTimeDivider(const QString &timeText) {
-    QString divider = QStringLiteral(
-                              "<div style='margin: 20px auto; text-align: center;'>"
-                              "<div style='display: inline-block; padding: 4px 12px; background: #E0E0E0; border-radius: 12px;"
-                              "color: #666; font-size: 12px;'>"
-                              "%1"
-                              "</div>"
-                              "</div>")
-                              .arg(timeText);
-
-    //chatArea->append(divider);
-}
-
-QString MainWidget::getCurrentSessionName() const {
+const QString MainWidget::getCurrentSessionName() const {
     return _currentSessionName;
 }
 
+void MainWidget::showFilesPage() {
+    // 显示文件管理界面
+    spdlog::info("显示文件管理界面");
+
+    // 创建文件管理界面的 QWidget
+    QWidget *filesPage = new QWidget(this);
+    QVBoxLayout *filesLayout = new QVBoxLayout(filesPage);
+    filesLayout->addWidget(new QLabel("文件管理界面内容", this));
+    filesPage->setLayout(filesLayout);
+
+    // 创建新的窗口
+    QMainWindow *filesWindow = new QMainWindow(this);
+    filesWindow->setCentralWidget(filesPage);
+    filesWindow->setWindowTitle("文件管理");
+    filesWindow->show();
+}
+
+void MainWidget::showSettingsPage() {
+    // 显示设置界面
+    spdlog::info("显示设置界面");
+
+    // 创建设置界面的 QWidget
+    QWidget *settingsPage = new QWidget(this);
+    QVBoxLayout *settingsLayout = new QVBoxLayout(settingsPage);
+    settingsLayout->addWidget(new QLabel("设置界面内容", this));
+    settingsPage->setLayout(settingsLayout);
+
+    // 创建新的窗口
+    QMainWindow *settingsWindow = new QMainWindow(this);
+    settingsWindow->setCentralWidget(settingsPage);
+    settingsWindow->setWindowTitle("设置");
+    settingsWindow->show();
+}
+
+void MainWidget::showUserHomePage() {
+    // 显示用户主页
+    spdlog::info("显示用户主页");
+    // 创建用户主页的 QWidget
+    QWidget *userHomePage = new QWidget(this);
+    QVBoxLayout *userHomeLayout = new QVBoxLayout(userHomePage);
+    userHomeLayout->addWidget(new QLabel("用户主页内容", this));
+    userHomePage->setLayout(userHomeLayout);
+
+    // 创建新的窗口
+    QMainWindow *userHomeWindow = new QMainWindow(this);
+    userHomeWindow->setCentralWidget(userHomePage);
+    userHomeWindow->setWindowTitle("用户主页");
+    userHomeWindow->show();
+}
+
+
+//---------------------------------测试区域-------------------------------------------------//
+inline static QString getRandomTime() {
+    int hour = QRandomGenerator::global()->bounded(0, 24);
+    int minute = QRandomGenerator::global()->bounded(0, 60);
+    return QString("%1:%2").arg(hour, 2, 10, QLatin1Char('0')).arg(minute, 2, 10, QLatin1Char('0'));
+}
+
+inline static int getRandomUnreadCount() {
+    return QRandomGenerator::global()->bounded(0, 100);
+}
+
+void MainWidget::startTestMessagePush() {
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, [this]() {
+        // 获取当前激活的会话名称
+        QString sessionName = getCurrentSessionName();
+        if (sessionName.isEmpty()) {
+            qWarning() << "No active session selected!";
+            return;
+        }
+
+        // 随机生成发送者和内容
+        QString sender = QRandomGenerator::global()->bounded(0, 2) ? "我" : "系统通知";
+        QString content = QString("动态消息%1").arg(QRandomGenerator::global()->bounded(1, 100));
+        QString time = getRandomTime();
+
+        // 添加消息到当前会话
+        addMessage(sessionName, sender, time, content,
+                   sender == "系统通知" ? MessageType::System : MessageType::Other);
+
+        // 更新聊天区域
+        updateChatArea(sessionName);
+    });
+    timer->start(5000);// 每5秒推送一条消息
+}
+
 void MainWidget::insertTestCase() {
-    // 添加测试数据
-    addSessionItem({.name = "wyw", .lastMessage = "宝宝你是一个宝宝", .lastTime = "22:30", .unreadCount = 99});
-    addSessionItem({.name = "现代C++卢瑟群", .lastMessage = "感觉不如Rust", .lastTime = "22:31", .unreadCount = 5});
-    addSessionItem({.name = "Alice", .lastMessage = "你好，世界", .lastTime = "22:32", .unreadCount = 3});
-    addSessionItem({.name = "Bob", .lastMessage = "明天会更好", .lastTime = "22:33", .unreadCount = 0});
-    addSessionItem({.name = "Charlie", .lastMessage = "一起吃饭吧", .lastTime = "22:34", .unreadCount = 2});
-    addSessionItem({.name = "David", .lastMessage = "周末一起玩吧", .lastTime = "22:35", .unreadCount = 1});
-    addSessionItem({.name = "Eve", .lastMessage = "学习新东西", .lastTime = "22:36", .unreadCount = 4});
-    addSessionItem({.name = "Frank", .lastMessage = "看电影", .lastTime = "22:37", .unreadCount = 6});
-    addSessionItem({.name = "Grace", .lastMessage = "旅行计划", .lastTime = "22:38", .unreadCount = 7});
-    addSessionItem({.name = "Hannah", .lastMessage = "生日快乐", .lastTime = "22:39", .unreadCount = 8});
+    // 添加测试会话
+    QStringList names = {"wyw", "现代C++卢瑟群", "Alice", "Bob", "Charlie", "David", "Eve", "Frank", "Grace", "Hannah"};
+    QStringList lastMessages = {"宝宝你是一个宝宝", "感觉不如Rust", "你好，世界", "明天会更好", "一起吃饭吧",
+                                "周末一起玩吧", "学习新东西", "看电影", "旅行计划", "生日快乐"};
+
+    for (int i = 0; i < names.size(); ++i) {
+        addSessionItem({.name = names[i], .lastMessage = lastMessages[i], .lastTime = getRandomTime(), .unreadCount = getRandomUnreadCount()});
+    }
 
     // 添加测试消息
-    addMessasge("wyw", "系统通知", "09:00", "聊天系统初始化完成", MessageType::System);
-    addMessasge("wyw", "wyw", "09:00", "宝宝在吗", MessageType::Self);
-    addMessasge("wyw", "我", "09:00", "宝宝我爱你哦！", MessageType::Other);
-    addMessasge("wyw", "系统通知", "09:01", "新消息提醒", MessageType::System);
-    addMessasge("wyw", "wyw", "09:02", "宝宝，吃饭了吗？", MessageType::Self);
-    addMessasge("wyw", "我", "09:03", "吃了，你呢？", MessageType::Other);
-    addMessasge("wyw", "系统通知", "09:04", "新消息提醒", MessageType::System);
-    addMessasge("wyw", "wyw", "09:05", "明天一起去公园吧", MessageType::Self);
-    addMessasge("wyw", "我", "09:06", "好啊，明天见", MessageType::Other);
-    addMessasge("wyw", "系统通知", "09:07", "新消息提醒", MessageType::System);
+    QMap<QString, QList<QPair<QString, QString>>> testMessages = {
+            {"wyw", {{"系统通知", "聊天系统初始化完成"}, {"wyw", "宝宝在吗"}, {"我", "宝宝我爱你哦！"}}},
+            {"现代C++卢瑟群", {{"国王", "我觉得Rust还是太loser了"}, {"群友1", "国王说得对"}}}};
 
-    addMessasge("现代C++卢瑟群", "国王", "10:21", "我觉得Rust还是太loser了", MessageType::Other);
-    addMessasge("现代C++卢瑟群", "群友1", "10:21", "国王说得对", MessageType::Other);
-    addMessasge("现代C++卢瑟群", "群友2", "10:22", "国王说得对", MessageType::Other);
-    addMessasge("现代C++卢瑟群", "我", "10:23", "国王说得对", MessageType::Other);
-    addMessasge("现代C++卢瑟群", "系统通知", "10:23", "群友1被国王禁言十分钟", MessageType::System);
-    addMessasge("现代C++卢瑟群", "国王", "10:24", "今天天气真好", MessageType::Other);
-    addMessasge("现代C++卢瑟群", "群友1", "10:25", "是啊，出去走走吧", MessageType::Other);
-    addMessasge("现代C++卢瑟群", "群友2", "10:26", "好主意", MessageType::Other);
-    addMessasge("现代C++卢瑟群", "我", "10:27", "一起吧", MessageType::Other);
-    addMessasge("现代C++卢瑟群", "系统通知", "10:28", "群友2退出群聊", MessageType::System);
+    for (auto it = testMessages.begin(); it != testMessages.end(); ++it) {
+        const QString &sessionName = it.key();
+        for (const auto &[sender, content]: it.value()) {
+            addMessage(sessionName, sender, getRandomTime(), content,
+                       sender == "系统通知" ? MessageType::System : MessageType::Other);
+        }
+    }
 
-    addMessasge("Alice", "Alice", "11:00", "你好，Bob", MessageType::Self);
-    addMessasge("Alice", "Bob", "11:01", "你在干嘛呢？", MessageType::Other);
-    addMessasge("Alice", "Alice", "11:02", "我在看书", MessageType::Self);
-    addMessasge("Alice", "Bob", "11:03", "一起去看书吧", MessageType::Other);
-    addMessasge("Alice", "Alice", "11:04", "好啊", MessageType::Self);
-    addMessasge("Alice", "Bob", "11:05", "这本书不错", MessageType::Other);
-    addMessasge("Alice", "Alice", "11:06", "是啊，推荐一下", MessageType::Self);
-    addMessasge("Alice", "Bob", "11:07", "下次再聊", MessageType::Other);
-    addMessasge("Alice", "Alice", "11:08", "好的", MessageType::Self);
-    addMessasge("Alice", "Bob", "11:09", "明天见", MessageType::Other);
-
-    addMessasge("Bob", "Bob", "11:05", "好的，明天见", MessageType::Self);
-    addMessasge("Bob", "Alice", "11:06", "明天一起吃饭吧", MessageType::Other);
-    addMessasge("Bob", "Alice", "11:07", "这本书不错", MessageType::Other);
-    addMessasge("Bob", "Alice", "11:08", "是啊，推荐一下", MessageType::Other);
-    addMessasge("Bob", "Alice", "11:09", "下次再聊", MessageType::Other);
-    addMessasge("Bob", "Alice", "11:10", "好的", MessageType::Self);
-    addMessasge("Bob", "Alice", "11:11", "明天见", MessageType::Other);
-    addMessasge("Bob", "Alice", "11:12", "一起吃饭吧", MessageType::Other);
-    addMessasge("Bob", "Alice", "11:13", "好啊", MessageType::Self);
-    addMessasge("Bob", "Alice", "11:14", "这本书不错", MessageType::Other);
-
-    addMessasge("Charlie", "Charlie", "11:10", "晚上一起吃饭吧", MessageType::Self);
-    addMessasge("Charlie", "Alice", "11:11", "Alice，你呢？", MessageType::Other);
-    addMessasge("Charlie", "Bob", "11:12", "Bob，你呢？", MessageType::Other);
-    addMessasge("Charlie", "Alice", "11:13", "好啊", MessageType::Self);
-    addMessasge("Charlie", "Bob", "11:14", "好啊", MessageType::Self);
-    addMessasge("Charlie", "Alice", "11:15", "这本书不错", MessageType::Other);
-    addMessasge("Charlie", "Bob", "11:16", "是啊，推荐一下", MessageType::Other);
-    addMessasge("Charlie", "Alice", "11:17", "下次再聊", MessageType::Other);
-    addMessasge("Charlie", "Bob", "11:18", "好的", MessageType::Self);
-    addMessasge("Charlie", "Alice", "11:19", "明天见", MessageType::Other);
-
-    addMessasge("David", "David", "11:20", "周末一起玩吧", MessageType::Self);
-    addMessasge("David", "Alice", "11:21", "Alice，你呢？", MessageType::Other);
-    addMessasge("David", "Bob", "11:22", "Bob，你呢？", MessageType::Other);
-    addMessasge("David", "Alice", "11:23", "好啊", MessageType::Self);
-    addMessasge("David", "Bob", "11:24", "好啊", MessageType::Self);
-    addMessasge("David", "Alice", "11:25", "这本书不错", MessageType::Other);
-    addMessasge("David", "Bob", "11:26", "是啊，推荐一下", MessageType::Other);
-    addMessasge("David", "Alice", "11:27", "下次再聊", MessageType::Other);
-    addMessasge("David", "Bob", "11:28", "好的", MessageType::Self);
-    addMessasge("David", "Alice", "11:29", "明天见", MessageType::Other);
-
-    addMessasge("Eve", "Eve", "11:30", "学习新东西", MessageType::Self);
-    addMessasge("Eve", "Alice", "11:31", "Alice，你呢？", MessageType::Other);
-    addMessasge("Eve", "Bob", "11:32", "Bob，你呢？", MessageType::Other);
-    addMessasge("Eve", "Alice", "11:33", "好啊", MessageType::Self);
-    addMessasge("Eve", "Bob", "11:34", "好啊", MessageType::Self);
-    addMessasge("Eve", "Alice", "11:35", "这本书不错", MessageType::Other);
-    addMessasge("Eve", "Bob", "11:36", "是啊，推荐一下", MessageType::Other);
-    addMessasge("Eve", "Alice", "11:37", "下次再聊", MessageType::Other);
-    addMessasge("Eve", "Bob", "11:38", "好的", MessageType::Self);
-    addMessasge("Eve", "Alice", "11:39", "明天见", MessageType::Other);
-
-    addMessasge("Frank", "Frank", "11:40", "看电影", MessageType::Self);
-    addMessasge("Frank", "Alice", "11:41", "Alice，你呢？", MessageType::Other);
-    addMessasge("Frank", "Bob", "11:42", "Bob，你呢？", MessageType::Other);
-    addMessasge("Frank", "Alice", "11:43", "好啊", MessageType::Self);
-    addMessasge("Frank", "Bob", "11:44", "好啊", MessageType::Self);
-    addMessasge("Frank", "Alice", "11:45", "这本书不错", MessageType::Other);
-    addMessasge("Frank", "Bob", "11:46", "是啊，推荐一下", MessageType::Other);
-    addMessasge("Frank", "Alice", "11:47", "下次再聊", MessageType::Other);
-    addMessasge("Frank", "Bob", "11:48", "好的", MessageType::Self);
-    addMessasge("Frank", "Alice", "11:49", "明天见", MessageType::Other);
-
-    addMessasge("Grace", "Grace", "11:50", "旅行计划", MessageType::Self);
-    addMessasge("Grace", "Alice", "11:51", "Alice，你呢？", MessageType::Other);
-    addMessasge("Grace", "Bob", "11:52", "Bob，你呢？", MessageType::Other);
-    addMessasge("Grace", "Alice", "11:53", "好啊", MessageType::Self);
-    addMessasge("Grace", "Bob", "11:54", "好啊", MessageType::Self);
-    addMessasge("Grace", "Alice", "11:55", "这本书不错", MessageType::Other);
-    addMessasge("Grace", "Bob", "11:56", "是啊，推荐一下", MessageType::Other);
-    addMessasge("Grace", "Alice", "11:57", "下次再聊", MessageType::Other);
-    addMessasge("Grace", "Bob", "11:58", "好的", MessageType::Self);
-    addMessasge("Grace", "Alice", "11:59", "明天见", MessageType::Other);
-
-    addMessasge("Hannah", "Hannah", "12:00", "生日快乐", MessageType::Self);
-    addMessasge("Hannah", "Alice", "12:01", "Alice，你呢？", MessageType::Other);
-    addMessasge("Hannah", "Bob", "12:02", "Bob，你呢？", MessageType::Other);
-    addMessasge("Hannah", "Alice", "12:03", "好啊", MessageType::Self);
-    addMessasge("Hannah", "Bob", "12:04", "好啊", MessageType::Self);
-    addMessasge("Hannah", "Alice", "12:05", "这本书不错", MessageType::Other);
-    addMessasge("Hannah", "Bob", "12:06", "是啊，推荐一下", MessageType::Other);
-    addMessasge("Hannah", "Alice", "12:07", "下次再聊", MessageType::Other);
-    addMessasge("Hannah", "Bob", "12:08", "好的", MessageType::Self);
-    addMessasge("Hannah", "Alice", "12:09", "明天见", MessageType::Other);
-
-    // 暂时清理掉所有的测试数据,保证在我们没有选择任何会话的时候页面是空的
-    updateChatArea("wyw");
-    updateChatArea("现代C++卢瑟群");
-    updateChatArea("Alice");
-    updateChatArea("Bob");
-    updateChatArea("Charlie");
-    updateChatArea("David");
-    updateChatArea("Eve");
-    updateChatArea("Frank");
-    updateChatArea("Grace");
-    updateChatArea("Hannah");
+    // 启动动态消息推送
+    startTestMessagePush();
 }
+//---------------------------------测试区域-------------------------------------------------//

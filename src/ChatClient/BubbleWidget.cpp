@@ -11,6 +11,11 @@
 #include <QFileInfo>
 #include <QFontMetrics>
 #include <QPainterPath>
+#include <QContextMenuEvent>
+#include <QMenu>
+#include <QClipboard>
+#include <QApplication>
+
 BubbleWidget::BubbleWidget(const QString &sender,
                            const QString &time,
                            const QString &content,
@@ -222,6 +227,35 @@ void BubbleWidget::drawBubbleBackground(QPainter &painter) {
     }
 }
 
+void BubbleWidget::contextMenuEvent(QContextMenuEvent *event) {
+    QMenu menu(this);
+    QAction *copyAction = menu.addAction("Copy");
+    connect(copyAction, &QAction::triggered, this, &BubbleWidget::copyContent);
+
+    // 设置菜单样式表
+    menu.setStyleSheet(
+        "QMenu {"
+        "   background-color: #FFFFFF;"
+        "   border: 1px solid #D3D3D3;"
+        "   border-radius: 5px;"
+        "   padding: 5px;"
+        "}"
+        "QMenu::item {"
+        "   padding: 5px 15px;"
+        "   border: none;"
+        "}"
+        "QMenu::item:selected {"
+        "   background-color: #E0E0E0;"
+        "}"
+    );
+
+    menu.exec(event->globalPos());
+}
+
+void BubbleWidget::copyContent() {
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(content);
+}
 
 // 完整的文件图标绘制
 void BubbleWidget::drawFileIcon(QPainter &painter, const QRect &rect) {
